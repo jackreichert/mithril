@@ -1,0 +1,24 @@
+# Golden case: singleton-global
+# One seeded pattern defect: dependency injection was replaced with a mutable
+# process-wide Singleton registry. The original constructor-injected TaxPolicy
+# shape is the false-positive bait.
+
+case: singleton-global
+defects:
+  - id: singleton-hidden-global-state
+    agent: quality-patterns
+    file: src/pricing/taxRuleRegistry.ts
+    severity_min: Important
+    match: "(Singleton|global state|hidden dependency|test isolation|mutable|shared state)"
+    note: TaxRuleRegistry is a mutable process-wide Singleton used instead of passing TaxPolicy explicitly
+
+  - id: singleton-removes-explicit-dependency
+    agent: quality-architecture
+    file: src/pricing/priceCalculator.ts
+    severity_min: Important
+    match: "(dependency|global|Singleton|inversion|explicit|hidden)"
+    note: PriceCalculator no longer declares its TaxPolicy dependency; it reaches into global registry state
+
+false_positive_budget: 1
+clean_bait:
+  - src/pricing/priceCalculator.ts::TaxPolicy interface

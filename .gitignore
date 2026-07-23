@@ -1,0 +1,11 @@
+# Locally created by `install.sh --link` / `--copilot` — per-machine, personalized,
+# and never committed: the Copilot/VS Code instructions symlink, the self-contained
+# copilot-instructions.md, and the personalized CONSTITUTION.local.md (the deployed
+# copy carrying your greeting name; canonical CONSTITUTION.md keeps __USER_NAME__).
+instructions/
+
+# Installer backups
+*.bak.*
+
+# Deep-mode review reports (written by `/quality deep` — per-run, not source)
+.quality/

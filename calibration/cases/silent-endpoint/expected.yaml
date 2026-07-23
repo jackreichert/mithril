@@ -1,0 +1,16 @@
+# Golden case: silent-endpoint
+# One observability defect on refundOrder; getOrder + healthz are clean bait.
+
+case: silent-endpoint
+defects:
+  - id: silent-refund-no-telemetry
+    agent: quality-observability
+    file: src/api/orders.ts
+    severity_min: Critical
+    match: "(metric|log|trace|telemetry|golden signal|observab|request_id|silent|no (metrics|logging))"
+    note: refundOrder is a user-facing money path with no metrics, logs, or trace/request id
+
+false_positive_budget: 1
+clean_bait:
+  - src/api/orders.ts::getOrder
+  - src/api/health.ts::healthz

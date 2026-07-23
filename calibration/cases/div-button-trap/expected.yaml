@@ -1,0 +1,22 @@
+# Golden case: div-button-trap
+# Two a11y defects in ConfirmDeleteModal; LoginForm is clean bait.
+
+case: div-button-trap
+defects:
+  - id: div-as-button
+    agent: quality-accessibility
+    file: src/ui/ConfirmDeleteModal.tsx
+    severity_min: Critical
+    match: "(button|role|keyboard|tabIndex|accessible name|div.*click|WCAG|2\\.1\\.1|4\\.1\\.2)"
+    note: Delete/Cancel are div+onClick without button semantics or keyboard support
+
+  - id: modal-no-escape-focus
+    agent: quality-accessibility
+    file: src/ui/ConfirmDeleteModal.tsx
+    severity_min: Important
+    match: "(Escape|focus|modal|trap|keyboard|dialog|aria-modal)"
+    note: modal has no Escape-to-close, no focus management, no dialog semantics
+
+false_positive_budget: 1
+clean_bait:
+  - src/ui/LoginForm.tsx

@@ -1,0 +1,24 @@
+# Golden case: missing-timeout
+# Two seeded distributed-systems defects in the new capture_payment; the
+# pre-existing get_payment_status (bounded timeout, idempotent GET) is the
+# false-positive bait.
+
+case: missing-timeout
+defects:
+  - id: post-without-timeout
+    agent: quality-distributed   # quality-flow should also catch on the path
+    file: src/payments/gatewayClient.py
+    severity_min: Important
+    match: "(timeout|hang|block.*forever|unbounded)"
+    note: requests.post has no timeout kwarg — and requests has no default
+
+  - id: retry-non-idempotent-capture
+    agent: quality-distributed
+    file: src/payments/gatewayClient.py
+    severity_min: Critical
+    match: "(idempoten|double.charg|retry.*executed|at.least.once|duplicate)"
+    note: retry loop around a money-moving POST with no idempotency key — a timeout is ambiguity, not failure
+
+false_positive_budget: 1
+clean_bait:
+  - src/payments/gatewayClient.py::get_payment_status

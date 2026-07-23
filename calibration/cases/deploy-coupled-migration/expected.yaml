@@ -1,0 +1,18 @@
+# Golden case: deploy-coupled-migration
+# One seeded defect: an in-place column rename shipped in the same deploy as
+# the code that needs it — the previous release breaks the moment the
+# migration runs (no expand phase, no dual-read window, no deferred contract).
+# The untouched 001_init.sql is baseline; flagging it is a false positive.
+
+case: deploy-coupled-migration
+defects:
+  - id: rename-in-place-breaks-previous-release
+    agent: quality-delivery   # quality-persistence may also flag under Theme 14/16 overlap
+    file: migrations/002_rename_full_name.sql
+    severity_min: Critical
+    match: "(expand.contract|rename|previous release|backward|zero.downtime|dual)"
+    note: correct fix is expand (add display_name, backfill, dual-read) now, contract (drop full_name) a release later
+
+false_positive_budget: 1
+clean_bait:
+  - migrations/001_init.sql (pre-existing baseline)

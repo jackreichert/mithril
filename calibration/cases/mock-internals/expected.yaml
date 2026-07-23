@@ -1,0 +1,24 @@
+# Golden case: mock-internals
+# Two seeded test-quality defects in the NEW pricingInternals.test.ts; the
+# pre-existing behavior-level pricing.test.ts (real fake at the boundary,
+# state-based assertion) is the false-positive bait.
+
+case: mock-internals
+defects:
+  - id: spy-on-private-method
+    agent: quality-test-quality
+    file: src/orders/pricingInternals.test.ts
+    severity_min: Important
+    match: "(implementation|internal|private|resistance to refactor|behavior|brittle)"
+    note: spies on the SUT's own private applyPercent and asserts the call — Khorikov pillar 2 = 0
+
+  - id: sleep-based-async-wait
+    agent: quality-test-quality
+    file: src/orders/pricingInternals.test.ts
+    severity_min: Important
+    match: "(sleep|setTimeout|flak|non.determin|await the promise|race)"
+    note: fire-then-sleep instead of awaiting the promise — timing-dependent and slow
+
+false_positive_budget: 1
+clean_bait:
+  - src/orders/pricing.test.ts (behavior-level, state-based, boundary fake)

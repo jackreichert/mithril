@@ -1,0 +1,26 @@
+# Golden case: n-plus-one
+# Two seeded defects; the batched invoicesWithItems path is the false-positive
+# bait (clean — flagging it at Critical/Important is a false positive).
+# The `version` field on Invoice exists and is unused — the hint the lost-update
+# fix should reach for.
+
+case: n-plus-one
+defects:
+  - id: n-plus-one-monthly-statement
+    agent: quality-persistence   # quality-flow should also catch it across files
+    file: src/billing/invoiceService.ts
+    severity_min: Important
+    match: "(N\\+1|query.*loop|per.?invoice quer|batch)"
+    note: monthlyStatement loops invoices calling findItemsByInvoice per iteration; fix is the existing findItemsByInvoiceIds
+
+  - id: lost-update-save-notes
+    agent: quality-persistence
+    file: src/billing/invoiceRepo.ts
+    severity_min: Important
+    match: "(lost update|optimistic|version|stale|concurrent edit)"
+    note: saveNotes writes blind across user think-time; Invoice.version exists but is never checked
+
+false_positive_budget: 1
+clean_bait:
+  - src/billing/invoiceService.ts::invoicesWithItems
+  - src/billing/invoiceRepo.ts::findItemsByInvoiceIds

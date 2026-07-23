@@ -1,0 +1,25 @@
+# Golden case: shallow-module-pile
+# One seeded design defect: a direct function call was wrapped in three shallow
+# pass-through classes whose names imply layers but add no policy, abstraction,
+# validation, or isolation. The unchanged buildMonthlyReport function is the
+# false-positive bait.
+
+case: shallow-module-pile
+defects:
+  - id: shallow-pass-through-layers
+    agent: quality-architecture
+    file: src/reports/reportController.ts
+    severity_min: Important
+    match: "(shallow|pass.?through|indirection|layer|no.*abstraction|ceremony)"
+    note: ReportController -> ReportRequestMapper -> ReportApplicationService only forwards data to buildMonthlyReport
+
+  - id: shallow-wrapper-classes
+    agent: quality-code-quality
+    file: src/reports/reportApplicationService.ts
+    severity_min: Important
+    match: "(shallow|wrapper|pass.?through|middle.?man|ceremony|complexity)"
+    note: ReportApplicationService adds a class and method that simply delegates to the existing function
+
+false_positive_budget: 1
+clean_bait:
+  - src/reports/monthlyReport.ts::buildMonthlyReport

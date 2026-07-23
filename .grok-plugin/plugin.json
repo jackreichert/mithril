@@ -1,0 +1,32 @@
+{
+  "name": "code-quality",
+  "description": "The canonical CS literature distilled into agent-executable review form: the /quality orchestrator plus 18 specialist review agents (code quality, architecture, concurrency, refactoring, tests, security, delivery, distributed, patterns, persistence, performance, observability, accessibility, gates, specification, flow, process, review), each grounded in a cited knowledge base of books, papers, and standards.",
+  "version": "1.1.0",
+  "author": {
+    "name": "Jack Reichert"
+  },
+  "homepage": "https://github.com/jackreichert/code-quality-agents",
+  "commands": [
+    "./claude/commands/quality.md"
+  ],
+  "agents": [
+    "./claude/agents/quality-accessibility.md",
+    "./claude/agents/quality-architecture.md",
+    "./claude/agents/quality-code-quality.md",
+    "./claude/agents/quality-concurrency.md",
+    "./claude/agents/quality-delivery.md",
+    "./claude/agents/quality-distributed.md",
+    "./claude/agents/quality-flow.md",
+    "./claude/agents/quality-gates.md",
+    "./claude/agents/quality-observability.md",
+    "./claude/agents/quality-patterns.md",
+    "./claude/agents/quality-performance.md",
+    "./claude/agents/quality-persistence.md",
+    "./claude/agents/quality-process.md",
+    "./claude/agents/quality-refactor.md",
+    "./claude/agents/quality-review.md",
+    "./claude/agents/quality-security-review.md",
+    "./claude/agents/quality-specification.md",
+    "./claude/agents/quality-test-quality.md"
+  ]
+}

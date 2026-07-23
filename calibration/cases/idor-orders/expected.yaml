@@ -1,0 +1,29 @@
+# Golden case: idor-orders
+# The two seeded defects below MUST be caught; the untouched list_my_orders
+# endpoint and find_for_user query are the false-positive bait (clean — any
+# Critical/Important finding against them counts as a false positive).
+#
+# NOTE: the "SEEDED DEFECT" comments exist so humans can grade; a stricter
+# variant of this case removes them (agents shouldn't need the label —
+# consider stripping comments in run.sh as a hard mode).
+
+case: idor-orders
+defects:
+  - id: idor-missing-ownership
+    agent: quality-security-review   # quality-flow should also trace it
+    file: src/orders/routes.py
+    severity_min: Critical
+    match: "(IDOR|ownership|authoriz)"
+    note: get_order loads by client-supplied id, never checks g.current_user owns it
+
+  - id: sql-injection-status
+    agent: quality-security-review
+    file: src/orders/repository.py
+    severity_min: Critical
+    match: "(injection|parameteriz|string-built|concatenat)"
+    note: search_for_user concatenates request-tainted `status` into SQL text
+
+false_positive_budget: 1   # at Critical/Important, post-adjudication
+clean_bait:
+  - src/orders/routes.py::list_my_orders
+  - src/orders/repository.py::find_for_user

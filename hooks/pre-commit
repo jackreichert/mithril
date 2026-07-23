@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+#
+# Code Quality Skills — opt-in pre-commit gate
+#
+# Runs the FAST subset of the quality gates (lint + cyclomatic complexity)
+# against staged source files and blocks the commit on a real violation.
+# Coverage and mutation are deliberately excluded — too slow for a commit
+# hook; run those via `/quality gates` or in CI.
+#
+# Philosophy: enforce, don't just advise. See CONSTITUTION.md Article VII.
+#
+# This hook is OPT-IN. It is never installed automatically. To enable it
+# in a repo, from that repo's root:
+#
+#   ln -s /absolute/path/to/Code-Quality-Skills/hooks/pre-commit \
+#         .git/hooks/pre-commit
+#
+# (or copy it). See hooks/README.md for details and per-tool install hints.
+#
+# Escape hatches:
+#   git commit --no-verify      # bypass all hooks (native git)
+#   QUALITY_GATES_SKIP=1 git commit ...   # bypass just this gate
+#
+# Threshold overrides (env):
+#   QG_COMPLEXITY_MAX   hard cap, default 15
+#
+# A missing tool is SKIPPED with an install hint, never a failure — the
+# hook blocks only on actual violations of an available tool.
+
+set -euo pipefail
+
+if [[ "${QUALITY_GATES_SKIP:-0}" == "1" ]]; then
+  echo "quality-gates: skipped (QUALITY_GATES_SKIP=1)"
+  exit 0
+fi
+
+COMPLEXITY_MAX="${QG_COMPLEXITY_MAX:-15}"
+
+# Staged, added/copied/modified source files only.
+staged="$(git diff --cached --name-only --diff-filter=ACM)"
+[[ -z "$staged" ]] && exit 0
+
+# Partition staged files by language (whitespace-safe enough for paths
+# without newlines; git rejects newlines in paths by default).
+js_files=(); py_files=(); go_files=(); rb_files=(); rs_files=()
+all_src=()
+while IFS= read -r f; do
+  [[ -f "$f" ]] || continue
+  case "$f" in
+    *.js|*.jsx|*.ts|*.tsx) js_files+=("$f"); all_src+=("$f");;
+    *.py)                  py_files+=("$f"); all_src+=("$f");;
+    *.go)                  go_files+=("$f"); all_src+=("$f");;
+    *.rb)                  rb_files+=("$f"); all_src+=("$f");;
+    *.rs)                  rs_files+=("$f"); all_src+=("$f");;
+  esac
+done <<< "$staged"
+
+[[ ${#all_src[@]} -eq 0 ]] && exit 0
+
+fail=0
+have() { command -v "$1" >/dev/null 2>&1; }
+skip() { printf '  · %-12s SKIPPED — %s\n' "$1" "$2"; }
+bad()  { printf '  ✗ %-12s %s\n' "$1" "$2"; fail=1; }
+ok()   { printf '  ✓ %-12s %s\n' "$1" "$2"; }
+
+echo "quality-gates: checking ${#all_src[@]} staged source file(s)…"
+
+# ── Gate 1: Lint (zero errors) ──────────────────────────────────────────
+if [[ ${#js_files[@]} -gt 0 ]]; then
+  if have eslint; then
+    if eslint "${js_files[@]}"; then ok "lint(js)" "clean"; else bad "lint(js)" "eslint reported errors"; fi
+  else skip "lint(js)" "no eslint (npm i -D eslint)"; fi
+fi
+if [[ ${#py_files[@]} -gt 0 ]]; then
+  if have ruff; then
+    if ruff check "${py_files[@]}"; then ok "lint(py)" "clean"; else bad "lint(py)" "ruff reported errors"; fi
+  elif have flake8; then
+    if flake8 "${py_files[@]}"; then ok "lint(py)" "clean"; else bad "lint(py)" "flake8 reported errors"; fi
+  else skip "lint(py)" "no ruff/flake8 (pip install ruff)"; fi
+fi
+if [[ ${#go_files[@]} -gt 0 ]]; then
+  if have golangci-lint; then
+    if golangci-lint run; then ok "lint(go)" "clean"; else bad "lint(go)" "golangci-lint reported errors"; fi
+  else skip "lint(go)" "no golangci-lint"; fi
+fi
+if [[ ${#rb_files[@]} -gt 0 ]]; then
+  if have rubocop; then
+    if rubocop "${rb_files[@]}"; then ok "lint(rb)" "clean"; else bad "lint(rb)" "rubocop reported errors"; fi
+  else skip "lint(rb)" "no rubocop (gem install rubocop)"; fi
+fi
+if [[ ${#rs_files[@]} -gt 0 ]]; then
+  if have cargo; then
+    if cargo clippy -- -D warnings; then ok "lint(rs)" "clean"; else bad "lint(rs)" "clippy reported errors"; fi
+  else skip "lint(rs)" "no cargo"; fi
+fi
+
+# ── Gate 2: Cyclomatic complexity (hard cap) ────────────────────────────
+# lizard covers every language above with one tool and one threshold.
+if have lizard; then
+  if lizard -C "$COMPLEXITY_MAX" "${all_src[@]}" >/dev/null 2>&1; then
+    ok "complexity" "all functions ≤ $COMPLEXITY_MAX"
+  else
+    bad "complexity" "function(s) exceed CC $COMPLEXITY_MAX — run: lizard -C $COMPLEXITY_MAX ${all_src[*]}"
+  fi
+else
+  skip "complexity" "no lizard (pip install lizard)"
+fi
+
+echo
+if [[ "$fail" -ne 0 ]]; then
+  echo "quality-gates: BLOCKED — fix the failures above, or bypass with --no-verify."
+  exit 1
+fi
+echo "quality-gates: PASS"
+exit 0

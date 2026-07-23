@@ -1,0 +1,16 @@
+# Golden case: happy-path-only-codec
+# One test-quality defect: pure algebra with only a happy-path example (PBT opportunity).
+# encodeSlug itself is clean production code — do not require a code-quality Critical.
+
+case: happy-path-only-codec
+defects:
+  - id: codec-no-property-tests
+    agent: quality-test-quality
+    file: src/codec/slug.test.ts
+    severity_min: Important
+    match: "(property|PBT|Hypothesis|fast-check|invariant|edge|unicode|empty|generator|QuickCheck)"
+    note: pure encodeSlug algebra has one happy-path test; skill §6.6 says codecs should get properties/edge generators
+
+false_positive_budget: 1
+clean_bait:
+  - src/codec/slug.ts::encodeSlug

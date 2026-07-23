@@ -1,0 +1,14 @@
+{
+  "name": "code-quality-agents",
+  "owner": {
+    "name": "Jack Reichert"
+  },
+  "plugins": [
+    {
+      "name": "code-quality",
+      "source": "./",
+      "description": "The /quality review framework \u2014 orchestrator + 15 specialist agents grounded in the canonical CS literature (Clean Code, APOSD, DDIA, Release It!, GOOS, OWASP, and ~35 more cited sources)."
+    }
+  ],
+  "description": "Self-hosted marketplace for the code-quality-agents repo \u2014 one plugin: the /quality review framework."
+}

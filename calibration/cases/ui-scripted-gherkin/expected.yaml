@@ -1,0 +1,17 @@
+# Golden case: ui-scripted-gherkin
+# One seeded specification defect: a business acceptance scenario was written as
+# an imperative browser script full of selectors, timing, and presentation
+# details. The existing declarative refund scenario is the false-positive bait.
+
+case: ui-scripted-gherkin
+defects:
+  - id: imperative-ui-scripted-spec
+    agent: quality-specification
+    file: features/refund.feature
+    severity_min: Important
+    match: "(imperative|UI|selector|click|wait|declarative|business language|implementation detail)"
+    note: Scenario names browser controls, CSS selectors, colors, and sleeps instead of expressing refund behavior
+
+false_positive_budget: 1
+clean_bait:
+  - features/refund.feature::Support refunds a paid order
