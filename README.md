@@ -16,8 +16,8 @@ The framework is a **distillation of the canonical CS literature** into agent-ex
 1. **Source selection.** A reading list of ~24 canonical books plus key articles and papers (Clean Code, Refactoring, A Philosophy of Software Design, Clean Architecture, GOOS, Designing Data-Intensive Applications, PEAA, Release It!, Continuous Delivery, GoF, the OWASP standards, etc.) — the full inventory lives in [`CS-Best-Practices-Resources.md`](CS-Best-Practices-Resources.md).
 2. **Per-source summaries.** Each book/article was summarized into a structured note in [`Resources/`](Resources/) (Books, Articles, Papers, Standards, Originals). These summaries capture the principles, smell catalogs, patterns, and counterpoints from each source — not full reproductions, but enough to drive synthesis.
 3. **Cross-source themes.** The summaries are synthesized into **19 concept guides** in [`Resources/Themes/`](Resources/Themes/) (plus the one-file horizontal cut, [`THEMES.md`](THEMES.md)) — a Tier 1→5 curriculum (foundations → construction → design at scale → verification → systems in production). Each theme walks how the idea builds across its sources, names the real tensions instead of papering over them, and ends with the operational checklist its skill encodes. The learning on-ramp, and the reasoning layer the skills cite.
-4. **Synthesis into skills.** The themes and summaries were synthesized into the topical **skill documents** in [`skills/`](skills/) — the canonical, human-readable references. Each skill names its theme(s), cites the specific chapters and articles that drove each section, and reconciles tensions between sources (e.g., Clean Code ch.4 vs. APOSD ch.12-15 on comments).
-5. **Agent compilation.** Each skill is compiled into a concise **agent prompt** at `~/.claude/agents/quality-*.md`. The agents are the executable form; the skill files are the reasoning trail.
+4. **Synthesis into skills.** The themes and summaries were synthesized into concise, source-grounded runtime prompts in [`skills/`](skills/). These are both the executable specialists and the sole content source.
+5. **Host compatibility.** Plugin manifests load `skills/*.md` directly; classic installs expose the same files under `~/.claude/agents/` and `~/.grok/agents/`.
 6. **Orchestration.** The `/quality` slash command routes a diff to the relevant agents, runs them in parallel, normalizes severity, and aggregates the report.
 
 The "Sources by Skill" section below shows exactly which book/article/chapter informed each part of each skill, so any finding the framework produces can be traced back to a primary source.
@@ -58,7 +58,7 @@ Then in any git repo, run `/quality` from Grok. Grok loads agents from `~/.grok/
 /plugin install code-quality@code-quality-agents
 ```
 
-**Classic install** (copies into `~/.claude/` and `~/.grok/`; also wires the Constitution/Copilot extras):
+**Classic install** (links to the canonical skills for live updates by default):
 
 ```bash
 git clone https://github.com/jackreichert/code-quality-agents.git
@@ -66,7 +66,7 @@ cd code-quality-agents
 bash install.sh
 ```
 
-Then in any git repo, run `/quality` from Claude Code or Grok. Plugin and classic paths ship the same bundle: the agent/command files reference the canon via the `${CLAUDE_PLUGIN_ROOT}` placeholder, which Claude Code and Grok resolve natively in plugin mode and `install.sh` substitutes in classic mode. (Use one path or the other per host, not both — two installs means every agent exists twice.)
+Then run `/quality` from Claude Code or Grok. Plugin and classic paths load the same canonical skill content. Use one installation path per host.
 
 ### What it does
 
@@ -75,13 +75,15 @@ Then in any git repo, run `/quality` from Claude Code or Grok. Plugin and classi
 - 18 agent files into `~/.claude/agents/quality-*.md` and `~/.grok/agents/quality-*.md`
 - The `/quality` orchestrator into `~/.claude/commands/quality.md` and `~/.grok/commands/quality.md`
 
-Each agent is wired to read its canonical reference from wherever you cloned this repo (the absolute path is substituted in at install time, replacing the `${CLAUDE_PLUGIN_ROOT}` placeholder in the bundled files under `claude/` — the same token Claude Code and Grok resolve natively when the repo is installed as a plugin). Re-running the installer is idempotent — files already up to date are skipped, no backups created.
+By default the installer links both host installations directly to `skills/`, so one edit updates every linked host. `--copy-agents` creates a frozen install instead. Re-running is idempotent.
 
 ### Useful flags
 
 ```bash
 bash install.sh --dry-run             # show what would happen
 bash install.sh --force               # overwrite without backups
+bash install.sh --symlink-agents      # link Claude/Grok agents directly to canonical skills
+bash install.sh --copy-agents         # install frozen copies instead of live links
 bash install.sh --link                # link CONSTITUTION.md into Claude/Grok/Codex/Copilot (one source, no copies)
 bash install.sh --name "Your Name"    # set the Constitution greeting name (with --link; asked if omitted)
 bash install.sh --copilot             # (re)generate the self-contained Copilot file [--copilot-prefix F] [--copilot-out F]
@@ -115,7 +117,7 @@ Edit the Constitution once; every tool sees the change. `--uninstall` removes th
 
 ### Contributing
 
-The framework keeps three synchronized copies of every agent (canonical → bundle → deployed). See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the editing flow and the `bundle.sh` script that captures live edits back into the repo.
+The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUTING.md`](CONTRIBUTING.md); `bundle.sh --check` verifies plugin manifest parity.
 
 ---
 
@@ -185,7 +187,7 @@ This mirrors the lesson of [unclebob/swarm-forge](https://github.com/unclebob/sw
 | Path | Purpose |
 |------|---------|
 | `~/.claude/commands/quality.md` · `~/.grok/commands/quality.md` | The `/quality [aspects]` command — routes to agents, aggregates findings (Claude Code + Grok) |
-| `~/.claude/agents/quality-*.md` · `~/.grok/agents/quality-*.md` | Specialist review agents (same bundle on both hosts) |
+| `~/.claude/agents/quality-*.md` · `~/.grok/agents/quality-*.md` | Canonical skills exposed under host-compatible names |
 | `instructions/` (generated, gitignored) | Self-contained inlined instructions (vendor prefix + Constitution) for tools that can't `@import` — Codex & Copilot, via `install.sh --copilot` |
 | `install.sh --link` / `--copilot` | Wires the Constitution into Claude (import), Grok (`~/.grok/AGENTS.md`), Codex (symlink), and Copilot (inlined file) from one source |
 
@@ -611,9 +613,9 @@ The master resource list (`CS-Best-Practices-Resources.md`) is larger than the e
 | Release It! | `architecture` resilience + `distributed` |
 | Mythical Man-Month, Joel schedules / never-rewrite | `process`, `refactor` |
 
-### Layer-lag rule
+### Runtime parity rule
 
-When a source is "in skills" but missing from **agents** or **Constitution**, that is a defect — agents and write-time rules must carry the named checklists (STRIDE, error budget, USE method, Vernon aggregate rules, golden signals). Re-run `bash install.sh` after agent edits; re-run `bash healthcheck.sh` for parity.
+When a named checklist is missing from a canonical runtime skill or the Constitution, that is a defect. Run `bash healthcheck.sh` for parity and redeploy copy installs after skill edits.
 
 ---
 
@@ -621,12 +623,12 @@ When a source is "in skills" but missing from **agents** or **Constitution**, th
 
 When extending or revising a skill:
 
-1. **Edit the Obsidian file in this directory** — that's the canonical source of truth
-2. **Mirror the change in the corresponding agent file** at `~/.claude/agents/quality-*.md` — keep agent files concise; full reasoning lives here
+1. **Edit the skill in `skills/`** — it is the sole source of truth and the runtime prompt
+2. **Run `bash bundle.sh --check` and `bash healthcheck.sh`**
 3. **If adding a new source**, update both:
    - The skill's "Sources" line at the top of its file
    - This README's "Sources by Skill" section
-4. **If adding a new aspect to the orchestrator**, update `~/.claude/commands/quality.md`'s aspect routing table and tips section
+4. **If adding a new aspect to the orchestrator**, update `claude/commands/quality.md`'s aspect routing table and tips section
 
 ---
 

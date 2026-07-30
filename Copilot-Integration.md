@@ -28,7 +28,7 @@ code-quality-agents/
 ├── skills/                            # Canonical skills (source of truth)
 │   └── *.md                           # 18 skill files (+ tutor.md)
 ├── README.md                          # Framework overview
-├── claude/agents/                     # 18 quality-* agents (Claude + Grok)
+├── .claude-plugin/ + .grok-plugin/    # manifests load skills/*.md directly
 ├── claude/commands/quality.md         # /quality orchestrator
 ├── copilot/
 │   ├── prompts/                       # Per-skill Copilot prompts (subset may lag agents)
@@ -50,7 +50,7 @@ code-quality-agents/
 └── Copilot-Integration.md             # This file
 ```
 
-**Skill inventory (canonical):** `code-quality`, `architecture`, `refactor`, `review`, `security-review`, `test-quality`, `delivery`, `distributed`, `concurrency`, `patterns`, `persistence`, `gates`, `specification`, `process`, `performance`, `observability`, `accessibility`, plus `tutor` (inline teaching, not a subagent).
+**Skill inventory (canonical):** `code-quality`, `architecture`, `refactor`, `review`, `security-review`, `test-quality`, `delivery`, `distributed`, `concurrency`, `patterns`, `persistence`, `gates`, `specification`, `process`, `performance`, `observability`, `accessibility`, `flow`, plus `tutor` (inline teaching, not a subagent).
 
 ## Setup — three layers
 
@@ -110,7 +110,7 @@ A symlink works if the repo allows.
 
 **Claude Code:**
 ```bash
-ls ~/.claude/agents/quality-*.md         # 13 agents
+ls ~/.claude/agents/quality-*.md         # 18 agents
 ls ~/.claude/commands/quality.md         # orchestrator
 # In a repo: /quality
 ```
@@ -153,8 +153,8 @@ These are inherent to Copilot's architecture, not gaps in this framework.
 ## Maintenance
 
 When canonical skills (`skills/code-quality.md`, `skills/architecture.md`, etc.) are updated:
-1. Mirror changes to the corresponding agent file (`~/.claude/agents/quality-*.md`)
-2. Mirror changes to the corresponding prompt file (`copilot/prompts/quality-*.prompt.md`)
-3. If the change affects high-level priorities or stance, update `copilot/global-instructions.md` and `copilot/AGENTS.md`
+1. Linked Claude/Grok installs update immediately; rerun `install.sh` for copy installs.
+2. Mirror relevant changes to the corresponding Copilot prompt file (`copilot/prompts/quality-*.prompt.md`).
+3. If the change affects high-level priorities or stance, update `copilot/global-instructions.md` and `copilot/AGENTS.md`.
 
-A future improvement: a script that regenerates the agent and prompt files from the canonical skills automatically.
+Claude and Grok plugin manifests load canonical skills directly; there is no second agent-content directory.

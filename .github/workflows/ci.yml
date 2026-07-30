@@ -14,7 +14,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y shellcheck
-          shellcheck install.sh bundle.sh hooks/pre-commit
+          shellcheck install.sh bundle.sh healthcheck.sh calibration/prompt-size.sh hooks/pre-commit
 
   install-smoke-test:
     runs-on: ubuntu-latest
@@ -44,6 +44,8 @@ jobs:
             quality-specification quality-test-quality
           )
           for home in /tmp/fake-claude /tmp/fake-grok; do
+            test -f "$home/agents/.code-quality-skills-agents" \
+              || { echo "missing ownership manifest: $home"; exit 1; }
             for name in "${expected_agents[@]}"; do
               test -f "$home/agents/${name}.md" \
                 || { echo "missing: $home/agents/${name}.md"; exit 1; }
@@ -58,16 +60,20 @@ jobs:
           grep -q 'spawn_subagent' /tmp/fake-grok/commands/quality.md \
             || { echo "orchestrator missing Grok spawn_subagent guidance"; exit 1; }
 
-      - name: Verify token substitution
+      - name: Verify canonical agent links
         run: |
           for home in /tmp/fake-claude /tmp/fake-grok; do
-            if grep -RIn '${CLAUDE_PLUGIN_ROOT}' "$home/"; then
-              echo "found unsubstituted \${CLAUDE_PLUGIN_ROOT} token under $home"
+            if grep -RIn '${CLAUDE_PLUGIN_ROOT}' "$home/commands"; then
+              echo "found unsubstituted \${CLAUDE_PLUGIN_ROOT} token under $home/commands"
               exit 1
             fi
-            expected_path="$GITHUB_WORKSPACE"
-            grep -l "$expected_path" "$home/agents"/quality-*.md > /dev/null \
-              || { echo "no agent under $home references $expected_path"; exit 1; }
+            for agent in "$home/agents"/quality-*.md; do
+              test -L "$agent" || { echo "agent is not linked: $agent"; exit 1; }
+              name="$(basename "$agent")"
+              expected="$GITHUB_WORKSPACE/skills/${name#quality-}"
+              test "$(readlink "$agent")" = "$expected" \
+                || { echo "$agent does not target $expected"; exit 1; }
+            done
           done
 
       - name: Idempotency check
@@ -84,16 +90,27 @@ jobs:
             exit 1
           fi
 
-      - name: Bundle round-trip
+      - name: Remove stale installer-owned agents
         run: |
-          # Live → bundle should also be a no-op against the freshly installed tree
-          # (bundle.sh still reads Claude as the live-edit source of truth)
-          out="$(bash bundle.sh --claude-home /tmp/fake-claude --dry-run)"
-          echo "$out"
-          if echo "$out" | grep -qE "would update "; then
-            echo "bundle round-trip is not a no-op"
-            exit 1
-          fi
+          for home in /tmp/fake-claude /tmp/fake-grok; do
+            touch "$home/agents/quality-retired.md"
+            printf 'quality-retired.md\n' >> "$home/agents/.code-quality-skills-agents"
+          done
+          bash install.sh --claude-home /tmp/fake-claude --grok-home /tmp/fake-grok
+          test ! -e /tmp/fake-claude/agents/quality-retired.md
+          test ! -e /tmp/fake-grok/agents/quality-retired.md
+
+      - name: Canonical skill and manifest integrity
+        run: |
+          test -x bundle.sh
+          bash bundle.sh --check
+          bash healthcheck.sh --quiet
+
+      - name: Frozen copy install
+        run: |
+          bash install.sh --copy-agents --claude-only --claude-home /tmp/fake-copy
+          test ! -L /tmp/fake-copy/agents/quality-code-quality.md
+          cmp skills/code-quality.md /tmp/fake-copy/agents/quality-code-quality.md
 
       - name: Personalization & linking (--name / --copilot / --link)
         run: |

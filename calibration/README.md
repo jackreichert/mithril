@@ -4,7 +4,7 @@ Golden diffs with **seeded, labeled defects**, used to measure the review harnes
 
 ## Layout
 
-```
+```text
 calibration/
 ├── README.md          # this file — the protocol
 ├── run.sh             # stages a case as a git diff and invokes /quality on it
@@ -30,10 +30,57 @@ calibration/
 - **False positives ≤ 1 per case** at Critical/Important after the orchestrator's adjudication pass.
 - A case that every model always passes teaches nothing — retire it and seed a harder one.
 
+## Prompt compression benchmark
+
+Treat prompt slimming as a non-inferiority experiment. Change one agent at a time.
+
+### 1. Freeze the baseline
+
+Keep an immutable copy of the original agent outside the active bundle and record its size:
+
+```bash
+bash calibration/prompt-size.sh /path/to/baseline-agent.md
+```
+
+Record the exact model/version, orchestrator prompt, case revision, and run count. Do not compare different model versions.
+
+### 2. Run behavioral A/B trials
+
+Run the baseline and candidate against the same relevant seeded cases at least three times each. Use fresh sessions and identical model settings to expose model variance. Score every run against `expected.yaml` and record it in `SCORES.md`.
+
+For a specialist agent, start with its targeted cases, then run the full suite before merging because shorter prompts can alter orchestrator routing and cross-agent false positives.
+
+```bash
+bash calibration/run.sh shallow-module-pile --keep
+```
+
+### 3. Enforce non-inferiority
+
+A compressed prompt passes only when all gates hold:
+
+| Measure | Candidate gate |
+| ------- | -------------- |
+| Seeded-defect recall | No more than 5 percentage points below baseline; still ≥80% overall |
+| Critical defects | No misses that the baseline caught |
+| Severity | No seeded finding drops below `severity_min` |
+| Critical/Important false positives | No increase in mean per case; still ≤1 per case |
+| Stability | Every seeded defect caught by the baseline is caught in at least 2 of 3 candidate runs |
+| Prompt size | At least 30% fewer words, or a documented exception in the run's `SCORES.md` notes |
+| Static contracts | `bash healthcheck.sh` passes |
+
+Use the word budget as an executable regression gate after choosing the accepted candidate size:
+
+```bash
+bash calibration/prompt-size.sh --max-words 1400 \
+    skills/code-quality.md
+```
+
+The token value is estimated from bytes and is useful for trend comparison, not billing. Behavioral calibration remains the fidelity gate.
+
 ## Seed cases (the pattern — extend to ≥1 per agent domain)
 
 | Case | Seeded defects | Target agents |
-|------|----------------|---------------|
+| ---- | -------------- | ------------- |
 | `idor-orders` | Handler loads a resource by client-supplied ID with no ownership check; string-built SQL | quality-security-review, quality-flow |
 | `n-plus-one` | Loop calling a per-item repository query across files; blind write across user think-time (lost update) | quality-persistence, quality-flow |
 | `racy-cache` | Unsynchronized lazy singleton; check-then-act across an await; un-awaited async write | quality-concurrency |

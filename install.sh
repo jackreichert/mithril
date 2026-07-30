@@ -3,13 +3,13 @@
 # Code Quality Skills installer
 #
 # Deploys the /quality framework into Claude Code and Grok Build (first-class on both):
-#   - 18 agent files into ~/.claude/agents/ and ~/.grok/agents/ (quality-*.md)
+#   - 18 canonical skill files into ~/.claude/agents/ and ~/.grok/agents/,
+#     linked by default or copied with --copy-agents
 #   - 1 orchestrator command into ~/.claude/commands/ and ~/.grok/commands/ (quality.md)
 #
-# Each agent file references the canonical skill markdown in this repo;
-# the installer substitutes the ${CLAUDE_PLUGIN_ROOT} placeholder (the plugin-standard
-# token — resolved by Claude Code and Grok when installed as a plugin; Grok also
-# aliases GROK_PLUGIN_ROOT) with the absolute path of wherever this repo lives.
+# Agent files are linked or copied directly from the canonical skills in this repo.
+# The orchestrator command receives the absolute repo path in place of the
+# plugin-standard ${CLAUDE_PLUGIN_ROOT} token used by plugin installations.
 #
 # Alternative install (Grok): `grok plugin install . --trust` (or the GitHub URL)
 # uses .claude-plugin/plugin.json / .grok-plugin/plugin.json and needs no classic copy.
@@ -32,6 +32,8 @@
 #   bash install.sh                       # install into Claude + Grok with defaults
 #   bash install.sh --dry-run             # show what would happen
 #   bash install.sh --force               # overwrite without backups
+#   bash install.sh --symlink-agents      # explicitly select the default linked mode
+#   bash install.sh --copy-agents         # install frozen copies instead of live links
 #   bash install.sh --link                # also link the Constitution into Claude/Grok/Codex/Copilot
 #   bash install.sh --name "Your Name"    # greeting name baked into the DEPLOYED copy only (asked if omitted, with --link)
 #   bash install.sh --poem                # enable the haiku/limerick sign-off (off by default; --no-poem to disable)
@@ -57,6 +59,7 @@ FORCE=0
 DRY_RUN=0
 UNINSTALL=0
 LINK=0
+SYMLINK_AGENTS=1
 USER_NAME=""
 POEM=""
 COPILOT=0
@@ -77,6 +80,8 @@ while [[ $# -gt 0 ]]; do
     --grok-only)   INSTALL_CLAUDE=0; INSTALL_GROK=1; shift;;
     --force|-f)    FORCE=1; shift;;
     --dry-run|-n)  DRY_RUN=1; shift;;
+    --symlink-agents) SYMLINK_AGENTS=1; shift;;
+    --copy-agents) SYMLINK_AGENTS=0; shift;;
     --link)        LINK=1; shift;;
     --name)        USER_NAME="$2"; shift 2;;
     --poem)        POEM=1; shift;;
@@ -92,7 +97,7 @@ done
 
 SKILLS_DIR="$(cd "$SKILLS_DIR" 2>/dev/null && pwd || echo "$SKILLS_DIR")"
 
-AGENTS_SRC="$SCRIPT_DIR/claude/agents"
+AGENTS_SRC="$SKILLS_DIR/skills"
 COMMANDS_SRC="$SCRIPT_DIR/claude/commands"
 
 log()  { printf '  %s\n' "$*"; }
@@ -107,20 +112,40 @@ run() {
   fi
 }
 
+make_temp() {
+  mktemp "${TMPDIR:-/tmp}/code-quality-skills.XXXXXX"
+}
+
 # Remove quality agents + orchestrator from one host home (Claude or Grok).
 uninstall_host() {
   local home="$1" label="$2"
   local agents_dest="$home/agents" commands_dest="$home/commands"
+  local manifest="$agents_dest/.code-quality-skills-agents"
   note "UNINSTALL" "removing files from $home ($label)"
-  for src in "$AGENTS_SRC"/quality-*.md; do
-    [[ -e "$src" ]] || continue
-    name="$(basename "$src")"
-    target="$agents_dest/$name"
-    if [[ -f "$target" ]]; then
-      run rm -f "$target"
-      log "removed $target"
-    fi
-  done
+  local name target
+  if [[ -f "$manifest" ]]; then
+    while IFS= read -r name; do
+      [[ -n "$name" ]] || continue
+      target="$agents_dest/$name"
+      if [[ -f "$target" || -L "$target" ]]; then
+        run rm -f "$target"
+        log "removed $target"
+      fi
+    done < "$manifest"
+    run rm -f "$manifest"
+    log "removed $manifest"
+  else
+    for src in "$AGENTS_SRC"/*.md; do
+      [[ -e "$src" ]] || continue
+      name="$(basename "$src")"
+      [[ "$name" == "tutor.md" ]] && continue
+      target="$agents_dest/quality-$name"
+      if [[ -f "$target" || -L "$target" ]]; then
+        run rm -f "$target"
+        log "removed $target"
+      fi
+    done
+  fi
   if [[ -f "$commands_dest/quality.md" ]]; then
     run rm -f "$commands_dest/quality.md"
     log "removed $commands_dest/quality.md"
@@ -162,7 +187,7 @@ if [[ "$UNINSTALL" -eq 1 ]]; then
     if [[ "$DRY_RUN" -eq 1 ]]; then
       log "dry-run: would remove Constitution import line(s) from $claude_md"
     else
-      tmp="$(mktemp)"
+      tmp="$(make_temp)"
       grep -Ev '^@.*CONSTITUTION(\.local)?\.md$' "$claude_md" > "$tmp" || true
       mv "$tmp" "$claude_md"
       log "removed Constitution import line(s) from $claude_md"
@@ -184,6 +209,8 @@ log "skills dir:    $SKILLS_DIR"
 (( INSTALL_GROK ))   && log "grok home:     $GROK_HOME    (agents + commands)"
 [[ "$DRY_RUN" -eq 1 ]] && log "mode:          DRY RUN"
 [[ "$FORCE"   -eq 1 ]] && log "mode:          FORCE (no backups)"
+[[ "$SYMLINK_AGENTS" -eq 1 ]] && log "agents:        SYMLINKED (canonical: $SKILLS_DIR/skills)"
+[[ "$SYMLINK_AGENTS" -eq 0 ]] && log "agents:        COPIED (frozen install)"
 
 if (( INSTALL_CLAUDE )) && [[ ! -d "$CLAUDE_HOME" ]]; then
   log "warning:       $CLAUDE_HOME does not exist — Claude Code may not be installed"
@@ -209,7 +236,7 @@ backup_if_needed() {
 
 install_file() {
   local src="$1" dest="$2"
-  local tmp; tmp="$(mktemp)"
+  local tmp; tmp="$(make_temp)"
   sed "s|\${CLAUDE_PLUGIN_ROOT}|${SKILLS_DIR}|g" "$src" > "$tmp"
   if [[ -f "$dest" ]] && cmp -s "$tmp" "$dest"; then
     rm -f "$tmp"
@@ -226,10 +253,26 @@ install_file() {
   fi
 }
 
+copy_file() {
+  local src="$1" dest="$2"
+  if [[ -f "$dest" ]] && cmp -s "$src" "$dest"; then
+    log "unchanged $(basename "$dest")"
+    return 0
+  fi
+  backup_if_needed "$dest"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    log "dry-run: would install $dest"
+  else
+    cp "$src" "$dest"
+    log "installed $dest"
+  fi
+}
+
 # Point a symlink at a single canonical source — no content copy.
 link_symlink() {
   local target="$1" linkpath="$2"
   if [[ -L "$linkpath" && "$(readlink "$linkpath")" == "$target" ]]; then
+    [[ -e "$target" ]] || die "canonical symlink target is missing: $target"
     log "unchanged $linkpath → $target"
     return 0
   fi
@@ -276,7 +319,7 @@ personalize_constitution() {
     return 0
   fi
   local pstate="off"; [[ "$poem" == "1" ]] && pstate="on"
-  local tmp; tmp="$(mktemp)"
+  local tmp; tmp="$(make_temp)"
   awk -v name="$name" -v poem="$poem" '
     /<!-- BEGIN quality:communication-style -->/ {
       print
@@ -315,7 +358,7 @@ generate_copilot() {
   elif [[ -n "$prefix" ]]; then
     log "warning: --copilot-prefix $prefix not found — generating Constitution-only (no HIPAA prefix)"
   fi
-  local tmp; tmp="$(mktemp)"
+  local tmp; tmp="$(make_temp)"
   {
     printf '<!-- GENERATED by install.sh --copilot. Self-contained for Copilot (which cannot\n'
     printf 'resolve @import): Constitution inlined below. Company HIPAA/safety rules inline and\n'
@@ -355,7 +398,7 @@ set_constitution_import() {
     return 0
   fi
   mkdir -p "$(dirname "$file")"
-  local tmp; tmp="$(mktemp)"
+  local tmp; tmp="$(make_temp)"
   if [[ -f "$file" ]]; then
     grep -Ev "$re" "$file" > "$tmp" || true
   fi
@@ -364,19 +407,47 @@ set_constitution_import() {
   log "set Constitution import → $file ($want)"
 }
 
-# Deploy the agent bundle + orchestrator into one host home.
+# Deploy canonical skills + orchestrator into one host home.
 deploy_host() {
   local home="$1" label="$2"
   local agents_dest="$home/agents" commands_dest="$home/commands"
+  local manifest="$agents_dest/.code-quality-skills-agents"
   run mkdir -p "$agents_dest" "$commands_dest"
 
   note "AGENTS" "deploying agents → $agents_dest ($label)"
-  local count=0
-  for src in "$AGENTS_SRC"/quality-*.md; do
+  local desired_manifest
+  desired_manifest="$(make_temp)"
+  local count=0 src name dest stale
+  for src in "$AGENTS_SRC"/*.md; do
     [[ -e "$src" ]] || die "no agent files found in $AGENTS_SRC"
-    install_file "$src" "$agents_dest/$(basename "$src")"
+    name="$(basename "$src")"
+    [[ "$name" == "tutor.md" ]] && continue
+    dest="$agents_dest/quality-$name"
+    printf 'quality-%s\n' "$name" >> "$desired_manifest"
+    if [[ "$SYMLINK_AGENTS" -eq 1 ]]; then
+      link_symlink "$src" "$dest"
+    else
+      copy_file "$src" "$dest"
+    fi
     count=$((count + 1))
   done
+  if [[ -f "$manifest" ]]; then
+    while IFS= read -r stale; do
+      [[ -n "$stale" ]] || continue
+      if ! grep -qxF "$stale" "$desired_manifest"; then
+        if [[ -f "$agents_dest/$stale" || -L "$agents_dest/$stale" ]]; then
+          run rm -f "$agents_dest/$stale"
+          log "removed stale $agents_dest/$stale"
+        fi
+      fi
+    done < "$manifest"
+  fi
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    rm -f "$desired_manifest"
+    log "dry-run: would update $manifest"
+  else
+    mv "$desired_manifest" "$manifest"
+  fi
   log "$count agent file(s) processed for $label"
 
   note "ORCHESTRATOR" "deploying /quality command → $commands_dest ($label)"

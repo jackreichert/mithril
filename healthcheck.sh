@@ -2,14 +2,14 @@
 #
 # Code Quality Skills — health check
 #
-# Guards the drift the three-copy architecture (canonical skills/ → bundle
-# claude/ → deployed ~/.claude/ and ~/.grok/) invites, plus doc integrity:
-#   1. AGENT INTEGRITY   — every bundled agent has valid frontmatter and its
+# Guards the canonical-skill architecture (skills/ → deployed ~/.claude/ and
+# ~/.grok/) plus doc integrity:
+#   1. AGENT INTEGRITY   — every runtime skill has valid frontmatter and its
 #                          ${CLAUDE_PLUGIN_ROOT} skill references point at real files
 #   2. ROUTING           — every subagent_type the orchestrator routes to has a
-#                          matching bundled agent (and no agent is orphaned)
+#                          matching runtime skill (and no skill is orphaned)
 #   3. COUNT CLAIMS      — "N agent" figures in README.md / install.sh match reality
-#   4. DEPLOYED SYNC     — ~/.claude and ~/.grok copies match the bundle (modulo token)
+#   4. DEPLOYED SYNC     — ~/.claude and ~/.grok agents match canonical skills
 #   5. DOC LINKS         — relative .md links AND plain-text ../ paths resolve
 #
 # Exit 0 = healthy, 1 = problems found.
@@ -21,7 +21,7 @@ set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 GROK_HOME="${GROK_HOME:-$HOME/.grok}"
-AGENTS_SRC="$SCRIPT_DIR/claude/agents"
+AGENTS_SRC="$SCRIPT_DIR/skills"
 CMD_SRC="$SCRIPT_DIR/claude/commands/quality.md"
 QUIET=0
 [[ "${1:-}" == "--quiet" ]] && QUIET=1
@@ -35,11 +35,12 @@ bad()  { printf '%s✗%s %s\n' "$RED" "$RST" "$*" >&2; FAILS=$((FAILS+1)); }
 hdr()  { (( QUIET )) || printf '\n%s%s%s\n' "$BOLD" "$*" "$RST"; }
 
 # ---- 1. agent integrity --------------------------------------------------------
-hdr "Agent integrity (bundle)"
+hdr "Canonical skill integrity"
 n_agents=0
 for f in "$AGENTS_SRC"/*.md; do
   [[ -f "$f" ]] || continue
-  name="$(basename "$f" .md)"; n_agents=$((n_agents+1)); agent_ok=1
+  [[ "$(basename "$f")" == "tutor.md" ]] && continue
+  name="quality-$(basename "$f" .md)"; n_agents=$((n_agents+1)); agent_ok=1
   [[ "$(head -1 "$f")" == "---" ]] || { bad "$name — missing frontmatter fence"; agent_ok=0; }
   fm="$(awk 'NR>1 && /^---/{exit} {print}' "$f")"
   for key in name: description: model: tools:; do
@@ -47,12 +48,7 @@ for f in "$AGENTS_SRC"/*.md; do
   done
   printf '%s\n' "$fm" | grep -qE "^name:[[:space:]]*$name([[:space:]]|$)" \
     || { bad "$name — frontmatter name does not match filename"; agent_ok=0; }
-  # every ${CLAUDE_PLUGIN_ROOT} skill reference must point at a real canonical file
-  while IFS= read -r ref; do
-    [[ -z "$ref" ]] && continue
-    [[ -f "$SCRIPT_DIR/$ref" ]] || { bad "$name — references missing $ref"; agent_ok=0; }
-  done < <(grep -ohE '\$\{CLAUDE_PLUGIN_ROOT\}/[A-Za-z0-9/._-]+\.md' "$f" 2>/dev/null | sed 's|${CLAUDE_PLUGIN_ROOT}/||' | sort -u)
-  (( agent_ok )) && ok "$name (frontmatter + skill refs valid)"
+  (( agent_ok )) && ok "$name (frontmatter valid)"
 done
 (( n_agents > 0 )) || bad "no agents found under $AGENTS_SRC"
 
@@ -63,14 +59,15 @@ if [[ -f "$CMD_SRC" ]]; then
   while IFS= read -r target; do
     [[ -z "$target" ]] && continue
     routed=$((routed+1))
-    [[ -f "$AGENTS_SRC/$target.md" ]] \
-      || { bad "orchestrator routes to '$target' but claude/agents/$target.md does not exist"; routing_ok=0; }
-  done < <(grep -ohE '(subagent_type="|→ )quality-[a-z-]+' "$CMD_SRC" | sed -E 's/^(subagent_type="|→ )//' | sort -u)
-  (( routing_ok )) && ok "all $routed routed agent targets exist in the bundle"
-  # orphan check: every bundled agent should be reachable from the orchestrator
+    [[ -f "$AGENTS_SRC/${target#quality-}.md" ]] \
+      || { bad "orchestrator routes to '$target' but skills/${target#quality-}.md does not exist"; routing_ok=0; }
+  done < <(grep -ohE '(subagent_type="|→ )quality-[a-z0-9_-]+' "$CMD_SRC" | sed -E 's/^(subagent_type="|→ )//' | sort -u)
+  (( routing_ok )) && ok "all $routed routed agent targets exist as canonical skills"
+  # Orphan check: every runtime skill should be reachable from the orchestrator.
   for f in "$AGENTS_SRC"/*.md; do
-    name="$(basename "$f" .md)"
-    grep -q "$name" "$CMD_SRC" || warn "$name is bundled but never referenced by the orchestrator"
+    [[ "$(basename "$f")" == "tutor.md" ]] && continue
+    name="quality-$(basename "$f" .md)"
+    grep -q "$name" "$CMD_SRC" || warn "$name is never referenced by the orchestrator"
   done
 else
   bad "claude/commands/quality.md missing"
@@ -86,13 +83,15 @@ check_plugin_manifest() {
   fi
   local manifest_ok=1
   for f in "$AGENTS_SRC"/*.md; do
-    local rel="./claude/agents/$(basename "$f")"
+    [[ "$(basename "$f")" == "tutor.md" ]] && continue
+    local rel
+    rel="./skills/$(basename "$f")"
     grep -qF "\"$rel\"" "$plugin_json" || { bad "$label missing agent entry: $rel"; manifest_ok=0; }
   done
   while IFS= read -r rel; do
     [[ -f "$SCRIPT_DIR/${rel#./}" ]] || { bad "$label lists missing file: $rel"; manifest_ok=0; }
-  done < <(grep -oE '"\./claude/[A-Za-z0-9/._-]+\.md"' "$plugin_json" | tr -d '"')
-  (( manifest_ok )) && ok "$label agent/command entries match the bundle"
+  done < <(grep -oE '"\./(claude|skills)/[A-Za-z0-9/._-]+\.md"' "$plugin_json" | tr -d '"')
+  (( manifest_ok )) && ok "$label agent/command entries match canonical files"
 }
 check_plugin_manifest "$SCRIPT_DIR/.claude-plugin/plugin.json" ".claude-plugin/plugin.json"
 check_plugin_manifest "$SCRIPT_DIR/.grok-plugin/plugin.json"   ".grok-plugin/plugin.json"
@@ -103,7 +102,7 @@ hdr "Skill → agent checklist parity"
 parity_ok=1
 require_in_agent() {
   local agent="$1" phrase="$2" label="$3"
-  local f="$AGENTS_SRC/$agent.md"
+  local f="$AGENTS_SRC/${agent#quality-}.md"
   if [[ ! -f "$f" ]]; then bad "missing agent $agent"; parity_ok=0; return; fi
   if grep -qiE "$phrase" "$f"; then
     ok "$agent carries $label"
@@ -151,7 +150,7 @@ for doc in README.md install.sh; do
   while IFS= read -r n; do
     [[ -z "$n" ]] && continue
     [[ "$n" -eq "$n_agents" ]] \
-      || { bad "$doc claims $n agents; $n_agents exist in claude/agents/ (stale count)"; claims_ok=0; }
+      || { bad "$doc claims $n agents; $n_agents canonical runtime skills exist (stale count)"; claims_ok=0; }
   done < <(grep -ohE '[0-9]+ agent' "$SCRIPT_DIR/$doc" 2>/dev/null | grep -oE '^[0-9]+' | sort -u)
 done
 (( claims_ok )) && ok "README/install agent counts match reality ($n_agents)"
@@ -172,23 +171,30 @@ check_deployed_sync() {
   local f name dst
   for f in "$AGENTS_SRC"/*.md; do
     name="$(basename "$f")"
-    dst="$home/agents/$name"
+    [[ "$name" == "tutor.md" ]] && continue
+    dst="$home/agents/quality-$name"
     if [[ -f "$dst" ]]; then
       deployed_any=1
-      if diff -q <(sed "s|\${CLAUDE_PLUGIN_ROOT}|$SCRIPT_DIR|g" "$f") "$dst" >/dev/null 2>&1; then
-        ok "$label: $name deployed & in sync"
+      if diff -q "$f" "$dst" >/dev/null 2>&1; then
+        ok "$label: quality-$name deployed & in sync"
       else
-        warn "$label: $name deployed but DRIFTED from bundle (re-run install.sh, or bundle.sh to capture live edits)"
+        warn "$label: quality-$name deployed but DRIFTED from its canonical skill (edit skills/, then re-run install.sh for copy installs)"
       fi
     fi
   done
   if [[ -f "$home/commands/quality.md" ]]; then
     deployed_any=1
-    diff -q <(sed "s|\${CLAUDE_PLUGIN_ROOT}|$SCRIPT_DIR|g" "$CMD_SRC") "$home/commands/quality.md" >/dev/null 2>&1 \
-      && ok "$label: quality.md command deployed & in sync" \
-      || warn "$label: quality.md command deployed but DRIFTED from bundle"
+    local expected_command
+    expected_command="$(mktemp "${TMPDIR:-/tmp}/quality-healthcheck.XXXXXX")"
+    sed "s|\${CLAUDE_PLUGIN_ROOT}|$SCRIPT_DIR|g" "$CMD_SRC" > "$expected_command"
+    if diff -q "$expected_command" "$home/commands/quality.md" >/dev/null 2>&1; then
+      ok "$label: quality.md command deployed & in sync"
+    else
+      warn "$label: quality.md command deployed but DRIFTED from canonical command"
+    fi
+    rm -f "$expected_command"
   fi
-  (( deployed_any )) || warn "nothing deployed to $home — run install.sh (bundle-only checks passed)"
+  (( deployed_any )) || warn "nothing deployed to $home — run install.sh (repository checks passed)"
 }
 check_deployed_sync "$CLAUDE_HOME" "Claude"
 check_deployed_sync "$GROK_HOME"   "Grok"
@@ -202,7 +208,7 @@ while IFS= read -r f; do
   while IFS= read -r p; do
     [[ -z "$p" ]] && continue
     checked=$((checked+1))
-    [[ -f "$fdir/$p" || -d "$fdir/$p" ]] || { bad "broken relative path in ${f#$SCRIPT_DIR/}: $p"; brk=1; }
+    [[ -f "$fdir/$p" || -d "$fdir/$p" ]] || { bad "broken relative path in ${f#"$SCRIPT_DIR"/}: $p"; brk=1; }
   done < <(grep -ohE '\]\((\.{1,2}/)?[A-Za-z0-9][A-Za-z0-9/._-]*\.md|(^|[[:space:]`(])(\.\./)+[A-Za-z0-9][A-Za-z0-9/._-]*\.md' "$f" 2>/dev/null \
            | sed -E 's/^\]\(//; s/^[[:space:]`(]+//' | grep -v 'CLAUDE_PLUGIN_ROOT' | sort -u)
 done < <(find "$SCRIPT_DIR" -name '*.md' \

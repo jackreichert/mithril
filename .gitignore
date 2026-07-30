@@ -9,3 +9,4 @@ instructions/
 
 # Deep-mode review reports (written by `/quality deep` — per-run, not source)
 .quality/
+.vscode/

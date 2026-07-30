@@ -43,7 +43,7 @@ CS-Best-Practices-Resources.md      the master inventory (what exists, who owns 
   └── Resources/{Books,Articles,Papers,Standards}/   one summary per source (condense)
         └── Resources/Themes/                        19 concept guides (synthesize across sources)  ← you are here
               └── skills/                            18 skill docs (operationalize for review; + tutor)
-                    ├── ~/.claude/agents/quality-*   compiled agent prompts (execute)
+                    ├── ~/.claude/agents/quality-*   canonical skills exposed under host names
                     ├── CONSTITUTION.md               write-time rules (prevent)
                     └── skills/gates.md + hooks/      measured thresholds (enforce)
 ```
