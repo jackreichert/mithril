@@ -1,4 +1,0 @@
-interface:
-  display_name: "Code Quality"
-  short_description: "Review and improve code quality"
-  default_prompt: "Use $code-quality to review my current diff and tell me the highest-priority issues."

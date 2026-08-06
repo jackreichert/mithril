@@ -94,7 +94,7 @@ Each has a measurable metric.
 
 **Ch 34 — The Missing Chapter** (Simon Brown, guest) — Practical package structure: package-by-feature beats package-by-layer.
 
-## Why it's deeply integrated into `/quality architecture`
+## Why it's deeply integrated into `/mithril architecture`
 Dependency-rule violations and layer mixing are primary findings.
 
 ## Critique

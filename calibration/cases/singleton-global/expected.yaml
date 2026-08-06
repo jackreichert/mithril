@@ -6,14 +6,14 @@
 case: singleton-global
 defects:
   - id: singleton-hidden-global-state
-    agent: quality-patterns
+    agent: mithril-patterns
     file: src/pricing/taxRuleRegistry.ts
     severity_min: Important
     match: "(Singleton|global state|hidden dependency|test isolation|mutable|shared state)"
     note: TaxRuleRegistry is a mutable process-wide Singleton used instead of passing TaxPolicy explicitly
 
   - id: singleton-removes-explicit-dependency
-    agent: quality-architecture
+    agent: mithril-architecture
     file: src/pricing/priceCalculator.ts
     severity_min: Important
     match: "(dependency|global|Singleton|inversion|explicit|hidden)"

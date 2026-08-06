@@ -1,13 +1,13 @@
 {
-  "name": "code-quality",
-  "description": "The canonical CS literature distilled into agent-executable review form: the /quality orchestrator plus 18 specialist review agents (code quality, architecture, concurrency, refactoring, tests, security, delivery, distributed, patterns, persistence, performance, observability, accessibility, gates, specification, flow, process, review), each grounded in a cited knowledge base of books, papers, and standards.",
+  "name": "mithril",
+  "description": "The canonical CS literature distilled into agent-executable review form: the /mithril orchestrator plus 18 specialist review agents (code quality, architecture, concurrency, refactoring, tests, security, delivery, distributed, patterns, persistence, performance, observability, accessibility, gates, specification, flow, process, review), each grounded in a cited knowledge base of books, papers, and standards.",
   "version": "1.1.0",
   "author": {
     "name": "Jack Reichert"
   },
-  "homepage": "https://github.com/jackreichert/code-quality-agents",
+  "homepage": "https://github.com/jackreichert/mithril",
   "commands": [
-    "./claude/commands/quality.md"
+    "./claude/commands/mithril.md"
   ],
   "agents": [
     "./skills/accessibility.md",

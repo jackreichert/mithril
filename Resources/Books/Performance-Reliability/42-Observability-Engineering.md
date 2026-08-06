@@ -8,7 +8,7 @@ focus: High-cardinality events, debugging production, structured telemetry, samp
 
 # Observability Engineering — Majors, Fong-Jones, Miranda (2022)
 
-The modern statement of **observability as a product capability**: the ability to ask novel questions about production behavior without shipping new instrumentation first. It is the companion to *Site Reliability Engineering*'s golden signals — SRE tells you *what* to measure for reliability; this book tells you *how* telemetry must be shaped so humans can debug unknown-unknowns. Feeds **quality-delivery** (observability prerequisites) and **quality-flow** (source→sink diagnosis).
+The modern statement of **observability as a product capability**: the ability to ask novel questions about production behavior without shipping new instrumentation first. It is the companion to *Site Reliability Engineering*'s golden signals — SRE tells you *what* to measure for reliability; this book tells you *how* telemetry must be shaped so humans can debug unknown-unknowns. Feeds **mithril-delivery** (observability prerequisites) and **mithril-flow** (source→sink diagnosis).
 
 ## Core claims
 

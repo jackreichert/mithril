@@ -1,11 +1,11 @@
 ---
-name: code-quality
+name: mithril
 description: Code quality skillset for Codex. Use when asked to review a diff or project for correctness, maintainability, architecture, tests, security, delivery, persistence, concurrency, distributed-systems risks, patterns, refactoring, specification quality, numeric gates, or to tutor/explain the code-quality canon from this repository.
 ---
 
 # Code Quality
 
-Use this skill as the Codex-native entrypoint for the Code Quality Skills canon. Keep the canonical long-form guidance in the repository's `skills/*.md` files; load only the documents needed for the user's request.
+Use this skill as the Codex-native entrypoint for the Mithril canon. Keep the canonical long-form guidance in the repository's `skills/*.md` files; load only the documents needed for the user's request.
 
 ## Workflow
 
@@ -14,7 +14,7 @@ Use this skill as the Codex-native entrypoint for the Code Quality Skills canon.
    - **Gates**: run lint, complexity, duplication, coverage, mutation, or related objective checks.
    - **Write-time guidance**: apply `CONSTITUTION.md` while implementing.
    - **Tutor**: explain a principle, trade-off, or source-backed theme.
-2. Resolve the repository root before reading references. This skill is normally installed as a symlink from `~/.codex/skills/code-quality` to `codex/skills/code-quality`; if needed, use `readlink ~/.codex/skills/code-quality` or `pwd -P` from the skill directory, then go three parents up to the repo root.
+2. Resolve the repository root before reading references. This skill is normally installed as a symlink from `~/.codex/skills/mithril` to `codex/skills/mithril`; if needed, use `readlink ~/.codex/skills/mithril` or `pwd -P` from the skill directory, then go three parents up to the repo root.
 3. Gather fresh project context before reviewing: changed files, nearby conventions, reuse surfaces, tests, and dependency boundaries.
 4. Report findings first, ordered by severity. Prefer high-confidence bugs and risks over broad style commentary.
 5. For implementation tasks, apply the Constitution while writing and then verify with the narrowest meaningful tests and gates.

@@ -1,6 +1,6 @@
 # 04 — Smells, Refactoring & Legacy Rescue
 
-> **Tier 2 · Construction.** How code gets better without getting broken: the smell vocabulary, the catalog of behavior-preserving moves, the legacy-code playbook for when there are no tests, and the strategies for replacements too big to do in one step. **Skill:** [`skills/refactor.md`](../../skills/refactor.md) · agent `quality-refactor`.
+> **Tier 2 · Construction.** How code gets better without getting broken: the smell vocabulary, the catalog of behavior-preserving moves, the legacy-code playbook for when there are no tests, and the strategies for replacements too big to do in one step. **Skill:** [`skills/refactor.md`](../../skills/refactor.md) · agent `mithril-refactor`.
 
 ## The idea in one paragraph
 

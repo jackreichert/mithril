@@ -7,7 +7,7 @@
 case: deploy-coupled-migration
 defects:
   - id: rename-in-place-breaks-previous-release
-    agent: quality-delivery   # quality-persistence may also flag under Theme 14/16 overlap
+    agent: mithril-delivery   # mithril-persistence may also flag under Theme 14/16 overlap
     file: migrations/002_rename_full_name.sql
     severity_min: Critical
     match: "(expand.contract|rename|previous release|backward|zero.downtime|dual)"

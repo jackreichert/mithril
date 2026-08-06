@@ -8,7 +8,7 @@ focus: threads, locks, memory model, safe publication, concurrent collections
 
 # Java Concurrency in Practice — Brian Goetz et al. (2006)
 
-The definitive practitioner's guide to writing correct concurrent JVM code, feeding the **quality-concurrency** agent. The Constitution's Article II concurrency rules (atomic / visible / safe-publication / consistent lock ordering / no alien calls under a lock) derive almost verbatim from this book.
+The definitive practitioner's guide to writing correct concurrent JVM code, feeding the **mithril-concurrency** agent. The Constitution's Article II concurrency rules (atomic / visible / safe-publication / consistent lock ordering / no alien calls under a lock) derive almost verbatim from this book.
 
 ## Per-chapter summary
 

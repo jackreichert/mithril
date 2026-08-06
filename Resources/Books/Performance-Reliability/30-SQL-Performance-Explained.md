@@ -8,7 +8,7 @@ focus: Indexing, B-tree anatomy, query performance, joins, sorting, pagination
 
 # SQL Performance Explained — Markus Winand (2012)
 
-A developer-focused, vendor-neutral field guide to making SQL fast — the index is a structure you design, not a switch the DBA flips. It feeds the **quality-persistence** agent and is the source for the SQL-hygiene rules in `skills/persistence.md §10`: the **no `SELECT *` in production code; name explicit columns** rule (over-fetching, killing **covering indexes**, breaking silently when columns are added) plus the indexing / `WHERE` / `ORDER BY` / `LIMIT` guidance below.
+A developer-focused, vendor-neutral field guide to making SQL fast — the index is a structure you design, not a switch the DBA flips. It feeds the **mithril-persistence** agent and is the source for the SQL-hygiene rules in `skills/persistence.md §10`: the **no `SELECT *` in production code; name explicit columns** rule (over-fetching, killing **covering indexes**, breaking silently when columns are added) plus the indexing / `WHERE` / `ORDER BY` / `LIMIT` guidance below.
 
 ## Per-chapter summary
 

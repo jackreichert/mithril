@@ -1,6 +1,6 @@
 # 08 — Test-First: TDD as Design
 
-> **Tier 4 · Verification.** The red-green-refactor discipline, the outside-in school that grows architecture from acceptance tests, and the honest account of the classical-vs-London split. Tests as a *design pressure*, not just a safety net. **Skill:** [`skills/test-quality.md`](../../skills/test-quality.md) (TDD indicators) · agent `quality-test-quality`.
+> **Tier 4 · Verification.** The red-green-refactor discipline, the outside-in school that grows architecture from acceptance tests, and the honest account of the classical-vs-London split. Tests as a *design pressure*, not just a safety net. **Skill:** [`skills/test-quality.md`](../../skills/test-quality.md) (TDD indicators) · agent `mithril-test-quality`.
 
 ## The idea in one paragraph
 

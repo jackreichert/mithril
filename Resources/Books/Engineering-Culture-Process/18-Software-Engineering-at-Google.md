@@ -103,5 +103,5 @@ Software engineering is a people problem dressed in code.
 - **Beyoncé rule** — if you like it, put a test on it.
 - **"Live at head"** — don't pin versions; keep dependencies current.
 
-## Why it's deeply integrated into `/quality`
+## Why it's deeply integrated into `/mithril`
 The code-review chapter and testing chapters inform the review-style guidance and the test-quality smells.

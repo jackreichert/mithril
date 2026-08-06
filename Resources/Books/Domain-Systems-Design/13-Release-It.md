@@ -93,5 +93,5 @@ Systems must change while running. Plan for change as you would for failure.
 **Ch 17 — Chaos Engineering**
 Inject faults in production to surface latent failures. Game days. Failure-injection playbooks.
 
-## Why it's deeply integrated into `/quality architecture` + `/quality security`
+## Why it's deeply integrated into `/mithril architecture` + `/mithril security`
 Stability antipatterns and patterns map directly to the resilience pillar of architecture review.

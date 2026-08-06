@@ -8,7 +8,7 @@ focus: Storage engines, B-trees/LSM-trees, WAL, distributed consensus, replicati
 
 # Database Internals — Alex Petrov (2019)
 
-A deep dive into how storage engines and distributed data systems actually work under the hood. Feeds the **quality-persistence** and **quality-distributed** agents, and complements *Designing Data-Intensive Applications* with far deeper storage-engine and consensus internals.
+A deep dive into how storage engines and distributed data systems actually work under the hood. Feeds the **mithril-persistence** and **mithril-distributed** agents, and complements *Designing Data-Intensive Applications* with far deeper storage-engine and consensus internals.
 
 ## Part I — Storage Engines
 

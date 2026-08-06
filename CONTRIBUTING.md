@@ -6,21 +6,21 @@ The framework keeps **one canonical definition** for every runtime specialist: `
 
 ```text
 skills/code-quality.md ──┬── Claude/Grok plugin manifests (direct path)
-                         ├── ~/.claude/agents/quality-code-quality.md (symlink)
-                         └── ~/.grok/agents/quality-code-quality.md (symlink)
+                         ├── ~/.claude/agents/mithril-code-quality.md (symlink)
+                         └── ~/.grok/agents/mithril-code-quality.md (symlink)
 
-claude/commands/quality.md ──── ~/.claude/commands/ and ~/.grok/commands/
+claude/commands/mithril.md ──── ~/.claude/commands/ and ~/.grok/commands/
 ```
 
 | Layer | Location | Purpose |
 | --- | --- | --- |
 | Canonical | `skills/*.md` | Source-grounded runtime prompt and sole content source. |
 | Deployed | `~/.claude/agents/`, `~/.grok/agents/` | Direct links to `skills/` by default, or frozen copies with `--copy-agents`. |
-| Orchestrator | `claude/commands/quality.md` | Routes specialists and remains a separate command artifact. |
+| Orchestrator | `claude/commands/mithril.md` | Routes specialists and remains a separate command artifact. |
 
 ## The two scripts
 
-- **`install.sh`** deploys canonical skills under host-compatible `quality-*` names. Live links are the default; use `--copy-agents` for a frozen install.
+- **`install.sh`** deploys canonical skills under host-compatible `mithril-*` names. Live links are the default; use `--copy-agents` for a frozen install.
 - **`bundle.sh`** is a legacy-named parity check that verifies both plugin manifests list every canonical runtime skill.
 
 ## Workflows
@@ -35,7 +35,7 @@ Do not edit deployed `~/.claude/agents/` / `~/.grok/agents/` files. They point t
 
 ### Editing the orchestrator
 
-Edit `claude/commands/quality.md` directly, then run `bash install.sh` to redeploy it.
+Edit `claude/commands/mithril.md` directly, then run `bash install.sh` to redeploy it.
 
 ## Drift caution
 
@@ -45,10 +45,10 @@ Edit `claude/commands/quality.md` directly, then run `bash install.sh` to redepl
 
 1. Add the canonical runtime `.md` under `skills/`, including agent frontmatter.
 2. Add `./skills/<name>.md` to both plugin manifests.
-3. Update `claude/commands/quality.md` to route the new aspect.
+3. Update `claude/commands/mithril.md` to route the new aspect.
 4. Run `bash install.sh` to deploy.
 5. Update `README.md` (skills table) and `Copilot-Integration.md` (file layout).
-6. If a Copilot prompt is wanted, add `copilot/prompts/quality-accessibility.prompt.md` mirroring an existing one.
+6. If a Copilot prompt is wanted, add `copilot/prompts/mithril-accessibility.prompt.md` mirroring an existing one.
 
 ## CI
 

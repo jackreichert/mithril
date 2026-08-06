@@ -1,6 +1,6 @@
 # Copilot Integration
 
-How to use the `/quality` framework with GitHub Copilot, in addition to (or instead of) Claude Code.
+How to use the `/mithril` framework with GitHub Copilot, in addition to (or instead of) Claude Code.
 
 ## What works the same
 
@@ -12,10 +12,10 @@ Claude Code and Copilot have fundamentally different mechanics:
 
 | Feature | Claude Code | GitHub Copilot |
 |---------|-------------|----------------|
-| Slash commands | `/quality` orchestrator | `/quality-code`, `/quality-arch`, etc. (per-skill prompts; no orchestrator) |
+| Slash commands | `/mithril` orchestrator | `/mithril-code`, `/mithril-arch`, etc. (per-skill prompts; no orchestrator) |
 | Auto-routing by diff signal | Yes — orchestrator inspects `git diff` and spawns relevant agents | No — user picks the prompt |
 | Parallel agent execution | Yes — agents run simultaneously, results aggregated | No — one prompt at a time |
-| Custom agents (per-tool) | `~/.claude/agents/quality-*.md` | Custom prompt files (`.prompt.md`) |
+| Custom agents (per-tool) | `~/.claude/agents/mithril-*.md` | Custom prompt files (`.prompt.md`) |
 | Personal global instructions | `~/.claude/CLAUDE.md` | github.com personal instructions + VS Code user settings |
 | Repo-level instructions | `CLAUDE.md` in repo root | `.github/copilot-instructions.md` or `AGENTS.md` |
 
@@ -24,27 +24,27 @@ The Copilot side has **less workflow automation** but the **same review content*
 ## File layout
 
 ```
-code-quality-agents/
+mithril/
 ├── skills/                            # Canonical skills (source of truth)
 │   └── *.md                           # 18 skill files (+ tutor.md)
 ├── README.md                          # Framework overview
 ├── .claude-plugin/ + .grok-plugin/    # manifests load skills/*.md directly
-├── claude/commands/quality.md         # /quality orchestrator
+├── claude/commands/mithril.md         # /mithril orchestrator
 ├── copilot/
 │   ├── prompts/                       # Per-skill Copilot prompts (subset may lag agents)
-│   │   ├── quality-code.prompt.md
-│   │   ├── quality-arch.prompt.md
-│   │   ├── quality-tests.prompt.md
-│   │   ├── quality-refactor.prompt.md
-│   │   ├── quality-simplify.prompt.md
-│   │   ├── quality-review.prompt.md
-│   │   ├── quality-security.prompt.md
-│   │   ├── quality-process.prompt.md
-│   │   ├── quality-delivery.prompt.md
-│   │   ├── quality-distributed.prompt.md
-│   │   ├── quality-patterns.prompt.md
-│   │   └── quality-persistence.prompt.md
-│   │   # TODO: quality-performance / observability / accessibility / concurrency prompts
+│   │   ├── mithril-code.prompt.md
+│   │   ├── mithril-arch.prompt.md
+│   │   ├── mithril-tests.prompt.md
+│   │   ├── mithril-refactor.prompt.md
+│   │   ├── mithril-simplify.prompt.md
+│   │   ├── mithril-review.prompt.md
+│   │   ├── mithril-security.prompt.md
+│   │   ├── mithril-process.prompt.md
+│   │   ├── mithril-delivery.prompt.md
+│   │   ├── mithril-distributed.prompt.md
+│   │   ├── mithril-patterns.prompt.md
+│   │   └── mithril-persistence.prompt.md
+│   │   # TODO: mithril-performance / observability / accessibility / concurrency prompts
 │   ├── global-instructions.md         # Paste-ready ~2.5K char snippet
 │   └── AGENTS.md                      # Repo-drop-in cross-tool template
 └── Copilot-Integration.md             # This file
@@ -83,18 +83,18 @@ Make the 12 prompt files available globally in VS Code:
 ```
 
 Then in any VS Code workspace, in Copilot Chat, type:
-- `/quality-code` — naming, smells, FP, error handling
-- `/quality-arch` — SOLID, dependency direction, resilience patterns
-- `/quality-tests` — F.I.R.S.T., mutation, property-based
-- `/quality-refactor` — Fowler moves + WELC dependency-breaking
-- `/quality-simplify` — light behavior-preserving cleanup
-- `/quality-review` — confidence-scored review (Google priority order)
-- `/quality-security` — OWASP Top 10:2021 systematic
-- `/quality-process` — pre-flight + post-validation discipline
-- `/quality-delivery` — CD pipeline + 12-Factor + DORA
-- `/quality-distributed` — Waldo's four differences + microservices
-- `/quality-patterns` — GoF + anti-patterns + modern alternatives
-- `/quality-persistence` — PEAA + N+1 + transactions + migrations
+- `/mithril-code` — naming, smells, FP, error handling
+- `/mithril-arch` — SOLID, dependency direction, resilience patterns
+- `/mithril-tests` — F.I.R.S.T., mutation, property-based
+- `/mithril-refactor` — Fowler moves + WELC dependency-breaking
+- `/mithril-simplify` — light behavior-preserving cleanup
+- `/mithril-review` — confidence-scored review (Google priority order)
+- `/mithril-security` — OWASP Top 10:2021 systematic
+- `/mithril-process` — pre-flight + post-validation discipline
+- `/mithril-delivery` — CD pipeline + 12-Factor + DORA
+- `/mithril-distributed` — Waldo's four differences + microservices
+- `/mithril-patterns` — GoF + anti-patterns + modern alternatives
+- `/mithril-persistence` — PEAA + N+1 + transactions + migrations
 
 ### Layer 3 — Per-repo AGENTS.md (cross-tool consistency)
 
@@ -110,15 +110,15 @@ A symlink works if the repo allows.
 
 **Claude Code:**
 ```bash
-ls ~/.claude/agents/quality-*.md         # 18 agents
-ls ~/.claude/commands/quality.md         # orchestrator
-# In a repo: /quality
+ls ~/.claude/agents/mithril-*.md         # 18 agents
+ls ~/.claude/commands/mithril.md         # orchestrator
+# In a repo: /mithril
 ```
 
 **Copilot (VS Code):**
 ```bash
 ls <path-to-this-repo>/copilot/prompts/  # 12 .prompt.md files
-# In VS Code Chat: type "/" — should see /quality-code, /quality-arch, etc.
+# In VS Code Chat: type "/" — should see /mithril-code, /mithril-arch, etc.
 ```
 
 **Copilot (github.com):**
@@ -129,13 +129,13 @@ ls <path-to-this-repo>/copilot/prompts/  # 12 .prompt.md files
 ## Workflow recommendations
 
 **For Claude Code (preferred when available):**
-- Default: `/quality` before each commit. Auto-routing covers the common case.
-- Targeted: `/quality persistence delivery` when touching schema. `/quality distributed arch` when touching service-to-service code.
+- Default: `/mithril` before each commit. Auto-routing covers the common case.
+- Targeted: `/mithril persistence delivery` when touching schema. `/mithril distributed arch` when touching service-to-service code.
 
 **For Copilot (when working in VS Code without Claude Code, or in github.com PR review):**
 - Default: rely on Layer 1 global instructions for ambient guidance during code generation and review.
-- Targeted: invoke a specific prompt (`/quality-code`, `/quality-arch`) when you want a focused audit on the open file or selection.
-- For a full review: walk through the prompts you'd combine in Claude Code (e.g., for a schema change, run `/quality-persistence` then `/quality-delivery` separately).
+- Targeted: invoke a specific prompt (`/mithril-code`, `/mithril-arch`) when you want a focused audit on the open file or selection.
+- For a full review: walk through the prompts you'd combine in Claude Code (e.g., for a schema change, run `/mithril-persistence` then `/mithril-delivery` separately).
 
 **For github.com Copilot PR review:**
 - Layer 1 global instructions apply automatically. The PR review will reflect the framework priorities.
@@ -143,10 +143,10 @@ ls <path-to-this-repo>/copilot/prompts/  # 12 .prompt.md files
 
 ## Limitations honest about
 
-- **No parallel orchestration in Copilot.** Claude Code's `/quality` runs 5+ agents in parallel and aggregates; Copilot runs one prompt at a time. Reviewing a complex change is more manual.
+- **No parallel orchestration in Copilot.** Claude Code's `/mithril` runs 5+ agents in parallel and aggregates; Copilot runs one prompt at a time. Reviewing a complex change is more manual.
 - **No git-diff awareness in Copilot Chat by default.** Prompts work on the current file or selection. To review a diff, paste it into chat or use the Source Control view's Copilot integration.
 - **Tool augmentation is unavailable in Copilot prompts.** Where a Claude Code agent could run `semgrep`, `bandit`, `npm audit`, etc., Copilot Chat can only suggest the user run them. The security prompt handles this by calling out which scanners would augment its findings.
-- **No model-of-modes routing in Copilot.** Claude Code's `/quality refactor` (Mode 2) vs `/quality simplify` (Mode 1) is split into two distinct prompt files.
+- **No model-of-modes routing in Copilot.** Claude Code's `/mithril refactor` (Mode 2) vs `/mithril simplify` (Mode 1) is split into two distinct prompt files.
 
 These are inherent to Copilot's architecture, not gaps in this framework.
 
@@ -154,7 +154,7 @@ These are inherent to Copilot's architecture, not gaps in this framework.
 
 When canonical skills (`skills/code-quality.md`, `skills/architecture.md`, etc.) are updated:
 1. Linked Claude/Grok installs update immediately; rerun `install.sh` for copy installs.
-2. Mirror relevant changes to the corresponding Copilot prompt file (`copilot/prompts/quality-*.prompt.md`).
+2. Mirror relevant changes to the corresponding Copilot prompt file (`copilot/prompts/mithril-*.prompt.md`).
 3. If the change affects high-level priorities or stance, update `copilot/global-instructions.md` and `copilot/AGENTS.md`.
 
 Claude and Grok plugin manifests load canonical skills directly; there is no second agent-content directory.

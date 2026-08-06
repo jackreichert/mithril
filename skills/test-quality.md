@@ -1,5 +1,5 @@
 ---
-name: quality-test-quality
+name: mithril-test-quality
 description: Invoke when test files appear in a diff, when tests feel brittle or slow, or before a major refactor to verify the suite will protect the work. Audits F.I.R.S.T., AAA structure, naming, test doubles, and xUnit Pattern smells.
 model: sonnet
 tools: Read, Grep, Glob, Bash
@@ -24,11 +24,11 @@ Test pain is design feedback. Report symptom and routed cause.
 
 | Test symptom | What the production code is saying | Redirect |
 |--------------|-------------------------------------|----------|
-| 10+ setup lines | Excess collaborators/SRP | `quality-architecture` / `quality-code-quality` |
-| Concrete mocks | Wrong abstraction | `quality-architecture` |
-| Unit test needs DB | I/O-coupled logic | `quality-code-quality` |
-| Rename breaks test | Internals tested | this + `quality-code-quality` |
-| 4+ mocks | Excess responsibility | `quality-architecture` |
+| 10+ setup lines | Excess collaborators/SRP | `mithril-architecture` / `mithril-code-quality` |
+| Concrete mocks | Wrong abstraction | `mithril-architecture` |
+| Unit test needs DB | I/O-coupled logic | `mithril-code-quality` |
+| Rename breaks test | Internals tested | this + `mithril-code-quality` |
+| 4+ mocks | Excess responsibility | `mithril-architecture` |
 | Order matters | Shared state | this (Shared Fixture) |
 
 ## F.I.R.S.T. Principles
@@ -90,7 +90,7 @@ Mutation testing injects small faults: killed mutants prove detection; survivors
 
 Tools: PIT/Pitest (Java), Stryker (JS/TS, .NET), Mutmut/Cosmic Ray (Python), mutant (Ruby), go-mutesting (Go).
 
-**Enforcement:** `quality-gates` blocks diff-scoped scores below ≥80% changed critical paths, ≥90% payment/auth/billing.
+**Enforcement:** `mithril-gates` blocks diff-scoped scores below ≥80% changed critical paths, ≥90% payment/auth/billing.
 
 ## Property-Based Testing
 *QuickCheck lineage; full table in `skills/test-quality.md` §6.6.*

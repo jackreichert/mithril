@@ -6,7 +6,7 @@ focus: Provenance, SBOMs, dependency hygiene, CI trust boundaries, signed builds
 
 # Software Supply Chain Security — SLSA, SBOM & related practice
 
-A compact standard note for this library: modern delivery is attacked through **dependencies, build systems, and distribution**, not only application code. Complements OWASP A08 (Software and Data Integrity Failures) and ASVS with concrete controls. Feeds **quality-security-review** (A08 / SCA) and **quality-delivery** (pipeline trust).
+A compact standard note for this library: modern delivery is attacked through **dependencies, build systems, and distribution**, not only application code. Complements OWASP A08 (Software and Data Integrity Failures) and ASVS with concrete controls. Feeds **mithril-security-review** (A08 / SCA) and **mithril-delivery** (pipeline trust).
 
 ## Core ideas
 

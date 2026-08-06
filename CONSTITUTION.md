@@ -1,6 +1,6 @@
 # The Constitution — Write-Time Engineering Discipline
 
-> The `/quality` agents *catch* problems after code exists. This Constitution *prevents* them while code is being written. It is the always-on companion to the review framework: the same distilled CS canon, compiled into terse imperative rules an agent obeys on **every task**, before a single review runs.
+> The `/mithril` agents *catch* problems after code exists. This Constitution *prevents* them while code is being written. It is the always-on companion to the review framework: the same distilled CS canon, compiled into terse imperative rules an agent obeys on **every task**, before a single review runs.
 >
 > Inspired by the layered-constitution pattern in [unclebob/swarm-forge](https://github.com/unclebob/swarm-forge). Where swarm-forge ships ~5 hard rules, this Constitution distills the quality skills — but keeps the same spirit: *disciplined agents build better software, faster and more reliably, by embedding craftsmanship up front rather than relying on post-hoc review.*
 
@@ -10,7 +10,7 @@ This is opt-in and always-on once imported — it is **not** a slash command.
 
 - **Claude Code** — add one line to your project's `CLAUDE.md` (or `~/.claude/CLAUDE.md`):
   ```
-  @/absolute/path/to/Code-Quality-Skills/CONSTITUTION.md
+  @/absolute/path/to/Mithril/CONSTITUTION.md
   ```
   Claude Code resolves `@`-imports at load time, so the rules ride along on every turn.
 - **Copilot / Cursor / Continue** — paste the articles below into your repo-root `AGENTS.md` (or the tool's per-repo instructions file).
@@ -99,7 +99,7 @@ When two rules pull in opposite directions, resolve in this fixed order — **ea
 ---
 
 ## Article VII — Numeric Gates (the enforceable floor)
-*Deep reference: [`skills/gates.md`](skills/gates.md) — run via `/quality gates` or the [pre-commit hook](hooks/)*
+*Deep reference: [`skills/gates.md`](skills/gates.md) — run via `/mithril gates` or the [pre-commit hook](hooks/)*
 
 Subjective rules above become objective here. These thresholds are the *minimum*, not the target. A change that breaches one is not done until it's fixed or an explicit, recorded exception is taken.
 
@@ -127,12 +127,12 @@ A task is complete only when **all** of the following hold. This is the checklis
 - [ ] **Self-review done** — names reveal intent; functions do one thing; no swallowed exceptions; specific exception types; no N+1; big-O acceptable; USE-visible saturation on new pools/queues.
 - [ ] **Security clear** — threat model for new surfaces; all external input validated; no secrets, PHI, or PII committed; lockfile/deps reviewed.
 - [ ] **Operability clear** — golden signals / logs / traces for new paths; expand-contract for schema/API breaks; shippable behind flags.
-- [ ] **UI accessibility clear** (when shipping interactive UI) — keyboard operable primary path; controls have accessible names; labels/errors associated; no keyboard trap; WCAG 2.2 AA intent (`/quality a11y`).
+- [ ] **UI accessibility clear** (when shipping interactive UI) — keyboard operable primary path; controls have accessible names; labels/errors associated; no keyboard trap; WCAG 2.2 AA intent (`/mithril a11y`).
 - [ ] **Precedence honored** — where rules conflicted, Article I's order was applied and the trade-off is explained.
-- [ ] **Reviewed** — `/quality` run on the diff with no unresolved Critical findings.
+- [ ] **Reviewed** — `/mithril` run on the diff with no unresolved Critical findings.
 - [ ] **Committed cleanly** — atomic commit, no unrelated changes or generated artifacts, on a feature branch (never directly to a protected branch).
 
-> When in doubt, run `/quality` for the full review before declaring a feature done.
+> When in doubt, run `/mithril` for the full review before declaring a feature done.
 
 ---
 

@@ -7,6 +7,6 @@ instructions/
 # Installer backups
 *.bak.*
 
-# Deep-mode review reports (written by `/quality deep` — per-run, not source)
-.quality/
+# Deep-mode review reports (written by `/mithril deep` — per-run, not source)
+.mithril/
 .vscode/

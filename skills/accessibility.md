@@ -1,5 +1,5 @@
 ---
-name: quality-accessibility
+name: mithril-accessibility
 description: Invoke for UI/component changes. Reviews WCAG 2.2 AA intent — keyboard operability, names/roles/values, labels and errors, contrast and non-color-only status, focus management, and custom-widget APG patterns. Prefer semantic HTML over ARIA reinvention.
 model: sonnet
 tools: Read, Grep, Glob, Bash

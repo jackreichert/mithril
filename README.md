@@ -1,10 +1,10 @@
-# Code Quality Skills — Sources & Index
+# Mithril — Sources & Index
 
 ## What this is
 
 This repo is a **code-quality framework** — the canonical CS literature distilled into agent-executable form — delivered through two layers:
 
-- **Review-time (catch).** A set of specialized review agents — for code quality, architecture, refactoring, testing, security, delivery, distributed systems, design patterns, persistence, and process discipline — run against your current `git diff` and aggregate their findings into a severity-ranked verdict (`SHIP IT` / `NEEDS WORK` / `SIGNIFICANT ISSUES`). This layer runs first-class inside [Claude Code](https://docs.claude.com/claude-code) and [Grok Build](https://docs.x.ai) via the `/quality` slash command (parallel subagent orchestration + tool execution).
+- **Review-time (catch).** A set of specialized review agents — for code quality, architecture, refactoring, testing, security, delivery, distributed systems, design patterns, persistence, and process discipline — run against your current `git diff` and aggregate their findings into a severity-ranked verdict (`SHIP IT` / `NEEDS WORK` / `SIGNIFICANT ISSUES`). This layer runs first-class inside [Claude Code](https://docs.claude.com/claude-code) and [Grok Build](https://docs.x.ai) via the `/mithril` slash command (parallel subagent orchestration + tool execution).
 - **Write-time (prevent).** The always-on [Constitution](CONSTITUTION.md) compiles the same canon into terse imperative rules an agent obeys *while writing*. It's plain markdown, so it's portable: Claude Code, Grok, GitHub Copilot, and Codex are wired natively by `install.sh --link`, and any other agentic tool (Cursor, Continue, Windsurf, Cline, Aider, Zed, …) adopts it through that tool's project-instructions file (see [Multi-tool reach](#multi-tool-reach)).
 
 Each agent is a focused lens. The orchestrator picks which lenses are relevant to the diff, runs them in parallel, deduplicates overlap, and returns one report.
@@ -18,7 +18,7 @@ The framework is a **distillation of the canonical CS literature** into agent-ex
 3. **Cross-source themes.** The summaries are synthesized into **19 concept guides** in [`Resources/Themes/`](Resources/Themes/) (plus the one-file horizontal cut, [`THEMES.md`](THEMES.md)) — a Tier 1→5 curriculum (foundations → construction → design at scale → verification → systems in production). Each theme walks how the idea builds across its sources, names the real tensions instead of papering over them, and ends with the operational checklist its skill encodes. The learning on-ramp, and the reasoning layer the skills cite.
 4. **Synthesis into skills.** The themes and summaries were synthesized into concise, source-grounded runtime prompts in [`skills/`](skills/). These are both the executable specialists and the sole content source.
 5. **Host compatibility.** Plugin manifests load `skills/*.md` directly; classic installs expose the same files under `~/.claude/agents/` and `~/.grok/agents/`.
-6. **Orchestration.** The `/quality` slash command routes a diff to the relevant agents, runs them in parallel, normalizes severity, and aggregates the report.
+6. **Orchestration.** The `/mithril` slash command routes a diff to the relevant agents, runs them in parallel, normalizes severity, and aggregates the report.
 
 The "Sources by Skill" section below shows exactly which book/article/chapter informed each part of each skill, so any finding the framework produces can be traced back to a primary source.
 
@@ -28,52 +28,52 @@ For the master inventory of every book and article that informed this work, see 
 
 ## Quick start
 
-Install into [Claude Code](https://docs.claude.com/claude-code) and/or [Grok Build](https://docs.x.ai) — both get the full `/quality` review framework.
+Install into [Claude Code](https://docs.claude.com/claude-code) and/or [Grok Build](https://docs.x.ai) — both get the full `/mithril` review framework.
 
 ### Grok (plugin — recommended)
 
 ```bash
 # from a clone, or use the GitHub shorthand once published
-grok plugin install /path/to/code-quality-agents --trust
-grok plugin enable code-quality
+grok plugin install /path/to/mithril --trust
+grok plugin enable mithril
 ```
 
 Or classic install (also deploys Claude paths by default):
 
 ```bash
-git clone https://github.com/jackreichert/code-quality-agents.git
-cd code-quality-agents
+git clone https://github.com/jackreichert/mithril.git
+cd mithril
 bash install.sh --grok-only          # Grok only
 # bash install.sh                    # Claude + Grok
 ```
 
-Then in any git repo, run `/quality` from Grok. Grok loads agents from `~/.grok/agents/` (and, via Claude compatibility, `~/.claude/agents/` if you installed both).
+Then in any git repo, run `/mithril` from Grok. Grok loads agents from `~/.grok/agents/` (and, via Claude compatibility, `~/.claude/agents/` if you installed both).
 
 ### Claude Code
 
 **As a plugin** (recommended — no file copies, updates with the repo):
 
 ```
-/plugin marketplace add jackreichert/code-quality-agents
-/plugin install code-quality@code-quality-agents
+/plugin marketplace add jackreichert/mithril
+/plugin install mithril@mithril
 ```
 
 **Classic install** (links to the canonical skills for live updates by default):
 
 ```bash
-git clone https://github.com/jackreichert/code-quality-agents.git
-cd code-quality-agents
+git clone https://github.com/jackreichert/mithril.git
+cd mithril
 bash install.sh
 ```
 
-Then run `/quality` from Claude Code or Grok. Plugin and classic paths load the same canonical skill content. Use one installation path per host.
+Then run `/mithril` from Claude Code or Grok. Plugin and classic paths load the same canonical skill content. Use one installation path per host.
 
 ### What it does
 
 `install.sh` deploys (Claude and Grok by default):
 
-- 18 agent files into `~/.claude/agents/quality-*.md` and `~/.grok/agents/quality-*.md`
-- The `/quality` orchestrator into `~/.claude/commands/quality.md` and `~/.grok/commands/quality.md`
+- 18 agent files into `~/.claude/agents/mithril-*.md` and `~/.grok/agents/mithril-*.md`
+- The `/mithril` orchestrator into `~/.claude/commands/mithril.md` and `~/.grok/commands/mithril.md`
 
 By default the installer links both host installations directly to `skills/`, so one edit updates every linked host. `--copy-agents` creates a frozen install instead. Re-running is idempotent.
 
@@ -127,24 +127,24 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 
 | File | Focus | Agent file |
 |------|-------|-----------|
-| `skills/code-quality.md` | Naming, functions, smells, comments, complexity, FP, error handling, performance, structure, formatting | `~/.claude/agents/quality-code-quality.md` |
-| `skills/architecture.md` | SOLID, dependency direction, component principles, coupling/cohesion, info hiding, DDD, resilience patterns | `~/.claude/agents/quality-architecture.md` |
-| `skills/refactor.md` | Dual-mode: Mode 1 simplify (light) + Mode 2 full Fowler-catalog refactor plan, plus Branch by Abstraction & Strangler Fig | `~/.claude/agents/quality-refactor.md` |
-| `skills/review.md` | Confidence-scored code review with quick, full-PR, and targeted-follow-up modes; Google design-first priority | `~/.claude/agents/quality-review.md` |
-| `skills/security-review.md` | Adversarial security review using OWASP Top 10, CWE, and selected OWASP ASVS control families | `~/.claude/agents/quality-security-review.md` |
-| `skills/test-quality.md` | F.I.R.S.T., AAA, naming, test doubles, xUnit Pattern smells, coverage; GOOS Listen-to-the-Tests as organizing principle | `~/.claude/agents/quality-test-quality.md` |
-| `skills/delivery.md` | CD pipeline readiness, trunk-based dev, 12-Factor compliance, feature flags, expand-contract migrations, observability prereqs | `~/.claude/agents/quality-delivery.md` |
-| `skills/distributed.md` | Waldo's four differences, replication/consistency, idempotency, partitioning, microservice boundaries, CQRS/ES tradeoffs | `~/.claude/agents/quality-distributed.md` |
-| `skills/concurrency.md` | In-process concurrency: the three hazards (atomicity, visibility, liveness), shared mutable state, races, locking discipline & deadlock, high-level utilities, async/event-loop, thread-safety contracts, testing concurrent code | `~/.claude/agents/quality-concurrency.md` |
-| `skills/patterns.md` | GoF + HFDP pattern recognition vocabulary, anti-patterns (Singleton/Visitor abuse), modern alternatives | `~/.claude/agents/quality-patterns.md` |
-| `skills/persistence.md` | PEAA pattern catalog: Active Record vs Data Mapper, Unit of Work, Repository, Lazy Load + N+1, transactions, migrations | `~/.claude/agents/quality-persistence.md` |
-| `skills/gates.md` | Objective tool-measured floor: lint, cyclomatic complexity, function length, duplication, coverage, mutation score, CRAP — runs tools and reports pass/fail vs explicit thresholds | `~/.claude/agents/quality-gates.md` |
-| `skills/specification.md` | Acceptance-criteria / BDD feature-file quality: key examples, declarative phrasing, ubiquitous language, executable & living specs, acceptance-level mutation | `~/.claude/agents/quality-specification.md` |
-| `skills/performance.md` | Measure-then-change, USE method, latency percentiles, N+1/query cost, caches, bounded fan-out — Theme 18 | `~/.claude/agents/quality-performance.md` |
-| `skills/observability.md` | Golden signals (incl. saturation), structured logs, traces, SLIs/SLOs/error budgets, alert hygiene — Theme 18 | `~/.claude/agents/quality-observability.md` |
-| `skills/accessibility.md` | WCAG 2.2 AA UI review: keyboard, names/roles/values, labels/errors, contrast, APG widgets — Theme 19 | `~/.claude/agents/quality-accessibility.md` |
-| _cross-cutting: `security-review` + `distributed` + `persistence` + `code-quality` + `performance`_ | Flow tracing — control + data flow from entry points to sinks: taint (source→sink), error propagation, resource/transaction lifecycle, N+1-across-chain, cross-boundary partial failure. Runs as Phase 2 of `/quality deep`; standalone via `/quality flow` | `~/.claude/agents/quality-flow.md` |
-| `skills/tutor.md` | Grounded CS tutor — teaches a concept/theme from the library, or the principles at play in a PR/diff; cites sources, surfaces tensions, explains rather than reviews | — (inline via `/quality tutor` \| `/quality learn`) |
+| `skills/code-quality.md` | Naming, functions, smells, comments, complexity, FP, error handling, performance, structure, formatting | `~/.claude/agents/mithril-code-quality.md` |
+| `skills/architecture.md` | SOLID, dependency direction, component principles, coupling/cohesion, info hiding, DDD, resilience patterns | `~/.claude/agents/mithril-architecture.md` |
+| `skills/refactor.md` | Dual-mode: Mode 1 simplify (light) + Mode 2 full Fowler-catalog refactor plan, plus Branch by Abstraction & Strangler Fig | `~/.claude/agents/mithril-refactor.md` |
+| `skills/review.md` | Confidence-scored code review with quick, full-PR, and targeted-follow-up modes; Google design-first priority | `~/.claude/agents/mithril-review.md` |
+| `skills/security-review.md` | Adversarial security review using OWASP Top 10, CWE, and selected OWASP ASVS control families | `~/.claude/agents/mithril-security-review.md` |
+| `skills/test-quality.md` | F.I.R.S.T., AAA, naming, test doubles, xUnit Pattern smells, coverage; GOOS Listen-to-the-Tests as organizing principle | `~/.claude/agents/mithril-test-quality.md` |
+| `skills/delivery.md` | CD pipeline readiness, trunk-based dev, 12-Factor compliance, feature flags, expand-contract migrations, observability prereqs | `~/.claude/agents/mithril-delivery.md` |
+| `skills/distributed.md` | Waldo's four differences, replication/consistency, idempotency, partitioning, microservice boundaries, CQRS/ES tradeoffs | `~/.claude/agents/mithril-distributed.md` |
+| `skills/concurrency.md` | In-process concurrency: the three hazards (atomicity, visibility, liveness), shared mutable state, races, locking discipline & deadlock, high-level utilities, async/event-loop, thread-safety contracts, testing concurrent code | `~/.claude/agents/mithril-concurrency.md` |
+| `skills/patterns.md` | GoF + HFDP pattern recognition vocabulary, anti-patterns (Singleton/Visitor abuse), modern alternatives | `~/.claude/agents/mithril-patterns.md` |
+| `skills/persistence.md` | PEAA pattern catalog: Active Record vs Data Mapper, Unit of Work, Repository, Lazy Load + N+1, transactions, migrations | `~/.claude/agents/mithril-persistence.md` |
+| `skills/gates.md` | Objective tool-measured floor: lint, cyclomatic complexity, function length, duplication, coverage, mutation score, CRAP — runs tools and reports pass/fail vs explicit thresholds | `~/.claude/agents/mithril-gates.md` |
+| `skills/specification.md` | Acceptance-criteria / BDD feature-file quality: key examples, declarative phrasing, ubiquitous language, executable & living specs, acceptance-level mutation | `~/.claude/agents/mithril-specification.md` |
+| `skills/performance.md` | Measure-then-change, USE method, latency percentiles, N+1/query cost, caches, bounded fan-out — Theme 18 | `~/.claude/agents/mithril-performance.md` |
+| `skills/observability.md` | Golden signals (incl. saturation), structured logs, traces, SLIs/SLOs/error budgets, alert hygiene — Theme 18 | `~/.claude/agents/mithril-observability.md` |
+| `skills/accessibility.md` | WCAG 2.2 AA UI review: keyboard, names/roles/values, labels/errors, contrast, APG widgets — Theme 19 | `~/.claude/agents/mithril-accessibility.md` |
+| _cross-cutting: `security-review` + `distributed` + `persistence` + `code-quality` + `performance`_ | Flow tracing — control + data flow from entry points to sinks: taint (source→sink), error propagation, resource/transaction lifecycle, N+1-across-chain, cross-boundary partial failure. Runs as Phase 2 of `/mithril deep`; standalone via `/mithril flow` | `~/.claude/agents/mithril-flow.md` |
+| `skills/tutor.md` | Grounded CS tutor — teaches a concept/theme from the library, or the principles at play in a PR/diff; cites sources, surfaces tensions, explains rather than reviews | — (inline via `/mithril tutor` \| `/mithril learn`) |
 
 ### Workflow & Supporting Docs
 
@@ -154,7 +154,7 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `CS-Best-Practices-Resources.md` | Per-source index — every book, article, and paper that informed the framework, and which idea each one owns | — |
 | `THEMES.md` | Cross-cutting synthesis of the `Resources/` library — the themes that recur across sources, where they converge, and the documented tensions (with a resolution map keyed to the skills) | — |
 | `Resources/Themes/` | 19 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer between the per-source summaries and the skills; each theme names its tensions and the checklist its skill encodes | — |
-| `skills/process.md` | Planning discipline: pre-flight (edge cases, deps, alternatives) + post-validation (Big-O, requirements, assumptions) | `~/.claude/agents/quality-process.md` |
+| `skills/process.md` | Planning discipline: pre-flight (edge cases, deps, alternatives) + post-validation (Big-O, requirements, assumptions) | `~/.claude/agents/mithril-process.md` |
 | `CONSTITUTION.md` | Write-time prevention layer — the skills distilled into always-on imperative rules, a conflict-precedence order, numeric gate thresholds, and a Definition of Done. Loaded via a `CLAUDE.md` `@`-import. | — |
 | `hooks/pre-commit` | Opt-in git hook that runs the fast gates (lint + complexity) on staged files and blocks the commit on a breach. See `hooks/README.md`. | — |
 
@@ -162,9 +162,9 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 
 The framework now works at both ends of the change lifecycle:
 
-- **Review-time (catch).** `/quality` routes a diff to the relevant reading agents, which *judge* the code against the canon and report severity-ranked findings. This is the original framework.
-- **Write-time (prevent).** [`CONSTITUTION.md`](CONSTITUTION.md) compiles the same canon into terse always-on rules an agent obeys *while writing* — so issues are designed out, not just flagged. Import it into a project's `CLAUDE.md` with `@/path/to/Code-Quality-Skills/CONSTITUTION.md`.
-- **Enforcement (block).** `/quality gates` and the [`hooks/pre-commit`](hooks/) hook turn the qualitative rules into objective, tool-measured pass/fail gates (lint, complexity, duplication, coverage, mutation) — the floor beneath the reading agents. The agents opine; the gates measure.
+- **Review-time (catch).** `/mithril` routes a diff to the relevant reading agents, which *judge* the code against the canon and report severity-ranked findings. This is the original framework.
+- **Write-time (prevent).** [`CONSTITUTION.md`](CONSTITUTION.md) compiles the same canon into terse always-on rules an agent obeys *while writing* — so issues are designed out, not just flagged. Import it into a project's `CLAUDE.md` with `@/path/to/Mithril/CONSTITUTION.md`.
+- **Enforcement (block).** `/mithril gates` and the [`hooks/pre-commit`](hooks/) hook turn the qualitative rules into objective, tool-measured pass/fail gates (lint, complexity, duplication, coverage, mutation) — the floor beneath the reading agents. The agents opine; the gates measure.
 
 This mirrors the lesson of [unclebob/swarm-forge](https://github.com/unclebob/swarm-forge): the same distilled discipline should run as a *constitution* up front and as *enforced gates*, not only as post-hoc review.
 
@@ -186,18 +186,18 @@ This mirrors the lesson of [unclebob/swarm-forge](https://github.com/unclebob/sw
 
 | Path | Purpose |
 |------|---------|
-| `~/.claude/commands/quality.md` · `~/.grok/commands/quality.md` | The `/quality [aspects]` command — routes to agents, aggregates findings (Claude Code + Grok) |
-| `~/.claude/agents/quality-*.md` · `~/.grok/agents/quality-*.md` | Canonical skills exposed under host-compatible names |
+| `~/.claude/commands/mithril.md` · `~/.grok/commands/mithril.md` | The `/mithril [aspects]` command — routes to agents, aggregates findings (Claude Code + Grok) |
+| `~/.claude/agents/mithril-*.md` · `~/.grok/agents/mithril-*.md` | Canonical skills exposed under host-compatible names |
 | `instructions/` (generated, gitignored) | Self-contained inlined instructions (vendor prefix + Constitution) for tools that can't `@import` — Codex & Copilot, via `install.sh --copilot` |
 | `install.sh --link` / `--copilot` | Wires the Constitution into Claude (import), Grok (`~/.grok/AGENTS.md`), Codex (symlink), and Copilot (inlined file) from one source |
 
 ### Multi-tool reach
 
-The **review framework** (`/quality` — parallel agents, diff-routing, severity aggregation, tool-backed SAST/SCA) is first-class on **Claude Code and Grok Build**. Copilot and Codex do not offer equivalent subagent orchestration, so they get the write-time Constitution only.
+The **review framework** (`/mithril` — parallel agents, diff-routing, severity aggregation, tool-backed SAST/SCA) is first-class on **Claude Code and Grok Build**. Copilot and Codex do not offer equivalent subagent orchestration, so they get the write-time Constitution only.
 
 The **write-time [Constitution](CONSTITUTION.md)** reaches every wired assistant from a single source (`install.sh --link`):
 
-| Tool | How it gets the Constitution | Wired by installer? | `/quality` review agents? |
+| Tool | How it gets the Constitution | Wired by installer? | `/mithril` review agents? |
 |------|------------------------------|---------------------|---------------------------|
 | **Claude Code** | native `@import` in `~/.claude/CLAUDE.md` — live | ✅ `--link` | ✅ full |
 | **Grok Build** | `~/.grok/AGENTS.md` → Constitution (or self-contained file) | ✅ `--link` | ✅ full |
@@ -507,7 +507,7 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
 
 **Pattern:** Confidence-scored review (≥80 threshold), CLAUDE.md-driven, bug detection + general code quality, plus merged PR-review orchestration modes (`quick`, `full-pr`, `targeted-follow-up`).
 
-**Agent files**: `quality-review.md` and `quality-security-review.md` were derived from these canonical skills and now exist at `~/.claude/agents/`.
+**Agent files**: `mithril-review.md` and `mithril-security-review.md` were derived from these canonical skills and now exist at `~/.claude/agents/`.
 
 ---
 
@@ -628,11 +628,11 @@ When extending or revising a skill:
 3. **If adding a new source**, update both:
    - The skill's "Sources" line at the top of its file
    - This README's "Sources by Skill" section
-4. **If adding a new aspect to the orchestrator**, update `claude/commands/quality.md`'s aspect routing table and tips section
+4. **If adding a new aspect to the orchestrator**, update `claude/commands/mithril.md`'s aspect routing table and tips section
 
 ---
 
-## Worked Example: A Full `/quality` Session
+## Worked Example: A Full `/mithril` Session
 
 A walkthrough so you (or future-you in 3 months) can re-orient.
 
@@ -644,7 +644,7 @@ You just finished a feature: added an `/api/users/:id/orders` endpoint that fetc
 
 ### Step 1 — Ready to commit, run the default
 ```
-/quality
+/mithril
 ```
 
 The orchestrator:
@@ -654,13 +654,13 @@ The orchestrator:
   - Goal: an authenticated user can retrieve only that user's orders
   - Key examples: own orders returned; another user's ID denied; unknown user handled with the agreed error
   - If those outcomes are absent or contradictory in the request/spec, asks for confirmation before issuing a functional verdict
-4. Runs `quality-specification` first for this behavior-affecting change. Given/When/Then is the shared format; a Cucumber suite is required only if the team chooses to keep these as executable living documentation.
+4. Runs `mithril-specification` first for this behavior-affecting change. Given/When/Then is the shared format; a Cucumber suite is required only if the team chooses to keep these as executable living documentation.
 5. Auto-selects the remaining agents based on detectable signals:
-   - `quality-code-quality` (always, source files changed)
-   - `quality-architecture` (new function/endpoint adds structural surface)
-   - `quality-test-quality` (test file in diff)
+   - `mithril-code-quality` (always, source files changed)
+   - `mithril-architecture` (new function/endpoint adds structural surface)
+   - `mithril-test-quality` (test file in diff)
    - `security-auditor` (file in `routes/` path)
-   - `quality-refactor` Mode 1 (last, polish pass)
+   - `mithril-refactor` Mode 1 (last, polish pass)
 6. Passes the confirmed Review Contract to the code agents and spawns the applicable agents in parallel via `Task`
 7. Each returns severity-tagged findings
 8. Orchestrator deduplicates, normalizes severity, aggregates
@@ -674,13 +674,13 @@ Hypothetical output:
   user A can fetch user B's orders by changing the path param
 
 ## Important — Fix Before PR
-- [quality-test-quality] orderService.test.ts:42 — only happy path tested;
+- [mithril-test-quality] orderService.test.ts:42 — only happy path tested;
   missing test for non-existent userId
-- [quality-architecture] orderService.ts:15 — direct DB import in service
+- [mithril-architecture] orderService.ts:15 — direct DB import in service
   layer; should go through repository
 
 ## Minor — Worth Doing
-- [quality-code-quality] orderService.ts:23 — variable `data` is vague;
+- [mithril-code-quality] orderService.ts:23 — variable `data` is vague;
   rename to `userOrders`
 
 Counts: Critical: 1 | Important: 2 | Minor: 1
@@ -689,13 +689,13 @@ Verdict: SIGNIFICANT ISSUES
 
 ### Step 3 — Fix Critical, re-run
 
-Add the ownership check, re-run `/quality`. If now `NEEDS WORK`, fix the Importants and re-run. When `SHIP IT`, commit.
+Add the ownership check, re-run `/mithril`. If now `NEEDS WORK`, fix the Importants and re-run. When `SHIP IT`, commit.
 
 ### Step 4 — Optional: targeted follow-ups
 
 Want named refactoring moves for the architecture finding?
 ```
-/quality refactor
+/mithril refactor
 ```
 
 Mode 2 returns specific Fowler moves (e.g., "Extract Repository — mechanics: ...").
@@ -704,7 +704,7 @@ Mode 2 returns specific Fowler moves (e.g., "Extract Repository — mechanics: .
 
 ## Smoke Test Recipe
 
-Before relying on `/quality` for anything important, run it once on a low-stakes diff to confirm everything wires up.
+Before relying on `/mithril` for anything important, run it once on a low-stakes diff to confirm everything wires up.
 
 ```bash
 # In any git repo with some uncommitted changes:
@@ -715,7 +715,7 @@ echo "// test comment" >> src/some-file.ts
 
 # Run the framework:
 # (in Claude Code or Grok session)
-/quality
+/mithril
 ```
 
 **Expected:**
@@ -726,7 +726,7 @@ echo "// test comment" >> src/some-file.ts
 - Verdict on a trivial comment-only change should be `SHIP IT` or maybe one Minor finding
 
 **If it doesn't work:**
-- Agent fails to spawn → check `~/.claude/agents/quality-*.md` and/or `~/.grok/agents/quality-*.md` exist
+- Agent fails to spawn → check `~/.claude/agents/mithril-*.md` and/or `~/.grok/agents/mithril-*.md` exist
 - Orchestrator says "no diff found" but you have changes → check `git status`
 - Output format looks broken → see Troubleshooting below
 
@@ -736,15 +736,15 @@ echo "// test comment" >> src/some-file.ts
 
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
-| `/quality` not recognized | Command file missing or permission issue | `ls ~/.claude/commands/quality.md` and `ls ~/.grok/commands/quality.md` — re-run `install.sh` or enable the `code-quality` plugin |
+| `/mithril` not recognized | Command file missing or permission issue | `ls ~/.claude/commands/mithril.md` and `ls ~/.grok/commands/mithril.md` — re-run `install.sh` or enable the `mithril` plugin |
 | Orchestrator asks for files instead of using diff | Not a git repo OR no changes | `git status` — confirm you're in a repo with uncommitted work |
 | Agent returns nothing useful | Diff is empty or trivial | Verify `git diff` shows substantive changes |
-| Agent times out | Diff too large | Run targeted aspect on subset: `/quality code` on specific file |
+| Agent times out | Diff too large | Run targeted aspect on subset: `/mithril code` on specific file |
 | Severity counts don't match findings | Some agent didn't tag severity inline | Check that agent file has the `[CRITICAL]/[IMPORTANT]/[MINOR]` tagging instruction |
-| Security findings get swallowed | CVSS not normalizing correctly | Check the orchestrator's severity-normalization table — `~/.claude/commands/quality.md` or `~/.grok/commands/quality.md` |
+| Security findings get swallowed | CVSS not normalizing correctly | Check the orchestrator's severity-normalization table — `~/.claude/commands/mithril.md` or `~/.grok/commands/mithril.md` |
 | Output is severity-grouped but I want category-grouped | Default is severity-grouped (orchestrator); per-agent reports are category-grouped | Run agents directly via `Task` (Claude) or `spawn_subagent` (Grok) for per-agent category view |
 | Agents disagree about a finding | Expected — different lenses | Orchestrator preserves the most severe rating during deduplication |
-| Grok can't find `quality-*` agents | Classic install skipped Grok, or plugin disabled | `bash install.sh --grok-only` or `grok plugin enable code-quality` |
+| Grok can't find `mithril-*` agents | Classic install skipped Grok, or plugin disabled | `bash install.sh --grok-only` or `grok plugin enable mithril` |
 
 If output is consistently broken, smoke-test a single agent directly via `Task` (Claude Code) or `spawn_subagent` (Grok) to isolate whether the bug is in the orchestrator or the agent.
 

@@ -8,7 +8,7 @@ focus: DDD + FP, type-driven design, algebraic data types, making illegal states
 
 # Domain Modeling Made Functional — Scott Wlaschin (2018)
 
-Fuses Domain-Driven Design with functional programming: the domain is modeled directly in the type system, illegal states are made unrepresentable, and workflows are expressed as composable pipelines of pure functions with errors carried on a `Result` track (railway-oriented programming). Feeds the **quality-architecture** and **quality-code-quality** agents — it reinforces the FP-discipline rule (Article II: pure functions, immutability, I/O at the boundaries) and the domain-modeling/SOLID rules (Article III: deep domain model independent of frameworks and persistence). Uses F#, but the algebraic-types-as-design ideas transfer to any language with sum/product types (Rust, TypeScript, Kotlin, Scala, Swift).
+Fuses Domain-Driven Design with functional programming: the domain is modeled directly in the type system, illegal states are made unrepresentable, and workflows are expressed as composable pipelines of pure functions with errors carried on a `Result` track (railway-oriented programming). Feeds the **mithril-architecture** and **mithril-code-quality** agents — it reinforces the FP-discipline rule (Article II: pure functions, immutability, I/O at the boundaries) and the domain-modeling/SOLID rules (Article III: deep domain model independent of frameworks and persistence). Uses F#, but the algebraic-types-as-design ideas transfer to any language with sum/product types (Rust, TypeScript, Kotlin, Scala, Swift).
 
 ## Per-chapter summary
 

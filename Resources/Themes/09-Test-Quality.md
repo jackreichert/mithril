@@ -1,6 +1,6 @@
 # 09 — Test Quality: The Suite as an Asset
 
-> **Tier 4 · Verification.** What separates a suite that enables change from one that punishes it: the four pillars, the double taxonomy, the smell catalog, flakiness eradication, and distribution strategy — with coverage demoted to what it really is. **Skill:** [`skills/test-quality.md`](../../skills/test-quality.md) · agent `quality-test-quality` (mutation floor: [`skills/gates.md`](../../skills/gates.md)).
+> **Tier 4 · Verification.** What separates a suite that enables change from one that punishes it: the four pillars, the double taxonomy, the smell catalog, flakiness eradication, and distribution strategy — with coverage demoted to what it really is. **Skill:** [`skills/test-quality.md`](../../skills/test-quality.md) · agent `mithril-test-quality` (mutation floor: [`skills/gates.md`](../../skills/gates.md)).
 
 ## The idea in one paragraph
 

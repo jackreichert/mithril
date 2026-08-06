@@ -8,7 +8,7 @@ focus: service decomposition, information hiding, communication styles, deployme
 
 # Building Microservices — Sam Newman (2021, 2nd ed.)
 
-The definitive practitioner's guide to designing, deploying, and operating fine-grained services. Feeds the **quality-distributed** agent: it is the book behind the microservice boundary, coupling, and communication concerns that skill reviews — the practical complement to Fowler's *Microservices* article and the Waldo *A Note on Distributed Computing* paper already in the canon. Where Waldo warns that remote calls are not local calls, Newman shows how to model the boundaries, choose the communication style, and survive the partial failure that follows.
+The definitive practitioner's guide to designing, deploying, and operating fine-grained services. Feeds the **mithril-distributed** agent: it is the book behind the microservice boundary, coupling, and communication concerns that skill reviews — the practical complement to Fowler's *Microservices* article and the Waldo *A Note on Distributed Computing* paper already in the canon. Where Waldo warns that remote calls are not local calls, Newman shows how to model the boundaries, choose the communication style, and survive the partial failure that follows.
 
 ## Per-chapter summary
 

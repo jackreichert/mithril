@@ -6,14 +6,14 @@
 case: missing-timeout
 defects:
   - id: post-without-timeout
-    agent: quality-distributed   # quality-flow should also catch on the path
+    agent: mithril-distributed   # mithril-flow should also catch on the path
     file: src/payments/gatewayClient.py
     severity_min: Important
     match: "(timeout|hang|block.*forever|unbounded)"
     note: requests.post has no timeout kwarg — and requests has no default
 
   - id: retry-non-idempotent-capture
-    agent: quality-distributed
+    agent: mithril-distributed
     file: src/payments/gatewayClient.py
     severity_min: Critical
     match: "(idempoten|double.charg|retry.*executed|at.least.once|duplicate)"

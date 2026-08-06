@@ -36,28 +36,28 @@ jobs:
         run: |
           set -e
           expected_agents=(
-            quality-accessibility quality-architecture quality-code-quality
-            quality-concurrency quality-delivery quality-distributed
-            quality-flow quality-gates quality-observability quality-patterns
-            quality-performance quality-persistence quality-process
-            quality-refactor quality-review quality-security-review
-            quality-specification quality-test-quality
+            mithril-accessibility mithril-architecture mithril-code-quality
+            mithril-concurrency mithril-delivery mithril-distributed
+            mithril-flow mithril-gates mithril-observability mithril-patterns
+            mithril-performance mithril-persistence mithril-process
+            mithril-refactor mithril-review mithril-security-review
+            mithril-specification mithril-test-quality
           )
           for home in /tmp/fake-claude /tmp/fake-grok; do
-            test -f "$home/agents/.code-quality-skills-agents" \
+            test -f "$home/agents/.mithril-agents" \
               || { echo "missing ownership manifest: $home"; exit 1; }
             for name in "${expected_agents[@]}"; do
               test -f "$home/agents/${name}.md" \
                 || { echo "missing: $home/agents/${name}.md"; exit 1; }
             done
-            deployed=$(find "$home/agents" -name 'quality-*.md' | wc -l)
+            deployed=$(find "$home/agents" -name 'mithril-*.md' | wc -l)
             test "$deployed" -eq "${#expected_agents[@]}" \
               || { echo "agent count drift in $home: deployed=$deployed expected=${#expected_agents[@]}"; exit 1; }
-            test -f "$home/commands/quality.md" \
-              || { echo "missing: $home/commands/quality.md"; exit 1; }
+            test -f "$home/commands/mithril.md" \
+              || { echo "missing: $home/commands/mithril.md"; exit 1; }
           done
           # Grok host-agnostic orchestrator note must be present
-          grep -q 'spawn_subagent' /tmp/fake-grok/commands/quality.md \
+          grep -q 'spawn_subagent' /tmp/fake-grok/commands/mithril.md \
             || { echo "orchestrator missing Grok spawn_subagent guidance"; exit 1; }
 
       - name: Verify canonical agent links
@@ -67,10 +67,10 @@ jobs:
               echo "found unsubstituted \${CLAUDE_PLUGIN_ROOT} token under $home/commands"
               exit 1
             fi
-            for agent in "$home/agents"/quality-*.md; do
+            for agent in "$home/agents"/mithril-*.md; do
               test -L "$agent" || { echo "agent is not linked: $agent"; exit 1; }
               name="$(basename "$agent")"
-              expected="$GITHUB_WORKSPACE/skills/${name#quality-}"
+              expected="$GITHUB_WORKSPACE/skills/${name#mithril-}"
               test "$(readlink "$agent")" = "$expected" \
                 || { echo "$agent does not target $expected"; exit 1; }
             done
@@ -93,12 +93,12 @@ jobs:
       - name: Remove stale installer-owned agents
         run: |
           for home in /tmp/fake-claude /tmp/fake-grok; do
-            touch "$home/agents/quality-retired.md"
-            printf 'quality-retired.md\n' >> "$home/agents/.code-quality-skills-agents"
+            touch "$home/agents/mithril-retired.md"
+            printf 'mithril-retired.md\n' >> "$home/agents/.mithril-agents"
           done
           bash install.sh --claude-home /tmp/fake-claude --grok-home /tmp/fake-grok
-          test ! -e /tmp/fake-claude/agents/quality-retired.md
-          test ! -e /tmp/fake-grok/agents/quality-retired.md
+          test ! -e /tmp/fake-claude/agents/mithril-retired.md
+          test ! -e /tmp/fake-grok/agents/mithril-retired.md
 
       - name: Canonical skill and manifest integrity
         run: |
@@ -109,8 +109,8 @@ jobs:
       - name: Frozen copy install
         run: |
           bash install.sh --copy-agents --claude-only --claude-home /tmp/fake-copy
-          test ! -L /tmp/fake-copy/agents/quality-code-quality.md
-          cmp skills/code-quality.md /tmp/fake-copy/agents/quality-code-quality.md
+          test ! -L /tmp/fake-copy/agents/mithril-code-quality.md
+          cmp skills/code-quality.md /tmp/fake-copy/agents/mithril-code-quality.md
 
       - name: Personalization & linking (--name / --copilot / --link)
         run: |
@@ -188,9 +188,9 @@ jobs:
           if grep -qE '^@.*CONSTITUTION(\.local)?\.md$' /tmp/fake-claude/CLAUDE.md; then
             echo "uninstall left a Constitution import line behind"; exit 1
           fi
-          test ! -f /tmp/fake-claude/agents/quality-code-quality.md \
+          test ! -f /tmp/fake-claude/agents/mithril-code-quality.md \
             || { echo "uninstall left Claude agents behind"; exit 1; }
-          test ! -f /tmp/fake-grok/agents/quality-code-quality.md \
+          test ! -f /tmp/fake-grok/agents/mithril-code-quality.md \
             || { echo "uninstall left Grok agents behind"; exit 1; }
           test ! -e /tmp/fake-grok/AGENTS.md \
             || { echo "uninstall left Grok AGENTS.md behind"; exit 1; }

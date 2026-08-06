@@ -115,5 +115,5 @@ Polling, timeouts, completion semaphores.
 - **Listen to the tests**: pain in tests is feedback about design, not testing.
 - **Walking skeleton**: end-to-end on day 1.
 
-## Why it's deeply integrated into `/quality test-quality`
+## Why it's deeply integrated into `/mithril test-quality`
 The "listen to the tests" thesis underpins every test smell the test-quality agent flags.

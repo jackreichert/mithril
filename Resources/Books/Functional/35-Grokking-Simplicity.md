@@ -8,7 +8,7 @@ focus: actions/calculations/data, immutability (copy-on-write), stratified desig
 
 # Grokking Simplicity — Eric Normand (2021)
 
-A practical, illustration-heavy introduction to functional thinking that skips the jargon (no monads, no category theory) and reduces FP to one core skill: separating code into **actions** (depend on when/how often they run), **calculations** (pure input→output functions), and **data** (inert recorded facts). It feeds the **quality-code-quality** agent's functional-discipline axis, and is the source for the Constitution's Article II rule: "prefer pure functions and immutability; push I/O and side effects to the boundaries; keep the core deterministic." The actions/calculations/data distinction IS that rule — convert actions into calculations where you can, isolate the actions you can't, and build the deterministic core out of calculations over immutable data.
+A practical, illustration-heavy introduction to functional thinking that skips the jargon (no monads, no category theory) and reduces FP to one core skill: separating code into **actions** (depend on when/how often they run), **calculations** (pure input→output functions), and **data** (inert recorded facts). It feeds the **mithril-code-quality** agent's functional-discipline axis, and is the source for the Constitution's Article II rule: "prefer pure functions and immutability; push I/O and side effects to the boundaries; keep the core deterministic." The actions/calculations/data distinction IS that rule — convert actions into calculations where you can, isolate the actions you can't, and build the deterministic core out of calculations over immutable data.
 
 ## Per-chapter summary
 

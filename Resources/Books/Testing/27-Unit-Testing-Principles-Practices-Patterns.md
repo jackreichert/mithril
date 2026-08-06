@@ -165,4 +165,4 @@ Each test creates its own data. Shared baseline data creates test coupling.
 
 ## Why it belongs alongside the existing canon
 
-Beck (TDD by Example) teaches the *discipline*. Freeman & Pryce (GOOS) teach the *outside-in design approach*. Osherove (Art of Unit Testing) teaches *maintainability*. Khorikov answers the foundational question all three skip: *what makes a test valuable and how do you measure it?* The Four Pillars framework and the Classical/London analysis are the conceptual backbone behind the `/quality test-quality` agent's scoring rubric.
+Beck (TDD by Example) teaches the *discipline*. Freeman & Pryce (GOOS) teach the *outside-in design approach*. Osherove (Art of Unit Testing) teaches *maintainability*. Khorikov answers the foundational question all three skip: *what makes a test valuable and how do you measure it?* The Four Pillars framework and the Classical/London analysis are the conceptual backbone behind the `/mithril test-quality` agent's scoring rubric.

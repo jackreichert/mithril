@@ -7,14 +7,14 @@
 case: shallow-module-pile
 defects:
   - id: shallow-pass-through-layers
-    agent: quality-architecture
+    agent: mithril-architecture
     file: src/reports/reportController.ts
     severity_min: Important
     match: "(shallow|pass.?through|indirection|layer|no.*abstraction|ceremony)"
     note: ReportController -> ReportRequestMapper -> ReportApplicationService only forwards data to buildMonthlyReport
 
   - id: shallow-wrapper-classes
-    agent: quality-code-quality
+    agent: mithril-code-quality
     file: src/reports/reportApplicationService.ts
     severity_min: Important
     match: "(shallow|wrapper|pass.?through|middle.?man|ceremony|complexity)"

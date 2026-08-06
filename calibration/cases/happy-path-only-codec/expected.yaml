@@ -5,7 +5,7 @@
 case: happy-path-only-codec
 defects:
   - id: codec-no-property-tests
-    agent: quality-test-quality
+    agent: mithril-test-quality
     file: src/codec/slug.test.ts
     severity_min: Important
     match: "(property|PBT|Hypothesis|fast-check|invariant|edge|unicode|empty|generator|QuickCheck)"

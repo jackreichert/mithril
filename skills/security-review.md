@@ -1,5 +1,5 @@
 ---
-name: quality-security-review
+name: mithril-security-review
 description: Adversarial security review — find vulnerabilities a real attacker would find. Runs SAST (Semgrep, language-specific) + SCA (npm audit, pip-audit, govulncheck) + secrets scanning, then manual review against OWASP Top 10 and ASVS control families.
 model: opus
 tools: Read, Grep, Glob, Bash
@@ -70,7 +70,7 @@ Check every category; do not omit one because it seems unlikely.
 
 ### Security Logging/Monitoring Failures (OWASP A09:2021) — detection
 - Log auth/privilege changes, sensitive operations, and failed access with safe user/tenant context.
-- Preserve append-only/signed integrity, >=90-day investigation retention, and actionable alert routing; exclude PII/secrets. Route general telemetry delivery to quality-delivery.
+- Preserve append-only/signed integrity, >=90-day investigation retention, and actionable alert routing; exclude PII/secrets. Route general telemetry delivery to mithril-delivery.
 
 ## OWASP ASVS Overlay
 

@@ -1,6 +1,6 @@
 # 02 — The Professional's Discipline
 
-> **Tier 1 · Foundations.** Before construction technique: how a professional plans, commits, estimates, and validates — the checks that happen *around* the code. **Skill:** [`skills/process.md`](../../skills/process.md) · agent `quality-process`.
+> **Tier 1 · Foundations.** Before construction technique: how a professional plans, commits, estimates, and validates — the checks that happen *around* the code. **Skill:** [`skills/process.md`](../../skills/process.md) · agent `mithril-process`.
 
 ## The idea in one paragraph
 

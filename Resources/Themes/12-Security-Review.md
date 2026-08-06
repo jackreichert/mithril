@@ -1,6 +1,6 @@
 # 12 — Security: Thinking Like an Attacker
 
-> **Tier 4 · Verification.** The adversarial lens: every input is hostile until proven otherwise, design flaws outrank implementation bugs, and the supply chain and the logs are part of the attack surface. **Skill:** [`skills/security-review.md`](../../skills/security-review.md) · agent `quality-security-review` (taint tracing: `quality-flow`).
+> **Tier 4 · Verification.** The adversarial lens: every input is hostile until proven otherwise, design flaws outrank implementation bugs, and the supply chain and the logs are part of the attack surface. **Skill:** [`skills/security-review.md`](../../skills/security-review.md) · agent `mithril-security-review` (taint tracing: `mithril-flow`).
 
 ## The idea in one paragraph
 
@@ -10,7 +10,7 @@ Security review inverts the normal reviewer's question from "does this work?" to
 
 - **The posture: adversarial, scenario-based** — findings state attacker capability, path, and impact ("user A fetches user B's orders by changing the path param"), because an exploit scenario is falsifiable and prioritizable while "this looks unsafe" is neither.
 - **Access control first** (A01) — authenticate *who*, then authorize *this actor, this object, this action* on every request, server-side, deny-by-default. IDOR is the canonical review catch: any handler that loads a resource by client-supplied ID and skips the ownership check.
-- **Injection: keep data data** (A03) — parameterized queries, prepared statements, contextual output encoding; flag any string-built SQL/command/HTML with tainted input regardless of current exploitability (`quality-flow` traces source→sink to prove reachability).
+- **Injection: keep data data** (A03) — parameterized queries, prepared statements, contextual output encoding; flag any string-built SQL/command/HTML with tainted input regardless of current exploitability (`mithril-flow` traces source→sink to prove reachability).
 - **Crypto is a set of choices** (A02) — approved algorithms, real key management, TLS in transit, no secrets in source or logs; findings name the wrong choice and the sanctioned replacement (bcrypt/argon2, not MD5; env/secret store, not the repo — the 12-Factor config rule is a security control here).
 - **Design flaws outrank bugs** (A04) — draw the trust boundaries in review: where does untrusted data enter, which components trust which, what's the abuse case for this feature? Defense in depth over single points of enforcement; security-by-obscurity claims are findings by definition.
 - **The supply chain is code you run** (A06 + A08) — vulnerable/outdated components, unpinned versions, missing lockfiles, unverified artifacts, and CI/CD steps that fetch-and-execute over trust boundaries. The dependency diff is part of the security diff.
@@ -21,7 +21,7 @@ Security review inverts the normal reviewer's question from "does this work?" to
 
 - **Exploit-scenario findings** — capability + path + impact; severity via the normalization table, not adjectives.
 - **AuthN ≠ AuthZ; deny by default; server-side always** — the A01 triad behind most real breaches.
-- **Taint: source → sink** — the unifying model for injection, SSRF, and path traversal (owned by `quality-flow` at Phase 2).
+- **Taint: source → sink** — the unifying model for injection, SSRF, and path traversal (owned by `mithril-flow` at Phase 2).
 - **Trust boundaries & abuse cases** (A04) — threat modeling as a review activity, not a workshop artifact.
 - **Defense in depth** — no single check between the attacker and the crown jewels.
 - **Supply-chain hygiene** (A08) — pinned deps, lockfiles reviewed, artifact integrity, least-privilege CI.

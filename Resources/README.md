@@ -29,7 +29,7 @@ Resources/
 ## How to use
 
 - **Learning on-ramp**: start with [`Themes/`](Themes/README.md) — 19 concept guides that synthesize the summaries across sources (with the tensions named), each ending in the checklist its skill encodes. Read the theme, then drill into the summaries it cites.
-- **Skill synthesis**: cross-reference summaries against `/quality` agent prompts.
+- **Skill synthesis**: cross-reference summaries against `/mithril` agent prompts.
 - **Onboarding**: jump into a single resource without reading the whole book.
 - **Concept lookup**: see [`../CS-Best-Practices-Resources.md`](../CS-Best-Practices-Resources.md) for which resource owns which idea.
 - **Cross-cutting themes**: see [`../THEMES.md`](../THEMES.md) for the horizontal cut — the ideas that recur across many sources, where they converge, and where the canon openly disagrees with itself.

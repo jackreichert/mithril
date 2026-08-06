@@ -1,6 +1,6 @@
 # 14 — Delivery: Making Releases Boring
 
-> **Tier 5 · Systems in production.** The path from commit to production as an engineered system: one pipeline, trunk-based flow, environment-borne config, flags with expiry dates, migrations that never require downtime — and the four numbers that prove it's working. **Skill:** [`skills/delivery.md`](../../skills/delivery.md) · agent `quality-delivery`.
+> **Tier 5 · Systems in production.** The path from commit to production as an engineered system: one pipeline, trunk-based flow, environment-borne config, flags with expiry dates, migrations that never require downtime — and the four numbers that prove it's working. **Skill:** [`skills/delivery.md`](../../skills/delivery.md) · agent `mithril-delivery`.
 
 ## The idea in one paragraph
 

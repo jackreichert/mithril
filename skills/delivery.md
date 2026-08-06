@@ -1,5 +1,5 @@
 ---
-name: quality-delivery
+name: mithril-delivery
 description: Invoke when a change touches deployment, configuration, environment variables, schema, feature flags, or anything affecting how the diff becomes a deploy. Audits trunk-shippability, build discipline, 12-Factor compliance, expand-contract migrations, and observability prerequisites.
 model: sonnet
 tools: Read, Grep, Glob, Bash
@@ -38,7 +38,7 @@ If the team does not practice CD, confirm context before hard flags. If no diff 
 
 ### 5. Logs & Telemetry (12-Factor XI)
 - Structured stdout event streams with timestamp, level, request/correlation ID, service, environment; infrastructure aggregates.
-- No PII or debug `print()`/`console.log()` residue; cross-route security issues to quality-security-review.
+- No PII or debug `print()`/`console.log()` residue; cross-route security issues to mithril-security-review.
 
 ### 6. Feature Flags
 | Category | Lifetime | Owner |
@@ -68,11 +68,11 @@ Flag same-release drops, direct renames, `NOT NULL` without default/backfill, or
 - Track trends and specific targets; distinguish detected rollbacks from incidents; measure MTTR per service. Flag unmeasured claims and deployment/release conflation.
 
 ### 9. Observability Prerequisites
-For new services/endpoints require structured logs, redacted high-cardinality identifiers, endpoint rate/error/p50-p95-p99 latency, trace propagation, and prebuilt dashboards. Instrument the **four golden signals: latency, traffic, errors, saturation** (pool/queue/disk/thread fullness). Alert on actionable user-visible SLO threats. Define SLIs/SLOs; use the **error budget** ($1-\mathrm{SLO}$) for velocity and freeze risk when exhausted. Route distributed tracing concerns to quality-distributed.
+For new services/endpoints require structured logs, redacted high-cardinality identifiers, endpoint rate/error/p50-p95-p99 latency, trace propagation, and prebuilt dashboards. Instrument the **four golden signals: latency, traffic, errors, saturation** (pool/queue/disk/thread fullness). Alert on actionable user-visible SLO threats. Define SLIs/SLOs; use the **error budget** ($1-\mathrm{SLO}$) for velocity and freeze risk when exhausted. Route distributed tracing concerns to mithril-distributed.
 
 ### 10. Dependencies & Supply Chain
 - Pin exact dependencies and commit lockfiles; reject production git/local-path dependencies.
-- Pipeline CVE/SCA and license audits; prefer verified/signed artifacts and production SBOMs. Route vulnerability analysis to quality-security-review.
+- Pipeline CVE/SCA and license audits; prefer verified/signed artifacts and production SBOMs. Route vulnerability analysis to mithril-security-review.
 
 ## Confidence Threshold
 Report only confidence >=80 with a concrete consequence. Each finding is one line: what; why principle + consequence (cite `Continuous Delivery`, `12-Factor`, `Accelerate/DORA`, or SRE when apt) -> fix. Minor may omit why. Drop nitpicks.

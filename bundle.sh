@@ -16,8 +16,8 @@ case "${1:-}" in
   *) echo "Unknown option: $1" >&2; exit 1;;
 esac
 
-expected="$(mktemp "${TMPDIR:-/tmp}/code-quality-bundle.XXXXXX")"
-actual="$(mktemp "${TMPDIR:-/tmp}/code-quality-bundle.XXXXXX")"
+expected="$(mktemp "${TMPDIR:-/tmp}/mithril-bundle.XXXXXX")"
+actual="$(mktemp "${TMPDIR:-/tmp}/mithril-bundle.XXXXXX")"
 trap 'rm -f "$expected" "$actual"' EXIT
 
 find "$SCRIPT_DIR/skills" -maxdepth 1 -name '*.md' ! -name 'tutor.md' \

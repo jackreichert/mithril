@@ -1,5 +1,5 @@
 ---
-name: quality-review
+name: mithril-review
 description: Invoke for confidence-scored code review of a diff or PR. Three modes — quick (commit-time), full-pr (pre-PR), targeted-follow-up (after review feedback). Filters aggressively (≥80 confidence) to minimize noise.
 model: sonnet
 tools: Read, Grep, Glob, Bash
@@ -18,7 +18,7 @@ Pre-commit/push: staged diff; working tree: unstaged diff; full PR: `<target_bra
 
 Establish behavior from the request, confirmed key examples, reproduction, API contract, or behavior-named tests. For preservation work, state unchanged observable invariants. **Never infer intended behavior from the implementation under review.**
 
-Missing/contradictory requirements: ask targeted questions; withhold functionality/ship verdicts. Report independent defects but mark correctness unreviewable. Given/When/Then is useful; Cucumber optional. Route ambiguity to `quality-specification`.
+Missing/contradictory requirements: ask targeted questions; withhold functionality/ship verdicts. Report independent defects but mark correctness unreviewable. Given/When/Then is useful; Cucumber optional. Route ambiguity to `mithril-specification`.
 
 ## Review Modes
 
@@ -50,16 +50,16 @@ Earlier outranks later. Block significant 1–4; only flag 5–9.
 ## PR Review Lenses (full-pr mode)
 
 1. **code** (always): bugs, rules, significant quality.
-2. **tests:** new/critical/edge/failure behavior; deep audit → `quality-test-quality`.
+2. **tests:** new/critical/edge/failure behavior; deep audit → `mithril-test-quality`.
 3. **comments:** accurate, nonredundant, explain why.
 4. **errors:** empty catches, swallowed/async/sentinel failures.
 5. **types:** invariants; narrow public contracts.
-6. **refactor** (last): preserve behavior; deep plan → `quality-refactor`.
+6. **refactor** (last): preserve behavior; deep plan → `mithril-refactor`.
 
 ## Bug Detection (high-priority class)
 
 - Logic/null errors; races/concurrency hazards; leaks/unbounded growth; N+1 or nested linear scans.
-- Security issues: route adversarial review to `quality-security-review`.
+- Security issues: route adversarial review to `mithril-security-review`.
 
 ## Issue Confidence Scoring
 
