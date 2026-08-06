@@ -8,7 +8,7 @@ focus: the four-question framework, STRIDE, data flow diagrams + trust boundarie
 
 # Threat Modeling: Designing for Security — Adam Shostack (2014)
 
-The definitive practitioner's handbook on structured threat modeling, written by the engineer who shipped the discipline inside Microsoft's SDL. Feeds the **quality-security-review** agent: it supplies the *proactive, design-time* "what can go wrong?" discipline that OWASP's reactive vulnerability checklist lacks. The spine is the **four-question framework** — *What are we working on? What can go wrong? What are we going to do about it? Did we do a good job?* — applied to a model (usually a DFD with trust boundaries) before code exists. Backs Article V (validate input at the boundary, design for an adversary); pairs with the OWASP Top 10 as the generative "find threats early" half of the security loop.
+The definitive practitioner's handbook on structured threat modeling, written by the engineer who shipped the discipline inside Microsoft's SDL. Feeds the **mithril-security-review** agent: it supplies the *proactive, design-time* "what can go wrong?" discipline that OWASP's reactive vulnerability checklist lacks. The spine is the **four-question framework** — *What are we working on? What can go wrong? What are we going to do about it? Did we do a good job?* — applied to a model (usually a DFD with trust boundaries) before code exists. Backs Article V (validate input at the boundary, design for an adversary); pairs with the OWASP Top 10 as the generative "find threats early" half of the security loop.
 
 ## Per-chapter summary
 

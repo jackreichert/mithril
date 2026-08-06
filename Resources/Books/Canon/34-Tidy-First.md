@@ -8,7 +8,7 @@ focus: tidyings, structure vs behavior, coupling/cohesion, software design econo
 
 # Tidy First? — Kent Beck (2023)
 
-A short, practical book on *empirical software design*: improving the structure of code through small, safe, individually reversible changes called **tidyings**, and deciding *when* — before, after, later, or never — to make them. Beck reframes design as an economic activity governed by the time value of money and optionality, not a one-time upfront ritual. This summary feeds the **quality-refactor** and **quality-code-quality** agents, and directly backs the Constitution's Article II "Two Hats" rule (never mix a behavior change with a refactoring in the same step) plus Beck's four rules of simple design. Part I is a catalog of moves; Part II is the discipline of batching them; Part III is the theory that justifies the whole exercise.
+A short, practical book on *empirical software design*: improving the structure of code through small, safe, individually reversible changes called **tidyings**, and deciding *when* — before, after, later, or never — to make them. Beck reframes design as an economic activity governed by the time value of money and optionality, not a one-time upfront ritual. This summary feeds the **mithril-refactor** and **mithril-code-quality** agents, and directly backs the Constitution's Article II "Two Hats" rule (never mix a behavior change with a refactoring in the same step) plus Beck's four rules of simple design. Part I is a catalog of moves; Part II is the discipline of batching them; Part III is the theory that justifies the whole exercise.
 
 ## Per-chapter summary
 

@@ -1,5 +1,5 @@
 ---
-name: quality-performance
+name: mithril-performance
 description: Invoke for hot-path, query, cache, pool, or latency-sensitive changes. Reviews algorithms and data structures, USE-method resource hygiene, N+1/query cost, pagination, caching bounds, and measure-then-change discipline against Systems Performance, SQL Performance Explained, and DDIA.
 model: sonnet
 tools: Read, Grep, Glob, Bash
@@ -54,7 +54,7 @@ Touched pools/queues/rate limiters require **USE method: Utilization / Saturatio
 
 ### 7. Parallelism for throughput
 
-- Bounded fan-out; backpressure; justified parallelism (races → quality-concurrency)
+- Bounded fan-out; backpressure; justified parallelism (races → mithril-concurrency)
 
 ## Confidence Threshold
 

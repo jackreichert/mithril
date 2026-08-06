@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Code Quality Skills — health check
+# Mithril — health check
 #
 # Guards the canonical-skill architecture (skills/ → deployed ~/.claude/ and
 # ~/.grok/) plus doc integrity:
@@ -22,7 +22,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 GROK_HOME="${GROK_HOME:-$HOME/.grok}"
 AGENTS_SRC="$SCRIPT_DIR/skills"
-CMD_SRC="$SCRIPT_DIR/claude/commands/quality.md"
+CMD_SRC="$SCRIPT_DIR/claude/commands/mithril.md"
 QUIET=0
 [[ "${1:-}" == "--quiet" ]] && QUIET=1
 
@@ -40,7 +40,7 @@ n_agents=0
 for f in "$AGENTS_SRC"/*.md; do
   [[ -f "$f" ]] || continue
   [[ "$(basename "$f")" == "tutor.md" ]] && continue
-  name="quality-$(basename "$f" .md)"; n_agents=$((n_agents+1)); agent_ok=1
+  name="mithril-$(basename "$f" .md)"; n_agents=$((n_agents+1)); agent_ok=1
   [[ "$(head -1 "$f")" == "---" ]] || { bad "$name — missing frontmatter fence"; agent_ok=0; }
   fm="$(awk 'NR>1 && /^---/{exit} {print}' "$f")"
   for key in name: description: model: tools:; do
@@ -59,18 +59,18 @@ if [[ -f "$CMD_SRC" ]]; then
   while IFS= read -r target; do
     [[ -z "$target" ]] && continue
     routed=$((routed+1))
-    [[ -f "$AGENTS_SRC/${target#quality-}.md" ]] \
-      || { bad "orchestrator routes to '$target' but skills/${target#quality-}.md does not exist"; routing_ok=0; }
-  done < <(grep -ohE '(subagent_type="|→ )quality-[a-z0-9_-]+' "$CMD_SRC" | sed -E 's/^(subagent_type="|→ )//' | sort -u)
+    [[ -f "$AGENTS_SRC/${target#mithril-}.md" ]] \
+      || { bad "orchestrator routes to '$target' but skills/${target#mithril-}.md does not exist"; routing_ok=0; }
+  done < <(grep -ohE '(subagent_type="|→ )mithril-[a-z0-9_-]+' "$CMD_SRC" | sed -E 's/^(subagent_type="|→ )//' | sort -u)
   (( routing_ok )) && ok "all $routed routed agent targets exist as canonical skills"
   # Orphan check: every runtime skill should be reachable from the orchestrator.
   for f in "$AGENTS_SRC"/*.md; do
     [[ "$(basename "$f")" == "tutor.md" ]] && continue
-    name="quality-$(basename "$f" .md)"
+    name="mithril-$(basename "$f" .md)"
     grep -q "$name" "$CMD_SRC" || warn "$name is never referenced by the orchestrator"
   done
 else
-  bad "claude/commands/quality.md missing"
+  bad "claude/commands/mithril.md missing"
 fi
 
 # ---- 2b. plugin manifests (Claude + Grok) --------------------------------------
@@ -102,7 +102,7 @@ hdr "Skill → agent checklist parity"
 parity_ok=1
 require_in_agent() {
   local agent="$1" phrase="$2" label="$3"
-  local f="$AGENTS_SRC/${agent#quality-}.md"
+  local f="$AGENTS_SRC/${agent#mithril-}.md"
   if [[ ! -f "$f" ]]; then bad "missing agent $agent"; parity_ok=0; return; fi
   if grep -qiE "$phrase" "$f"; then
     ok "$agent carries $label"
@@ -111,24 +111,24 @@ require_in_agent() {
     parity_ok=0
   fi
 }
-require_in_agent quality-security-review 'STRIDE' 'STRIDE threat enum'
-require_in_agent quality-security-review 'Shostack|four questions' 'Shostack four questions'
-require_in_agent quality-delivery 'golden signals|error budget' 'SRE golden signals / error budget'
-require_in_agent quality-delivery 'saturation' 'saturation (4th golden signal)'
-require_in_agent quality-code-quality 'USE method|Utilization.*Saturation' 'USE method'
-require_in_agent quality-code-quality 'actions|calculations' 'actions/calculations FP frame'
-require_in_agent quality-code-quality 'Class Composition.*Decomposition|independent reasons to change' 'class decomposition decision test'
-require_in_agent quality-architecture 'Vernon|one transaction|illegal states' 'Vernon aggregates / illegal states'
-require_in_agent quality-architecture 'Hyrum|expand-contract|additive' 'API contract evolution'
-require_in_agent quality-architecture 'Class decomposition test|disjoint method/field clusters' 'class decomposition counterweight'
-require_in_agent quality-test-quality 'Property-Based|property-based|PBT' 'property-based testing'
-require_in_agent quality-test-quality 'shrink|Hypothesis|fast-check' 'PBT tooling / shrinking'
-require_in_agent quality-specification 'Requirements gate before code review|Never reverse-engineer intended behavior' 'requirements-first specification gate'
-require_in_agent quality-review 'Review Contract Precondition|Never infer intended behavior' 'requirements-first review contract'
-require_in_agent quality-concurrency 'atomic|visibility|liveness' 'three concurrency hazards'
-require_in_agent quality-performance 'USE method|Utilization' 'USE method (performance skill)'
-require_in_agent quality-observability 'golden signals|saturation' 'golden signals (observability skill)'
-require_in_agent quality-accessibility 'WCAG|keyboard|accessible name' 'WCAG / keyboard a11y'
+require_in_agent mithril-security-review 'STRIDE' 'STRIDE threat enum'
+require_in_agent mithril-security-review 'Shostack|four questions' 'Shostack four questions'
+require_in_agent mithril-delivery 'golden signals|error budget' 'SRE golden signals / error budget'
+require_in_agent mithril-delivery 'saturation' 'saturation (4th golden signal)'
+require_in_agent mithril-code-quality 'USE method|Utilization.*Saturation' 'USE method'
+require_in_agent mithril-code-quality 'actions|calculations' 'actions/calculations FP frame'
+require_in_agent mithril-code-quality 'Class Composition.*Decomposition|independent reasons to change' 'class decomposition decision test'
+require_in_agent mithril-architecture 'Vernon|one transaction|illegal states' 'Vernon aggregates / illegal states'
+require_in_agent mithril-architecture 'Hyrum|expand-contract|additive' 'API contract evolution'
+require_in_agent mithril-architecture 'Class decomposition test|disjoint method/field clusters' 'class decomposition counterweight'
+require_in_agent mithril-test-quality 'Property-Based|property-based|PBT' 'property-based testing'
+require_in_agent mithril-test-quality 'shrink|Hypothesis|fast-check' 'PBT tooling / shrinking'
+require_in_agent mithril-specification 'Requirements gate before code review|Never reverse-engineer intended behavior' 'requirements-first specification gate'
+require_in_agent mithril-review 'Review Contract Precondition|Never infer intended behavior' 'requirements-first review contract'
+require_in_agent mithril-concurrency 'atomic|visibility|liveness' 'three concurrency hazards'
+require_in_agent mithril-performance 'USE method|Utilization' 'USE method (performance skill)'
+require_in_agent mithril-observability 'golden signals|saturation' 'golden signals (observability skill)'
+require_in_agent mithril-accessibility 'WCAG|keyboard|accessible name' 'WCAG / keyboard a11y'
 if grep -qE 'adds/changes classes, constructors, fields, collaborators, or public methods' "$CMD_SRC"; then
   ok "quality orchestrator routes existing class-structure changes to architecture"
 else
@@ -172,25 +172,25 @@ check_deployed_sync() {
   for f in "$AGENTS_SRC"/*.md; do
     name="$(basename "$f")"
     [[ "$name" == "tutor.md" ]] && continue
-    dst="$home/agents/quality-$name"
+    dst="$home/agents/mithril-$name"
     if [[ -f "$dst" ]]; then
       deployed_any=1
       if diff -q "$f" "$dst" >/dev/null 2>&1; then
-        ok "$label: quality-$name deployed & in sync"
+        ok "$label: mithril-$name deployed & in sync"
       else
-        warn "$label: quality-$name deployed but DRIFTED from its canonical skill (edit skills/, then re-run install.sh for copy installs)"
+        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (edit skills/, then re-run install.sh for copy installs)"
       fi
     fi
   done
-  if [[ -f "$home/commands/quality.md" ]]; then
+  if [[ -f "$home/commands/mithril.md" ]]; then
     deployed_any=1
     local expected_command
-    expected_command="$(mktemp "${TMPDIR:-/tmp}/quality-healthcheck.XXXXXX")"
+    expected_command="$(mktemp "${TMPDIR:-/tmp}/mithril-healthcheck.XXXXXX")"
     sed "s|\${CLAUDE_PLUGIN_ROOT}|$SCRIPT_DIR|g" "$CMD_SRC" > "$expected_command"
-    if diff -q "$expected_command" "$home/commands/quality.md" >/dev/null 2>&1; then
-      ok "$label: quality.md command deployed & in sync"
+    if diff -q "$expected_command" "$home/commands/mithril.md" >/dev/null 2>&1; then
+      ok "$label: mithril.md command deployed & in sync"
     else
-      warn "$label: quality.md command deployed but DRIFTED from canonical command"
+      warn "$label: mithril.md command deployed but DRIFTED from canonical command"
     fi
     rm -f "$expected_command"
   fi

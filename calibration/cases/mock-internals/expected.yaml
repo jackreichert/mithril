@@ -6,14 +6,14 @@
 case: mock-internals
 defects:
   - id: spy-on-private-method
-    agent: quality-test-quality
+    agent: mithril-test-quality
     file: src/orders/pricingInternals.test.ts
     severity_min: Important
     match: "(implementation|internal|private|resistance to refactor|behavior|brittle)"
     note: spies on the SUT's own private applyPercent and asserts the call — Khorikov pillar 2 = 0
 
   - id: sleep-based-async-wait
-    agent: quality-test-quality
+    agent: mithril-test-quality
     file: src/orders/pricingInternals.test.ts
     severity_min: Important
     match: "(sleep|setTimeout|flak|non.determin|await the promise|race)"

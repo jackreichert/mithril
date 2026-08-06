@@ -8,7 +8,7 @@ focus: Resource-oriented APIs, naming, pagination, errors, versioning, partial u
 
 # API Design Patterns — JJ Geewax (2021)
 
-A practical catalog for **published API** design — primarily HTTP/JSON and resource-oriented style (Google AIP lineage). Bridges Hyrum's Law (every observable becomes contract) with day-to-day choices: naming, pagination, error models, versioning, and compatibility. Feeds **quality-architecture** (public contract stability) and **quality-distributed** / **quality-delivery** (expand-contract evolution).
+A practical catalog for **published API** design — primarily HTTP/JSON and resource-oriented style (Google AIP lineage). Bridges Hyrum's Law (every observable becomes contract) with day-to-day choices: naming, pagination, error models, versioning, and compatibility. Feeds **mithril-architecture** (public contract stability) and **mithril-distributed** / **mithril-delivery** (expand-contract evolution).
 
 ## Core patterns (high-signal for review)
 

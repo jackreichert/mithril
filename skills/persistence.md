@@ -1,5 +1,5 @@
 ---
-name: quality-persistence
+name: mithril-persistence
 description: Invoke when code uses an ORM (Hibernate, ActiveRecord, Entity Framework, SQLAlchemy, TypeORM, Prisma, etc.), introduces or modifies repositories/DAOs, adds queries or schema migrations, or when debugging slow queries / N+1 / connection-pool issues. Catches PEAA pattern misuse and the persistence concerns ORMs hide.
 model: sonnet
 tools: Read, Grep, Glob, Bash

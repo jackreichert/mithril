@@ -1,6 +1,6 @@
 # 11 — Code Review: The Human Gate
 
-> **Tier 4 · Verification.** The discipline of judging a change — what to look at first, what standard to hold it to, and the author's half of the bargain. The theme behind the framework's own reviewing conduct. **Skill:** [`skills/review.md`](../../skills/review.md) · agent `quality-review`.
+> **Tier 4 · Verification.** The discipline of judging a change — what to look at first, what standard to hold it to, and the author's half of the bargain. The theme behind the framework's own reviewing conduct. **Skill:** [`skills/review.md`](../../skills/review.md) · agent `mithril-review`.
 
 ## The idea in one paragraph
 

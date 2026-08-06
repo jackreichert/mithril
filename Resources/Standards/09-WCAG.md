@@ -6,14 +6,14 @@ focus: POUR principles, Level AA product floor, mapping to UI review
 
 # WCAG 2.2 — Web Content Accessibility Guidelines
 
-W3C recommendation for web (and web-like) accessibility. This note is the **agent-executable floor** for `quality-accessibility`, not a full certification guide. Canonical: https://www.w3.org/TR/WCAG22/
+W3C recommendation for web (and web-like) accessibility. This note is the **agent-executable floor** for `mithril-accessibility`, not a full certification guide. Canonical: https://www.w3.org/TR/WCAG22/
 
 ## Levels
 
 | Level | Role in this library |
 |-------|----------------------|
 | **A** | Minimum — often insufficient alone for product UI |
-| **AA** | **Default product bar** for `/quality a11y` |
+| **AA** | **Default product bar** for `/mithril a11y` |
 | **AAA** | Aspirational; flag only when project requires it |
 
 ## POUR (principles)

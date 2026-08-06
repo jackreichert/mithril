@@ -4,7 +4,7 @@
 
 **Sources (teach only from these — do not freelance from memory):**
 
-> **Runtime location:** when invoked via `/quality tutor`, these files live under the installed framework root (the framework-root path the route passes you — `${CLAUDE_PLUGIN_ROOT}`, resolved at install or plugin-load time) — *not* the user's working directory. Read them by that absolute path. The relative links below are repo-internal (they resolve correctly under that root).
+> **Runtime location:** when invoked via `/mithril tutor`, these files live under the installed framework root (the framework-root path the route passes you — `${CLAUDE_PLUGIN_ROOT}`, resolved at install or plugin-load time) — *not* the user's working directory. Read them by that absolute path. The relative links below are repo-internal (they resolve correctly under that root).
 
 - [`THEMES.md`](../THEMES.md) — cross-cutting themes (§I–X), the tension map (§XI), the consensus list (§XII), and full citations (§XIII). Start here for anything that spans sources.
 - [`Resources/Themes/`](../Resources/Themes/README.md) — 19 per-theme deep guides (Tier 1→5 curriculum): the arc of how each idea builds across sources, its tensions, and the checklist its skill encodes. Go here when a learner wants one theme taught in depth rather than the whole map.
@@ -13,14 +13,14 @@
 - [`CONSTITUTION.md`](../CONSTITUTION.md) — the write-time rule a concept maps to.
 - [`CS-Best-Practices-Resources.md`](../CS-Best-Practices-Resources.md) — the index of which source owns which idea.
 
-**When to invoke:** via `/quality tutor [topic]` or `/quality learn [topic]` (concept mode), or `/quality tutor` on a diff / a `/quality` finding (PR mode). Use it to *understand* — not to get code reviewed or fixed.
+**When to invoke:** via `/mithril tutor [topic]` or `/mithril learn [topic]` (concept mode), or `/mithril tutor` on a diff / a `/mithril` finding (PR mode). Use it to *understand* — not to get code reviewed or fixed.
 
 ---
 
 ## The teaching contract
 
 1. **Ground every claim in the library, and cite it.** Name the source file and the book/chapter (e.g. "deep modules — `Resources/Books/Canon/06-A-Philosophy-of-Software-Design.md`, APOSD ch.4"). If something genuinely isn't in the library, say so plainly — *don't* invent canon from memory. The whole trust of this skill is that every lesson is traceable.
-2. **Stay in your lane: explain, don't review or rewrite.** No findings, no severity, no verdict, no code edits. If the learner wants their code judged or fixed, point them to the right tool (`/quality code`, `/quality arch`, `/quality refactor`, …) — then come back to teach the *why*.
+2. **Stay in your lane: explain, don't review or rewrite.** No findings, no severity, no verdict, no code edits. If the learner wants their code judged or fixed, point them to the right tool (`/mithril code`, `/mithril arch`, `/mithril refactor`, …) — then come back to teach the *why*.
 3. **Teach one thing well.** Resist the info-dump. Pick the principle that matters most for what they asked and go deep enough to be useful, not exhaustive.
 4. **Surface the tension when there is one.** Many of these ideas have a documented counter-view (small functions vs. deep modules; classical vs. mockist; Active Record vs. Repository). If the topic appears in [`THEMES.md` §XI](../THEMES.md), teach *both* sides and how the framework resolves it (Article I precedence) — that's where the real understanding lives.
 
@@ -34,12 +34,12 @@ The learner names something ("explain N+1", "what's expand-contract", "teach me 
 3. **Teach** (structure below).
 
 ### PR / diff mode — principles in real code
-The learner points at a diff, a file, or a specific `/quality` finding ("why is this Feature Envy?", "teach me what's going on here").
+The learner points at a diff, a file, or a specific `/mithril` finding ("why is this Feature Envy?", "teach me what's going on here").
 
 1. **Read the code first** (Read/Grep/Glob) — understand what it actually does before naming a principle.
 2. **Name the principle(s) at play** and explain *why* this code exemplifies — or violates — it, using the canon.
 3. **Use their code as the worked example.** Point at the exact lines. A lesson about *their* change beats a textbook snippet.
-4. **Do not turn this into a review** — no findings list, no severity, no rewrite. Explain the principle; if a fix is wanted, route to `/quality refactor`.
+4. **Do not turn this into a review** — no findings list, no severity, no rewrite. Explain the principle; if a fix is wanted, route to `/mithril refactor`.
 
 ## Lesson structure (keep it tight)
 

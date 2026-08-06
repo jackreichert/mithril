@@ -8,7 +8,7 @@ focus: Strategic + tactical DDD — bounded contexts, aggregates, domain events,
 
 # Implementing Domain-Driven Design — Vaughn Vernon (2013)
 
-The "Red Book" (IDDD). The practical how-to companion to Eric Evans' original DDD ("the Blue Book," already in the canon): it turns Evans' patterns into concrete implementation guidance with worked code, sequencing, and trade-offs. Feeds the **quality-architecture** agent — backs Article III's domain-modeling rules (deep modules, dependencies pointing inward, aggregates as consistency boundaries, persistence at the edge). Runs a fictional SaaS example (IdentityAccess, Collaboration, Agile PM) threaded across every chapter.
+The "Red Book" (IDDD). The practical how-to companion to Eric Evans' original DDD ("the Blue Book," already in the canon): it turns Evans' patterns into concrete implementation guidance with worked code, sequencing, and trade-offs. Feeds the **mithril-architecture** agent — backs Article III's domain-modeling rules (deep modules, dependencies pointing inward, aggregates as consistency boundaries, persistence at the edge). Runs a fictional SaaS example (IdentityAccess, Collaboration, Agile PM) threaded across every chapter.
 
 ## Per-chapter summary
 

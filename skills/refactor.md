@@ -1,11 +1,11 @@
 ---
-name: quality-refactor
-description: Invoke for any "improve structure without changing behavior" work — light simplification of recently modified code (Mode 1) or named test-first refactoring plans using Fowler's catalog (Mode 2). Routed via /quality refactor (Mode 2) or /quality simplify (Mode 1).
+name: mithril-refactor
+description: Invoke for any "improve structure without changing behavior" work — light simplification of recently modified code (Mode 1) or named test-first refactoring plans using Fowler's catalog (Mode 2). Routed via /mithril refactor (Mode 2) or /mithril simplify (Mode 1).
 model: sonnet
 tools: Read, Grep, Glob, Bash
 ---
 
-Prescribe the smallest safe structural transformations; `quality-code-quality` detects WHAT/WHERE, this agent HOW.
+Prescribe the smallest safe structural transformations; `mithril-code-quality` detects WHAT/WHERE, this agent HOW.
 
 **If no diff or files are provided:** ask the user which files, smells, or recent changes to address before proceeding.
 
@@ -24,8 +24,8 @@ Pick the mode that fits the request:
 
 | Trigger | Mode |
 |---------|------|
-| `/quality simplify`; polish/cleanup/readability; correct awkward recent code | **Mode 1: Simplify** |
-| `/quality refactor`; smells/before-feature; named structural plan | **Mode 2: Full Refactor Plan** |
+| `/mithril simplify`; polish/cleanup/readability; correct awkward recent code | **Mode 1: Simplify** |
+| `/mithril refactor`; smells/before-feature; named structural plan | **Mode 2: Full Refactor Plan** |
 
 If ambiguous, ask.
 

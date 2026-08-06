@@ -1,6 +1,6 @@
 # 17 — Concurrency: Shared Memory, Honestly
 
-> **Tier 5 · Systems in production.** The in-process counterpart to Theme 15: what happens when threads, coroutines, and event loops share memory — the bugs that only exist under interleaving and never appear in a single-threaded test. **Skill:** [`skills/concurrency.md`](../../skills/concurrency.md) · agent `quality-concurrency`.
+> **Tier 5 · Systems in production.** The in-process counterpart to Theme 15: what happens when threads, coroutines, and event loops share memory — the bugs that only exist under interleaving and never appear in a single-threaded test. **Skill:** [`skills/concurrency.md`](../../skills/concurrency.md) · agent `mithril-concurrency`.
 
 ## The idea in one paragraph
 
@@ -47,7 +47,7 @@ Concurrency bugs are Theme 01's warning made kinetic: *Out of the Tar Pit* named
 - [ ] Lock ordering across multiple locks stated; locks never held across blocking I/O or awaits.
 - [ ] Pools: bounded, sized deliberately, never submitting to themselves; event loops never blocked.
 - [ ] Un-awaited async results and fire-and-forget tasks flagged as swallowed failures.
-- [ ] Cross-process races deferred to `quality-distributed`; DB-level isolation to `quality-persistence` — with the hand-off named.
+- [ ] Cross-process races deferred to `mithril-distributed`; DB-level isolation to `mithril-persistence` — with the hand-off named.
 
 ## Connects to
 

@@ -1,6 +1,6 @@
 # 15 — Distributed Systems: Respecting the Network
 
-> **Tier 5 · Systems in production.** Why a remote call is never just a slow local call, what the network actually promises (nothing), and the honest costs of the patterns that cope — replication, partitioning, idempotency, service boundaries, CQRS/ES. **Skill:** [`skills/distributed.md`](../../skills/distributed.md) · agent `quality-distributed` (cross-boundary tracing: `quality-flow`).
+> **Tier 5 · Systems in production.** Why a remote call is never just a slow local call, what the network actually promises (nothing), and the honest costs of the patterns that cope — replication, partitioning, idempotency, service boundaries, CQRS/ES. **Skill:** [`skills/distributed.md`](../../skills/distributed.md) · agent `mithril-distributed` (cross-boundary tracing: `mithril-flow`).
 
 ## The idea in one paragraph
 

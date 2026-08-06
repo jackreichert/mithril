@@ -28,7 +28,7 @@ Each theme states the idea in one paragraph, walks the arc of how the sources bu
 | 18 | [Performance & Operability](18-Performance-and-Operability.md) | 5 · Systems in production | `performance`, `observability`, `persistence`, `delivery` |
 | 19 | [Accessibility: Inclusive Interfaces](19-Accessibility.md) | 4 · Verification | `accessibility` |
 
-The cross-cutting `quality-flow` agent draws on 12, 15, 16, and 18 (taint, partial failure, resource/transaction lifecycle, and source→sink cost) rather than owning a theme — see each theme's "Connects to" and the flow agent prompt.
+The cross-cutting `mithril-flow` agent draws on 12, 15, 16, and 18 (taint, partial failure, resource/transaction lifecycle, and source→sink cost) rather than owning a theme — see each theme's "Connects to" and the flow agent prompt.
 
 ## Read order
 
@@ -43,7 +43,7 @@ CS-Best-Practices-Resources.md      the master inventory (what exists, who owns 
   └── Resources/{Books,Articles,Papers,Standards}/   one summary per source (condense)
         └── Resources/Themes/                        19 concept guides (synthesize across sources)  ← you are here
               └── skills/                            18 skill docs (operationalize for review; + tutor)
-                    ├── ~/.claude/agents/quality-*   canonical skills exposed under host names
+                    ├── ~/.claude/agents/mithril-*   canonical skills exposed under host names
                     ├── CONSTITUTION.md               write-time rules (prevent)
                     └── skills/gates.md + hooks/      measured thresholds (enforce)
 ```

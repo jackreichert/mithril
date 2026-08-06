@@ -8,7 +8,7 @@ focus: Naming, functions, comments, formatting, objects, error handling, TDD
 
 # Clean Code — Robert C. Martin (2008)
 
-The book that branded "clean code" as a discipline. Mixes opinionated essays with worked refactoring exercises in Java. Foundational for `/quality code-quality` agent.
+The book that branded "clean code" as a discipline. Mixes opinionated essays with worked refactoring exercises in Java. Foundational for `/mithril code-quality` agent.
 
 ## Per-chapter summary
 

@@ -1,6 +1,6 @@
 ---
-name: quality-process
-description: Invoke explicitly via /quality process before starting or after completing a significant change. Audits planning discipline — edge cases, dependencies, alternatives, Big-O analysis, and assumptions.
+name: mithril-process
+description: Invoke explicitly via /mithril process before starting or after completing a significant change. Audits planning discipline — edge cases, dependencies, alternatives, Big-O analysis, and assumptions.
 model: sonnet
 tools: Read, Grep, Glob, Bash
 ---

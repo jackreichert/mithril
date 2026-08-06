@@ -71,5 +71,5 @@ Pointers to xUnit Test Patterns, GOOS, etc.
 ## Why it pairs well with GOOS
 GOOS is opinionated about *style* (London-school, outside-in). Osherove is opinionated about *maintainability* in the long term. Reading both gives you both halves of test design.
 
-## Why it's deeply integrated into `/quality test-quality`
+## Why it's deeply integrated into `/mithril test-quality`
 The "trustworthy + maintainable + readable" trio is the test-quality agent's primary scoring rubric.

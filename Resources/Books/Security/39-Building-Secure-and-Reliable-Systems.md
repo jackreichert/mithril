@@ -8,7 +8,7 @@ focus: security + reliability as design-time properties — least privilege, des
 
 # Building Secure and Reliable Systems — Adkins, Beyer, Blankinship, Lewandowski, Oprea, Stubblefield (2020)
 
-Google/O'Reilly's companion to the SRE books: treats security and reliability not as features bolted on at the end but as intertwined properties designed in from the start. Feeds the **quality-security-review** and **quality-delivery** agents. Where OWASP gives a reactive checklist of known vulnerability classes, this book supplies the proactive design discipline that prevents whole categories before they exist — least privilege, understandability, defense in depth, and graceful recovery. Backs Article V (least privilege everywhere); free online at sre.google/books.
+Google/O'Reilly's companion to the SRE books: treats security and reliability not as features bolted on at the end but as intertwined properties designed in from the start. Feeds the **mithril-security-review** and **mithril-delivery** agents. Where OWASP gives a reactive checklist of known vulnerability classes, this book supplies the proactive design discipline that prevents whole categories before they exist — least privilege, understandability, defense in depth, and graceful recovery. Backs Article V (least privilege everywhere); free online at sre.google/books.
 
 ## Per-part summary
 

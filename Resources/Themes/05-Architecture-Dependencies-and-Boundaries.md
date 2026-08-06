@@ -1,6 +1,6 @@
 # 05 — Architecture: Dependencies, Boundaries & Resilience
 
-> **Tier 3 · Design at scale.** The same war as Theme 01, fought between components instead of inside them: which way dependencies point, where boundaries sit, and whether the system stays up when its neighbors don't. **Skill:** [`skills/architecture.md`](../../skills/architecture.md) · agent `quality-architecture`.
+> **Tier 3 · Design at scale.** The same war as Theme 01, fought between components instead of inside them: which way dependencies point, where boundaries sit, and whether the system stays up when its neighbors don't. **Skill:** [`skills/architecture.md`](../../skills/architecture.md) · agent `mithril-architecture`.
 
 ## The idea in one paragraph
 

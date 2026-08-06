@@ -6,21 +6,21 @@
 case: racy-cache
 defects:
   - id: lazy-singleton-race
-    agent: quality-concurrency
+    agent: mithril-concurrency
     file: src/cache/config_cache.py
     severity_min: Important
     match: "(lazy|singleton|check.then.act|double.checked|race)"
     note: get_instance is an unsynchronized check-then-act on a class attribute
 
   - id: check-then-act-across-await
-    agent: quality-concurrency
+    agent: mithril-concurrency
     file: src/cache/config_cache.py
     severity_min: Important
     match: "(await|interleav|check.then.act|duplicate load|race)"
     note: get() tests membership then awaits then writes — the await is an interleaving point
 
   - id: unawaited-persist
-    agent: quality-concurrency   # quality-code-quality may also flag as swallowed failure
+    agent: mithril-concurrency   # mithril-code-quality may also flag as swallowed failure
     file: src/cache/config_cache.py
     severity_min: Important
     match: "(create_task|un.?awaited|fire.and.forget|swallow|reference)"

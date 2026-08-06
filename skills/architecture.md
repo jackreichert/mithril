@@ -1,5 +1,5 @@
 ---
-name: quality-architecture
+name: mithril-architecture
 description: Invoke when new modules, classes, or structural changes appear in a diff, or when reviewing dependency/layering decisions. Reviews SOLID, dependency direction, coupling/cohesion, layer violations, and DDD patterns.
 model: opus
 tools: Read, Grep, Glob, Bash

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mithril"
+  short_description: "Review and improve code quality"
+  default_prompt: "Use $mithril to review my current diff and tell me the highest-priority issues."

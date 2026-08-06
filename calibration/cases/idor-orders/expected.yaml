@@ -10,14 +10,14 @@
 case: idor-orders
 defects:
   - id: idor-missing-ownership
-    agent: quality-security-review   # quality-flow should also trace it
+    agent: mithril-security-review   # mithril-flow should also trace it
     file: src/orders/routes.py
     severity_min: Critical
     match: "(IDOR|ownership|authoriz)"
     note: get_order loads by client-supplied id, never checks g.current_user owns it
 
   - id: sql-injection-status
-    agent: quality-security-review
+    agent: mithril-security-review
     file: src/orders/repository.py
     severity_min: Critical
     match: "(injection|parameteriz|string-built|concatenat)"

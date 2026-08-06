@@ -8,7 +8,7 @@ focus: asynchronous messaging patterns — channels, routing, transformation, en
 
 # Enterprise Integration Patterns — Gregor Hohpe & Bobby Woolf (2003)
 
-The canonical catalog of 65 patterns for connecting applications via asynchronous messaging. It feeds the **quality-distributed** agent: it is the shared pattern vocabulary for the queue/event/async-integration code that skill reviews — naming the routers, channels, transformers, and endpoint conventions so a reviewer can say "this is a Content-Based Router missing an Invalid Message Channel" instead of describing the shape from scratch. Pattern-first, technology-neutral (JMS/MSMQ/SOAP era, but the patterns outlived the stacks).
+The canonical catalog of 65 patterns for connecting applications via asynchronous messaging. It feeds the **mithril-distributed** agent: it is the shared pattern vocabulary for the queue/event/async-integration code that skill reviews — naming the routers, channels, transformers, and endpoint conventions so a reviewer can say "this is a Content-Based Router missing an Invalid Message Channel" instead of describing the shape from scratch. Pattern-first, technology-neutral (JMS/MSMQ/SOAP era, but the patterns outlived the stacks).
 
 ## Per-chapter summary
 

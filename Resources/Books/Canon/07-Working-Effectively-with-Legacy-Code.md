@@ -65,5 +65,5 @@ A reference catalogue of ~25 techniques (Adapt Parameter, Break Out Method Objec
 4. Refactor under the safety net.
 5. Add the new feature.
 
-## Why it's deeply integrated into `/quality refactor`
+## Why it's deeply integrated into `/mithril refactor`
 The refactoring agent uses the seam model and characterization-test-first protocol when working with untested code.

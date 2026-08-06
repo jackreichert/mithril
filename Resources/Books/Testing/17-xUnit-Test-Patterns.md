@@ -123,5 +123,5 @@ Dependency Injection, Dependency Lookup, Humble Object, Test Hook.
 ### Value Patterns
 Literal Value, Derived Value, Generated Value, Distinct Generated Value, Dummy Object.
 
-## Why it's deeply integrated into `/quality test-quality`
+## Why it's deeply integrated into `/mithril test-quality`
 The smell catalog is essentially the rubric for the test-quality agent. The pattern names give precise prescriptions for fixes.

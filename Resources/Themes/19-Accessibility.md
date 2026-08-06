@@ -1,6 +1,6 @@
 # 19 — Accessibility: Inclusive Interfaces
 
-> **Tier 4 · Verification (UI).** Making interactive software usable by people who use keyboards, assistive technology, and diverse sensory/motor profiles — WCAG as the floor, semantic HTML as the default. **Skill:** [`skills/accessibility.md`](../../skills/accessibility.md) · agent `quality-accessibility`.
+> **Tier 4 · Verification (UI).** Making interactive software usable by people who use keyboards, assistive technology, and diverse sensory/motor profiles — WCAG as the floor, semantic HTML as the default. **Skill:** [`skills/accessibility.md`](../../skills/accessibility.md) · agent `mithril-accessibility`.
 
 ## The idea in one paragraph
 

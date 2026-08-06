@@ -1,6 +1,6 @@
 # 16 — Persistence: The Data Layer
 
-> **Tier 5 · Systems in production.** The pattern catalog between domain and database: which domain-logic style to build on, how objects and rows map without lying to each other, where transactions begin and end, and the resource discipline underneath it all. **Skill:** [`skills/persistence.md`](../../skills/persistence.md) · agent `quality-persistence` (lifecycle tracing: `quality-flow`).
+> **Tier 5 · Systems in production.** The pattern catalog between domain and database: which domain-logic style to build on, how objects and rows map without lying to each other, where transactions begin and end, and the resource discipline underneath it all. **Skill:** [`skills/persistence.md`](../../skills/persistence.md) · agent `mithril-persistence` (lifecycle tracing: `mithril-flow`).
 
 ## The idea in one paragraph
 

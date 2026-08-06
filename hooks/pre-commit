@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 #
-# Code Quality Skills — opt-in pre-commit gate
+# Mithril — opt-in pre-commit gate
 #
 # Runs the FAST subset of the quality gates (lint + cyclomatic complexity)
 # against staged source files and blocks the commit on a real violation.
 # Coverage and mutation are deliberately excluded — too slow for a commit
-# hook; run those via `/quality gates` or in CI.
+# hook; run those via `/mithril gates` or in CI.
 #
 # Philosophy: enforce, don't just advise. See CONSTITUTION.md Article VII.
 #
 # This hook is OPT-IN. It is never installed automatically. To enable it
 # in a repo, from that repo's root:
 #
-#   ln -s /absolute/path/to/Code-Quality-Skills/hooks/pre-commit \
+#   ln -s /absolute/path/to/Mithril/hooks/pre-commit \
 #         .git/hooks/pre-commit
 #
 # (or copy it). See hooks/README.md for details and per-tool install hints.
@@ -30,7 +30,7 @@
 set -euo pipefail
 
 if [[ "${QUALITY_GATES_SKIP:-0}" == "1" ]]; then
-  echo "quality-gates: skipped (QUALITY_GATES_SKIP=1)"
+  echo "mithril-gates: skipped (QUALITY_GATES_SKIP=1)"
   exit 0
 fi
 
@@ -63,7 +63,7 @@ skip() { printf '  · %-12s SKIPPED — %s\n' "$1" "$2"; }
 bad()  { printf '  ✗ %-12s %s\n' "$1" "$2"; fail=1; }
 ok()   { printf '  ✓ %-12s %s\n' "$1" "$2"; }
 
-echo "quality-gates: checking ${#all_src[@]} staged source file(s)…"
+echo "mithril-gates: checking ${#all_src[@]} staged source file(s)…"
 
 # ── Gate 1: Lint (zero errors) ──────────────────────────────────────────
 if [[ ${#js_files[@]} -gt 0 ]]; then
@@ -108,8 +108,8 @@ fi
 
 echo
 if [[ "$fail" -ne 0 ]]; then
-  echo "quality-gates: BLOCKED — fix the failures above, or bypass with --no-verify."
+  echo "mithril-gates: BLOCKED — fix the failures above, or bypass with --no-verify."
   exit 1
 fi
-echo "quality-gates: PASS"
+echo "mithril-gates: PASS"
 exit 0

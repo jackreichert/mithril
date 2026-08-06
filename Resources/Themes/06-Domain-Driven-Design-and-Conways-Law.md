@@ -1,6 +1,6 @@
 # 06 — Domain-Driven Design & Conway's Law
 
-> **Tier 3 · Design at scale.** Where boundaries should *mean* something: model the business in its own language, split the system where the language splits, and expect the org chart to ship itself. **Skill:** [`skills/architecture.md`](../../skills/architecture.md) (DDD patterns + Conway sections) · agent `quality-architecture`.
+> **Tier 3 · Design at scale.** Where boundaries should *mean* something: model the business in its own language, split the system where the language splits, and expect the org chart to ship itself. **Skill:** [`skills/architecture.md`](../../skills/architecture.md) (DDD patterns + Conway sections) · agent `mithril-architecture`.
 
 ## The idea in one paragraph
 

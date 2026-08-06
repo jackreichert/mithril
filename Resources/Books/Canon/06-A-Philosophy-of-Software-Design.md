@@ -80,5 +80,5 @@ Master complexity through deep modules, information hiding, and obvious code.
 - "Comments are failures" → Ousterhout: comments are essential design artifacts.
 - "Lots of small classes" → Ousterhout: small classes can multiply interfaces.
 
-## Why it's deeply integrated into `/quality`
+## Why it's deeply integrated into `/mithril`
 The architecture and code-quality agents treat **deep vs shallow modules** and **information leakage** as primary measures.

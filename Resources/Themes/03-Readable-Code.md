@@ -1,6 +1,6 @@
 # 03 — Readable Code: Naming, Functions, Comments
 
-> **Tier 2 · Construction.** The craft of code a stranger can maintain in six months — and the two most famous disagreements in the canon, resolved by judgment instead of dogma. **Skill:** [`skills/code-quality.md`](../../skills/code-quality.md) · agent `quality-code-quality`.
+> **Tier 2 · Construction.** The craft of code a stranger can maintain in six months — and the two most famous disagreements in the canon, resolved by judgment instead of dogma. **Skill:** [`skills/code-quality.md`](../../skills/code-quality.md) · agent `mithril-code-quality`.
 
 ## The idea in one paragraph
 

@@ -1,6 +1,6 @@
 # 18 — Performance & Operability
 
-> **Tier 5 · Systems in production.** Measure before you change: USE-method resource hygiene, latency percentiles, query cost models, SLOs/error budgets, and the telemetry that makes failure visible. **Primary skills:** [`skills/performance.md`](../../skills/performance.md) · [`skills/observability.md`](../../skills/observability.md) · agents `quality-performance`, `quality-observability`. Supporting: [`skills/persistence.md`](../../skills/persistence.md), [`skills/delivery.md`](../../skills/delivery.md), [`skills/code-quality.md`](../../skills/code-quality.md). Flow tracing (source→sink cost) is owned by `quality-flow`.
+> **Tier 5 · Systems in production.** Measure before you change: USE-method resource hygiene, latency percentiles, query cost models, SLOs/error budgets, and the telemetry that makes failure visible. **Primary skills:** [`skills/performance.md`](../../skills/performance.md) · [`skills/observability.md`](../../skills/observability.md) · agents `mithril-performance`, `mithril-observability`. Supporting: [`skills/persistence.md`](../../skills/persistence.md), [`skills/delivery.md`](../../skills/delivery.md), [`skills/code-quality.md`](../../skills/code-quality.md). Flow tracing (source→sink cost) is owned by `mithril-flow`.
 
 ## The idea in one paragraph
 
@@ -14,7 +14,7 @@ Performance work fails when it is fashion rather than measurement. *Systems Perf
 - **The database cost model** (Winand, *SQL Performance Explained*; Petrov, *Database Internals*) — B-tree/LSM engines, sargable predicates, covering indexes, why `SELECT *` and OFFSET pagination hurt; N+1 as the ORM face of the same blindness.
 - **SLOs and error budgets** (SRE ch.3–4) — pick a few meaningful SLIs, set objectives, spend the budget on velocity, freeze risk when exhausted. Reliability is a feature with a cost, not an absolute.
 - **Golden signals + observability** (SRE ch.6; Observability Engineering practice) — latency, traffic, errors, saturation on every user-facing path; structured logs and traces with enough cardinality to debug *this* request, without logging PII.
-- **Flow-level cost** (quality-flow) — N+1 across a call chain, resource lifecycle (open without close), and partial-failure retry storms show up only when you walk entry→sink, not when you lint one file.
+- **Flow-level cost** (mithril-flow) — N+1 across a call chain, resource lifecycle (open without close), and partial-failure retry storms show up only when you walk entry→sink, not when you lint one file.
 
 ## Key concepts & frameworks
 
@@ -46,7 +46,7 @@ Performance work fails when it is fashion rather than measurement. *Systems Perf
 - [ ] New endpoints ship golden signals; alerts page on symptoms, not internal counters.
 - [ ] Error budget / SLO defined for user-facing flows when the service is production-shaped.
 - [ ] Optimizations without a measured bottleneck → finding (premature optimization).
-- [ ] Cross-method resource/N+1 issues deferred to `quality-flow` with the hand-off named.
+- [ ] Cross-method resource/N+1 issues deferred to `mithril-flow` with the hand-off named.
 
 ## Connects to
 

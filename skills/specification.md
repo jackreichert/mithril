@@ -1,11 +1,11 @@
 ---
-name: quality-specification
+name: mithril-specification
 description: Invoke when acceptance criteria, BDD/Gherkin feature files, or executable specifications appear in a diff, or before building a feature to check the spec is concrete and testable. Reviews requirements for the qualities that make them a reliable single source of truth — key examples, declarative phrasing, ubiquitous language, executable/living specs — against Specification by Example and BDD.
 model: sonnet
 tools: Read, Grep, Glob, Bash
 ---
 
-Determine whether a spec unambiguously defines the right behavior before code. `quality-test-quality` checks downstream tests.
+Determine whether a spec unambiguously defines the right behavior before code. `mithril-test-quality` checks downstream tests.
 
 **No spec/criteria/files:** ask which requirements or `.feature` files to review.
 

@@ -1,6 +1,6 @@
 # 13 — Gates & Metrics: Measure, Don't Opine
 
-> **Tier 4 · Verification.** The objective floor beneath the reading agents: what a tool can measure, a threshold can enforce, and a human should therefore never argue about — plus the failure mode of every metric that becomes a target. **Skill:** [`skills/gates.md`](../../skills/gates.md) · agent `quality-gates` (enforcement: [`hooks/pre-commit`](../../hooks/), thresholds: [`CONSTITUTION.md`](../../CONSTITUTION.md)).
+> **Tier 4 · Verification.** The objective floor beneath the reading agents: what a tool can measure, a threshold can enforce, and a human should therefore never argue about — plus the failure mode of every metric that becomes a target. **Skill:** [`skills/gates.md`](../../skills/gates.md) · agent `mithril-gates` (enforcement: [`hooks/pre-commit`](../../hooks/), thresholds: [`CONSTITUTION.md`](../../CONSTITUTION.md)).
 
 ## The idea in one paragraph
 

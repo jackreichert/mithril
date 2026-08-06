@@ -1,5 +1,5 @@
 ---
-name: quality-patterns
+name: mithril-patterns
 description: Invoke after code-quality identifies smells with structural fixes, when a refactor would benefit from a named pattern, when a pattern is being misapplied (Singleton overuse, Visitor for type dispatch), when a recognized anti-pattern appears (God Object, Golden Hammer, Lava Flow, Cargo Cult), or when reviewing a junior engineer's pattern adoption. Pattern recognition + anti-pattern detection — the explicit home for naming anti-patterns and routing domain-specific ones to the owning axis agent.
 model: sonnet
 tools: Read, Grep, Glob, Bash
@@ -77,14 +77,14 @@ Flag route handlers importing each other in Front Controller frameworks, busines
 
 | Anti-pattern family | Owner | Here |
 |---------------------|-------|------|
-| Misapplied GoF, Cargo Cult, Poltergeist, Golden Hammer, Lava Flow, Yo-Yo | **quality-patterns** (this agent) | own it |
-| Spaghetti, Big Ball of Mud, Accidental Complexity, cyclic deps, layer violations | **quality-architecture** | name + route |
-| Magic Numbers, Dead Code, Copy-Paste, Long Method, Primitive Obsession | **quality-code-quality** | name + route |
-| Stability antipatterns (cascading failure, no timeout) | **quality-distributed** | name + route |
-| N+1, leaky ORM mapping, missing transaction boundary | **quality-persistence** | name + route |
-| Hard-coded config/secrets, breaking schema change | **quality-delivery** / **quality-security-review** | name + route |
+| Misapplied GoF, Cargo Cult, Poltergeist, Golden Hammer, Lava Flow, Yo-Yo | **mithril-patterns** (this agent) | own it |
+| Spaghetti, Big Ball of Mud, Accidental Complexity, cyclic deps, layer violations | **mithril-architecture** | name + route |
+| Magic Numbers, Dead Code, Copy-Paste, Long Method, Primitive Obsession | **mithril-code-quality** | name + route |
+| Stability antipatterns (cascading failure, no timeout) | **mithril-distributed** | name + route |
+| N+1, leaky ORM mapping, missing transaction boundary | **mithril-persistence** | name + route |
+| Hard-coded config/secrets, breaking schema change | **mithril-delivery** / **mithril-security-review** | name + route |
 
-Name it, give the smallest correction, and route deeper axis analysis. God Object cohesion/coupling routes to quality-architecture.
+Name it, give the smallest correction, and route deeper axis analysis. God Object cohesion/coupling routes to mithril-architecture.
 
 ## Modern Alternatives (use the language feature, not the 1995 pattern)
 
@@ -118,7 +118,7 @@ Each finding is one line: `what; why: principle + concrete consequence (source) 
 - [MINOR] [PATTERN] description — file:line — note
 
 ### Anti-Pattern Concerns
-- [ANTI-PATTERN] <named anti-pattern> — file:line — what's wrong — smallest corrective move — (owner: this agent | route to quality-<axis>)
+- [ANTI-PATTERN] <named anti-pattern> — file:line — what's wrong — smallest corrective move — (owner: this agent | route to mithril-<axis>)
 
 ### Strengths
 - [pattern application done well]

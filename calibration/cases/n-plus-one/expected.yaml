@@ -7,14 +7,14 @@
 case: n-plus-one
 defects:
   - id: n-plus-one-monthly-statement
-    agent: quality-persistence   # quality-flow should also catch it across files
+    agent: mithril-persistence   # mithril-flow should also catch it across files
     file: src/billing/invoiceService.ts
     severity_min: Important
     match: "(N\\+1|query.*loop|per.?invoice quer|batch)"
     note: monthlyStatement loops invoices calling findItemsByInvoice per iteration; fix is the existing findItemsByInvoiceIds
 
   - id: lost-update-save-notes
-    agent: quality-persistence
+    agent: mithril-persistence
     file: src/billing/invoiceRepo.ts
     severity_min: Important
     match: "(lost update|optimistic|version|stale|concurrent edit)"

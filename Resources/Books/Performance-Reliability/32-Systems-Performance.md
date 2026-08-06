@@ -8,7 +8,7 @@ focus: Performance methodology, USE method, latency analysis, CPU/memory/disk/ne
 
 # Systems Performance: Enterprise and the Cloud — Brendan Gregg (2020, 2nd ed.)
 
-The definitive field manual for analyzing performance of operating systems, applications, and cloud infrastructure. Feeds the **quality-code-quality** agent's performance axis (and quality-delivery's observability concern), supplying the *methodology* — the USE method, latency analysis, "profile before you optimize" — behind the Constitution's Article I performance-precedence rule.
+The definitive field manual for analyzing performance of operating systems, applications, and cloud infrastructure. Feeds the **mithril-code-quality** agent's performance axis (and mithril-delivery's observability concern), supplying the *methodology* — the USE method, latency analysis, "profile before you optimize" — behind the Constitution's Article I performance-precedence rule.
 
 ## Per-chapter summary
 

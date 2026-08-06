@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-# Code Quality Skills installer
+# Mithril installer
 #
-# Deploys the /quality framework into Claude Code and Grok Build (first-class on both):
+# Deploys the /mithril framework into Claude Code and Grok Build (first-class on both):
 #   - 18 canonical skill files into ~/.claude/agents/ and ~/.grok/agents/,
 #     linked by default or copied with --copy-agents
-#   - 1 orchestrator command into ~/.claude/commands/ and ~/.grok/commands/ (quality.md)
+#   - 1 orchestrator command into ~/.claude/commands/ and ~/.grok/commands/ (mithril.md)
 #
 # Agent files are linked or copied directly from the canonical skills in this repo.
 # The orchestrator command receives the absolute repo path in place of the
@@ -113,15 +113,60 @@ run() {
 }
 
 make_temp() {
-  mktemp "${TMPDIR:-/tmp}/code-quality-skills.XXXXXX"
+  mktemp "${TMPDIR:-/tmp}/mithril.XXXXXX"
 }
 
-# Remove quality agents + orchestrator from one host home (Claude or Grok).
+# Remove pre-rename artifacts (the `quality-*` agents and `/quality` orchestrator
+# deployed before this framework became Mithril). Prefers the legacy manifest so we
+# only ever delete files we installed; falls back to the canonical agent list rather
+# than globbing, to avoid touching a user's own `quality-*` agents.
+remove_legacy_host() {
+  local home="$1" label="$2"
+  local agents_dest="$home/agents" commands_dest="$home/commands"
+  local legacy_manifest="$agents_dest/.code-quality-skills-agents"
+  local name target found=0
+  if [[ -f "$legacy_manifest" ]]; then
+    while IFS= read -r name; do
+      [[ -n "$name" ]] || continue
+      target="$agents_dest/$name"
+      if [[ -f "$target" || -L "$target" ]]; then
+        run rm -f "$target"
+        log "removed legacy $target"
+        found=1
+      fi
+    done < "$legacy_manifest"
+    run rm -f "$legacy_manifest"
+    log "removed legacy $legacy_manifest"
+    found=1
+  else
+    for src in "$AGENTS_SRC"/*.md; do
+      [[ -e "$src" ]] || continue
+      name="$(basename "$src")"
+      [[ "$name" == "tutor.md" ]] && continue
+      target="$agents_dest/quality-$name"
+      if [[ -f "$target" || -L "$target" ]]; then
+        run rm -f "$target"
+        log "removed legacy $target"
+        found=1
+      fi
+    done
+  fi
+  if [[ -f "$commands_dest/quality.md" ]]; then
+    run rm -f "$commands_dest/quality.md"
+    log "removed legacy $commands_dest/quality.md"
+    found=1
+  fi
+  (( found )) && note "MIGRATE" "cleaned up pre-Mithril /quality install in $home ($label)"
+  return 0
+}
+
+# Remove Mithril agents + orchestrator from one host home (Claude or Grok).
 uninstall_host() {
   local home="$1" label="$2"
   local agents_dest="$home/agents" commands_dest="$home/commands"
-  local manifest="$agents_dest/.code-quality-skills-agents"
+  local manifest="$agents_dest/.mithril-agents"
   note "UNINSTALL" "removing files from $home ($label)"
+  remove_legacy_host "$home" "$label"
   local name target
   if [[ -f "$manifest" ]]; then
     while IFS= read -r name; do
@@ -139,16 +184,16 @@ uninstall_host() {
       [[ -e "$src" ]] || continue
       name="$(basename "$src")"
       [[ "$name" == "tutor.md" ]] && continue
-      target="$agents_dest/quality-$name"
+      target="$agents_dest/mithril-$name"
       if [[ -f "$target" || -L "$target" ]]; then
         run rm -f "$target"
         log "removed $target"
       fi
     done
   fi
-  if [[ -f "$commands_dest/quality.md" ]]; then
-    run rm -f "$commands_dest/quality.md"
-    log "removed $commands_dest/quality.md"
+  if [[ -f "$commands_dest/mithril.md" ]]; then
+    run rm -f "$commands_dest/mithril.md"
+    log "removed $commands_dest/mithril.md"
   fi
 }
 
@@ -203,7 +248,7 @@ fi
 [[ -f "$SKILLS_DIR/skills/code-quality.md" ]] || die "skills dir invalid: $SKILLS_DIR (no skills/code-quality.md found)"
 (( INSTALL_CLAUDE || INSTALL_GROK )) || die "nothing to install — both --claude-only and --grok-only cancelled each other?"
 
-note "PLAN" "installing /quality framework"
+note "PLAN" "installing /mithril framework"
 log "skills dir:    $SKILLS_DIR"
 (( INSTALL_CLAUDE )) && log "claude home:   $CLAUDE_HOME  (agents + commands)"
 (( INSTALL_GROK ))   && log "grok home:     $GROK_HOME    (agents + commands)"
@@ -411,8 +456,9 @@ set_constitution_import() {
 deploy_host() {
   local home="$1" label="$2"
   local agents_dest="$home/agents" commands_dest="$home/commands"
-  local manifest="$agents_dest/.code-quality-skills-agents"
+  local manifest="$agents_dest/.mithril-agents"
   run mkdir -p "$agents_dest" "$commands_dest"
+  remove_legacy_host "$home" "$label"
 
   note "AGENTS" "deploying agents → $agents_dest ($label)"
   local desired_manifest
@@ -422,8 +468,8 @@ deploy_host() {
     [[ -e "$src" ]] || die "no agent files found in $AGENTS_SRC"
     name="$(basename "$src")"
     [[ "$name" == "tutor.md" ]] && continue
-    dest="$agents_dest/quality-$name"
-    printf 'quality-%s\n' "$name" >> "$desired_manifest"
+    dest="$agents_dest/mithril-$name"
+    printf 'mithril-%s\n' "$name" >> "$desired_manifest"
     if [[ "$SYMLINK_AGENTS" -eq 1 ]]; then
       link_symlink "$src" "$dest"
     else
@@ -450,8 +496,8 @@ deploy_host() {
   fi
   log "$count agent file(s) processed for $label"
 
-  note "ORCHESTRATOR" "deploying /quality command → $commands_dest ($label)"
-  install_file "$COMMANDS_SRC/quality.md" "$commands_dest/quality.md"
+  note "ORCHESTRATOR" "deploying /mithril command → $commands_dest ($label)"
+  install_file "$COMMANDS_SRC/mithril.md" "$commands_dest/mithril.md"
 }
 
 (( INSTALL_CLAUDE )) && deploy_host "$CLAUDE_HOME" "Claude Code"
@@ -547,7 +593,7 @@ targets=""
   if [[ -n "$targets" ]]; then targets="$targets + Grok"; else targets="Grok"; fi
 }
 log "deployed to: $targets"
-log "try it:  open Claude Code or Grok in any git repo and run /quality"
+log "try it:  open Claude Code or Grok in any git repo and run /mithril"
 log "Grok plugin alternative:  grok plugin install $SCRIPT_DIR --trust && grok plugin enable code-quality"
 [[ "$FORCE" -eq 0 && "$DRY_RUN" -eq 0 ]] && log "backups: any pre-existing files were saved as *.bak.<timestamp>"
 
