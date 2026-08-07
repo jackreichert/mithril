@@ -34,6 +34,23 @@ When two rules pull in opposite directions, resolve in this fixed order — **ea
 
 ---
 
+## Convention Discovery Gate
+
+Before the first structural or cross-boundary edit:
+
+- Inspect repository-local instructions, package manifests, deployment entrypoints,
+  CI/CD configuration, tests, and the nearest working analogue.
+- Identify ownership boundaries for source, runtime process, deployment, persistence,
+  messaging contracts, generated artifacts, and tests.
+- Distinguish framework concepts from deployment boundaries. A queue, module, package,
+  or handler is not necessarily an independently deployed service.
+- State the inferred local convention and one check that could disprove it.
+- If authoritative repository sources disagree, surface the contradiction before editing.
+- Never introduce a new package, service, schema, protocol field, or deployment unit merely
+  because it is the framework's default organization.
+
+---
+
 ## Article II — Code
 *Deep reference: [`skills/code-quality.md`](skills/code-quality.md), [`skills/patterns.md`](skills/patterns.md), [`skills/concurrency.md`](skills/concurrency.md)*
 
