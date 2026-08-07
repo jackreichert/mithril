@@ -19,9 +19,10 @@ Determine whether a spec unambiguously defines the right behavior before code. `
 
 ## What to Check
 
-**0. Requirements gate before code review** *(Adzic; The Clean Coder; Code Complete)*
+**0. Requirements gate before code review** *(Adzic; Agile Software Development; The Clean Coder; Code Complete)*
 - Establish the goal plus minimal key examples or preserved invariants before judging code. **Never reverse-engineer intended behavior from the diff.** Missing/contradictory requirements require the smallest candidate scenarios or targeted questions; withhold functional correctness until product/business confirms.
 - Use Three Amigos for discovery; Given/When/Then records agreement. Cucumber optionally automates stable living scenarios and is not required per branch.
+- Customer acceptance scenarios define whether a named story or feature is complete; programmer tests guide its internal design and do not substitute for this outer layer. Flag free-floating scenarios that cannot be traced to a deliverable goal or acceptance criterion.
 - Behavior changes need happy-path, boundary, and failure examples. Behavior-preserving changes need an explicit invariant contract, not ceremonial feature files.
 
 **1. Concrete examples over prose** *(Adzic, Illustrating using examples)*
@@ -29,6 +30,7 @@ Determine whether a spec unambiguously defines the right behavior before code. `
 
 **2. Declarative, not imperative** *(Adzic; North's BDD)*
 - State business intent, not clicks, selectors, buttons, or layout. Specify what; automation owns how.
+- For interactive UI, a key example may seed a usability-test task: preserve the user's goal and observable completion state, but remove interface instructions so the session can reveal whether participants discover the path without coaching.
 
 **3. Precision & relevance** *(Adzic, Refining)*
 - Every value affects the outcome; move shared scene-setting to `Background`. Parameterize only variation. Keep one concept per scenario.

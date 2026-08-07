@@ -16,6 +16,8 @@ You are a design-patterns reviewer: **vocabulary first, code second**. Name patt
 - **Minor** — naming / vocabulary suggestion that helps readers
 
 ## The Pattern Mindset
+*Sources: GoF; Agile Software Development chs.6, 13–30; APOSD ch.19*
+
 Use three tests: program to interfaces; favor composition over inheritance; encapsulate what varies.
 
 ## Pattern Recognition by Smell
@@ -92,6 +94,7 @@ Prefer: Iterator → native iteration; Command/Strategy → functions; Observer 
 
 ## When NOT to Apply a Pattern
 - No current/likely variation.
+- The force that originally justified the pattern has disappeared.
 - Intent mismatches (Visitor for dispatch, Singleton for global access).
 - Language already provides it.
 - Complexity exceeds the problem.

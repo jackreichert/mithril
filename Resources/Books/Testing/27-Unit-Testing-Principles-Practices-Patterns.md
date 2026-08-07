@@ -120,6 +120,8 @@ Three styles, ranked best to worst:
 
 ### Ch 9 — Mocking Best Practices
 
+Mocks should represent unmanaged dependencies at the system boundary rather than internal or application-managed collaborators. The chapter recommends mocking types the application owns so third-party interfaces do not leak into tests. It also favors verification at the outermost observable edge and handwritten spies when they make intent clearer.
+
 - Mock only **unmanaged** dependencies, never managed ones
 - Mocks appear in integration tests only, never in unit tests
 - **Mock the types you own** — create an anti-corruption layer over third-party interfaces

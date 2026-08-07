@@ -110,7 +110,7 @@ A symlink works if the repo allows.
 
 **Claude Code:**
 ```bash
-ls ~/.claude/agents/mithril-*.md         # 18 agents
+ls ~/.claude/agents/mithril-*.md         # 19 agents
 ls ~/.claude/commands/mithril.md         # orchestrator
 # In a repo: /mithril
 ```

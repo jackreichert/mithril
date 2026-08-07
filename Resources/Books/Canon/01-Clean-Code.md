@@ -14,6 +14,7 @@ The book that branded "clean code" as a discipline. Mixes opinionated essays wit
 
 ### Ch 1 — Clean Code
 Quotes from luminaries (Bjarne, Dave Thomas, Michael Feathers, Ron Jeffries, Ward Cunningham) on what clean code feels like. Establishes "the boy scout rule": leave the code cleaner than you found it.
+Together, these perspectives frame clean code as readable, maintainable work that developers improve continuously rather than repair only during large rewrites.
 
 ### Ch 2 — Meaningful Names
 Use intention-revealing names; avoid disinformation, noise words (`Data`, `Info`, `Manager`), and Hungarian notation. Class names are nouns, methods are verbs. One word per concept. Pick a domain or solution vocabulary and stick to it.
@@ -47,21 +48,24 @@ Separate construction (main) from use. Dependency Injection. Cross-cutting conce
 
 ### Ch 12 — Emergence
 Kent Beck's four rules of simple design, in priority: (1) runs all tests, (2) no duplication, (3) expresses programmer intent, (4) minimal classes/methods.
+The ordering matters because correctness comes before structural elegance, while removing duplication and clarifying intent guide later simplification. Following the rules incrementally allows a design to emerge from working code instead of requiring a complete architecture up front.
 
 ### Ch 13 — Concurrency
 Concurrency is decoupling, not speedup. Single Responsibility for concurrency. Limit shared data scope. Use copies. Threads should be independent. Know your library (Executors, locks). Know execution models (producer-consumer, readers-writers, dining philosophers).
 
 ### Ch 14 — Successive Refinement
-Long worked example (command-line argument parser). Watch a working-but-ugly module become clean through dozens of tiny refactorings.
+The chapter presents a long worked example built around a command-line argument parser. It follows a working-but-ugly module as it becomes clean through dozens of tiny refactorings. The progression shows that preserving behavior while improving names and structure is safer than attempting a single large rewrite.
 
 ### Ch 15 — JUnit Internals
-Worked refactoring of JUnit's `ComparisonCompactor` — names, boolean expressions, structure. Real code from a respected codebase improved.
+The chapter works through a refactoring of JUnit's `ComparisonCompactor`, focusing on names, boolean expressions, and structure. It demonstrates that even real code from a respected codebase can be improved. The example also shows how a series of small, behavior-preserving changes can make dense implementation logic easier to understand.
 
 ### Ch 16 — Refactoring SerialDate
 Worked refactoring of JCommon's `SerialDate`. Tests pinned behavior; refactorings cleaned naming, structure, and bugs surfaced through reading.
+The case study illustrates how a test safety net lets developers improve an existing library while discovering defects that were obscured by the original design.
 
 ### Ch 17 — Smells and Heuristics
 Distilled catalog: Comments smells (C1–C5), Environment (E1–E2), Functions (F1–F4), General (G1–G36), Java (J1–J3), Names (N1–N7), Tests (T1–T9). The chapter that matters most for code review.
+Its categorized heuristics give reviewers a shared vocabulary for identifying recurring design and readability problems in unfamiliar code.
 
 ## Critiques worth knowing
 Some advice is dogmatic ("functions should never have side effects"). The "small classes/methods" rule can fragment logic when applied without judgment. Pair with **APOSD** (Ousterhout), which argues *deep* modules over many small ones.

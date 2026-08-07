@@ -7,7 +7,7 @@
     {
       "name": "mithril",
       "source": "./",
-      "description": "The /mithril review framework \u2014 orchestrator + 15 specialist agents grounded in the canonical CS literature (Clean Code, APOSD, DDIA, Release It!, GOOS, OWASP, and ~35 more cited sources)."
+      "description": "The /mithril review framework \u2014 orchestrator + 19 specialist agents grounded in the canonical software-engineering and usability literature."
     }
   ],
   "description": "Self-hosted marketplace for the mithril repo \u2014 one plugin: the /mithril review framework."

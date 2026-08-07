@@ -15,47 +15,47 @@ Fuses Domain-Driven Design with functional programming: the domain is modeled di
 ### Part 1 — Understanding the Domain
 
 ### Ch 1 — Introducing Domain-Driven Design
-Build a shared mental model with domain experts before writing code. Discover the domain through business events (event storming), partition it into subdomains, draw bounded-context boundaries, and forge a ubiquitous language that the same words mean the same thing in code and in conversation.
+Developers and domain experts should build a shared mental model before code is written. Event storming uses business events to discover important behavior, after which the domain can be partitioned into subdomains and bounded contexts. A ubiquitous language then ensures that important words carry the same meaning in code and in conversation.
 
 ### Ch 2 — Understanding the Domain
 Capture the domain by interviewing the expert, not by jumping to a database schema or a class hierarchy. Resist database-driven and class-driven design; document the domain in plain text first. Model real complexity (optionality, constraints, alternative cases) instead of flattening it.
 
 ### Ch 3 — A Functional Architecture
-Treat bounded contexts as autonomous components communicating via events and explicit contracts (commands in, events out). Model each workflow as a transformation inside its context, and let the onion/layered structure keep the pure domain at the center with I/O at the edges.
+Bounded contexts should act as autonomous components that communicate through events and explicit contracts. Each workflow is modeled as a transformation within its own context, typically accepting commands and producing events. An onion or layered architecture keeps the pure domain at the center and moves input, output, and infrastructure to the edges.
 
 ### Part 2 — Modeling the Domain
 
 ### Ch 4 — Understanding Types
-Introduces algebraic data types as the modeling tool: product types (records/tuples = AND) and sum types (discriminated unions = OR). Types are composable and act as documentation; a function signature is a specification of the transformation.
+Algebraic data types provide the basic vocabulary for functional domain modeling. Product types such as records and tuples combine values with an "and," while sum types such as discriminated unions represent an "or" among alternatives. Because types compose and document allowed data, a function signature can serve as a precise specification of a transformation.
 
 ### Ch 5 — Domain Modeling with Types
-Translate the ubiquitous language directly into types — wrap primitives in single-case unions (`OrderId`, `EmailAddress`) so a string can't masquerade as an ID. Model choices with unions and workflows with functions, so the type definitions read as the domain itself.
+The ubiquitous language should be translated directly into domain-specific types. Wrapping primitives in single-case unions such as `OrderId` and `EmailAddress` prevents an arbitrary string from masquerading as a meaningful value. Choices become union types and workflows become functions, allowing the type definitions to read like a description of the domain.
 
 ### Ch 6 — Integrity and Consistency in the Domain
-Make illegal states unrepresentable: encode validation into constructors (smart/private constructors), use constrained types so an invalid value cannot exist past the boundary. Keep integrity local to an aggregate, define consistency boundaries, and push validation to the edge so the core works only with already-valid data.
+Illegal states should be made unrepresentable so invalid values cannot circulate through the domain. Smart or private constructors enforce validation and create constrained types only when their invariants hold. Integrity stays local to an aggregate, consistency boundaries remain explicit, and the core receives data that has already been validated at the edge.
 
 ### Ch 7 — Modeling Workflows as Pipelines
-Express a business workflow as a pipeline of steps (`UnvalidatedOrder → ValidatedOrder → PricedOrder → …`), each a function with a precise type. Capture effects (validation failure, async, dependencies) in the signatures, so the whole workflow is described by its types before any implementation exists.
+A business workflow can be expressed as a pipeline of typed steps, such as `UnvalidatedOrder` to `ValidatedOrder` to `PricedOrder`. Each step is a function whose input and output types record the state transition it performs. Validation failures, asynchronous work, and dependencies also appear in signatures, allowing the complete workflow to be described before implementation.
 
 ### Part 3 — Implementing the Model
 
 ### Ch 8 — Understanding Functions
-Functions are first-class values: pass them as parameters, return them, and compose them. Currying and partial application inject dependencies functionally; total functions and the type signature define the contract of each pipeline step.
+Functions are first-class values that can be passed as parameters, returned as results, and composed into larger behavior. Currying and partial application provide a functional way to supply dependencies without hiding them in mutable objects. Total functions and explicit type signatures define the contract for each pipeline step.
 
 ### Ch 9 — Implementation: Composing a Pipeline
-Assemble the workflow by composing the step functions, injecting dependencies via partial application rather than a DI container. The challenge — steps have mismatched shapes (some return `Result`, some are async) — motivates the next chapter.
+The workflow is assembled by composing its step functions in domain order. Dependencies are supplied through partial application rather than resolved from a dependency-injection container. Composition becomes harder when steps have mismatched shapes, such as returning `Result` values or asynchronous work, which motivates the error-handling tools in the next chapter.
 
 ### Ch 10 — Implementation: Working with Errors
-Make errors explicit in the type system with `Result<Success, Error>` instead of exceptions for expected failures. Railway-oriented programming: `bind`/`map` chain functions on the success track and short-circuit to the error track on the first failure; model domain errors as a union and convert/adapt errors at boundaries.
+Expected failures should be explicit in the type system through `Result<Success, Error>` rather than hidden in exceptions. In railway-oriented programming, `bind` and `map` continue functions along the success track and short-circuit onto the error track at the first failure. Domain errors become a union of known cases, while boundary code converts or adapts them for external consumers.
 
 ### Ch 11 — Serialization
-Separate the rich internal domain types from the simple, stable Data Transfer Objects used on the wire. Map domain → DTO → JSON/XML at the boundary (and back) so the domain model can evolve without breaking external contracts.
+Rich internal domain types should remain separate from the simple, stable Data Transfer Objects used on the wire. Boundary code maps domain values to DTOs and then to JSON or XML, reversing the process for incoming data. This translation lets the internal model evolve without automatically breaking external contracts.
 
 ### Ch 12 — Persistence
-Keep persistence at the edge: the pure domain emits commands/events and the infrastructure layer translates them to storage. Covers working with relational and document stores, transaction/consistency boundaries aligned to aggregates, and avoiding leaking ORM or query concerns into the domain.
+Persistence belongs at the edge of the system rather than inside the pure domain. The domain emits commands or events, and infrastructure code translates those values into operations on relational or document stores. Transaction and consistency boundaries should align with aggregates, while ORM and query concerns remain outside domain logic.
 
 ### Ch 13 — Evolving a Design and Keeping It Clean
-Show how the type-driven model absorbs new requirements with localized, compiler-guided change — adding a case, a field, or a new step. Demonstrates that the compiler flags every site needing attention, keeping the design clean as it evolves rather than rotting.
+A type-driven model can absorb new requirements through localized changes such as adding a union case, record field, or workflow step. The compiler then identifies every location that must handle the changed type. This compiler-guided process helps the design evolve deliberately instead of allowing inconsistencies and obsolete assumptions to accumulate.
 
 ## Critiques worth knowing
 - **F#-specific surface.** Examples lean on F# discriminated unions, `Result`, and partial application; readers in languages with weaker sum-type or pattern-matching support (Java pre-records, Go) must translate the ideas, and some elegance is lost.

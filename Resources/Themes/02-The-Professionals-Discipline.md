@@ -13,6 +13,7 @@ Most catastrophic software failures are process failures wearing a technical cos
 - **Design it twice** (Ousterhout, APOSD ch. 11) — sketch two or three genuinely different designs before committing; the contrast surfaces issues single-design analysis cannot. Cheap insurance even (especially) for senior engineers who trust their first idea.
 - **Tracer bullets and blast radius** (Hunt & Thomas, *The Pragmatic Programmer*) — build a thin end-to-end slice first to verify the whole path under real conditions, then thicken; and before any change, map what it can break (decoupling chapters: the blast radius question). Design by Contract makes the assumptions explicit enough to validate.
 - **Estimate with evidence, not hope** (Spolsky, *Painless Software Schedules*; Martin, *Clean Coder* ch. 10) — fine-grained tasks, original-vs-current estimates kept side by side, and the schedule updated by what the data says, not what the deadline needs. An estimate is a probability distribution, not a number.
+- **Replan from measured delivery** (Martin, *Agile Software Development* ch. 3) — user stories make scope negotiable, while completed work from prior iterations supplies a measured velocity for the next plan. The iteration cadence stays fixed, but story selection changes as estimates, priorities, and actual throughput teach the team more; evidence-based scheduling becomes a continuous feedback loop rather than a one-time forecast.
 - **Respect the physics** (Brooks, *The Mythical Man-Month*) — Brooks's Law (adding people late adds communication before it adds output), the Tower of Babel (projects fail on coordination, not competence), and No Silver Bullet (expect incremental gains; distrust any plan that requires a miracle tool).
 - **Validate after, on purpose** (McConnell ch. 25–26; Martin ch. 7) — post-flight: does it meet the stated requirements (acceptance-level, not vibes), what's the Big-O under production data shapes, and which assumptions did the implementation quietly introduce?
 
@@ -35,6 +36,7 @@ Most catastrophic software failures are process failures wearing a technical cos
 - [**The Mythical Man-Month** — Brooks](../Books/Engineering-Culture-Process/20-The-Mythical-Man-Month.md) — Brooks's Law, Babel, essence vs. accident.
 - [**A Philosophy of Software Design** — Ousterhout](../Books/Canon/06-A-Philosophy-of-Software-Design.md) — ch. 11 Design It Twice; ch. 3 strategic vs. tactical.
 - [**Painless Software Schedules** — Spolsky](../Articles/Joel-Spolsky/03-Painless-Software-Schedules.md) — evidence-based estimation. (Environment sanity check: [The Joel Test](../Articles/Joel-Spolsky/01-The-Joel-Test.md).)
+- [**Agile Software Development** — Martin](../Books/Engineering-Culture-Process/44-Agile-Software-Development.md) — ch. 2 XP as an integrated feedback system; ch. 3 measured-velocity planning; ch. 4 acceptance tests as story completion.
 
 ## What the skill encodes (operational checklist)
 

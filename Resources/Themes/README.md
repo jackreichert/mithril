@@ -1,6 +1,6 @@
 # Themes — the concept guides
 
-Nineteen cross-source concept guides that sit **between the per-source summaries and the skills**. (For the one-file horizontal cut — the recurring meta-patterns, the tension map, and the consensus list the tutor teaches from — see [`THEMES.md`](../../THEMES.md); these guides are its per-theme deep dives.) A summary condenses one book; a theme synthesizes the *idea* across every source that touches it — including where the sources disagree; a skill operationalizes the theme into review judgment; the [Constitution](../../CONSTITUTION.md) compresses it into write-time rules; the gates enforce the measurable slice. Themes are the learning on-ramp: read the theme first, then drill into the summaries it cites, then the originals.
+Twenty cross-source concept guides that sit **between the per-source summaries and the skills**. (For the one-file horizontal cut — the recurring meta-patterns, the tension map, and the consensus list the tutor teaches from — see [`THEMES.md`](../../THEMES.md); these guides are its per-theme deep dives.) A summary condenses one book; a theme synthesizes the *idea* across every source that touches it — including where the sources disagree; a skill operationalizes the theme into review judgment; the [Constitution](../../CONSTITUTION.md) compresses it into write-time rules; the gates enforce the measurable slice. Themes are the learning on-ramp: read the theme first, then drill into the summaries it cites, then the originals.
 
 Each theme states the idea in one paragraph, walks the arc of how the sources build it, names the real tensions instead of papering over them (this repo's house rule — e.g. Clean Code vs. APOSD on comments), lists its sources from the [master list](../../CS-Best-Practices-Resources.md), and ends with the operational checklist its skill encodes.
 
@@ -27,6 +27,7 @@ Each theme states the idea in one paragraph, walks the arc of how the sources bu
 | 17 | [Concurrency: Shared Memory, Honestly](17-Concurrency.md) | 5 · Systems in production | `concurrency` |
 | 18 | [Performance & Operability](18-Performance-and-Operability.md) | 5 · Systems in production | `performance`, `observability`, `persistence`, `delivery` |
 | 19 | [Accessibility: Inclusive Interfaces](19-Accessibility.md) | 4 · Verification | `accessibility` |
+| 20 | [Usability: Obvious Interfaces, Tested with Users](20-Usability-and-User-Testing.md) | 4 · Verification | `usability` |
 
 The cross-cutting `mithril-flow` agent draws on 12, 15, 16, and 18 (taint, partial failure, resource/transaction lifecycle, and source→sink cost) rather than owning a theme — see each theme's "Connects to" and the flow agent prompt.
 
@@ -41,7 +42,7 @@ The cross-cutting `mithril-flow` agent draws on 12, 15, 16, and 18 (taint, parti
 ```
 CS-Best-Practices-Resources.md      the master inventory (what exists, who owns which idea)
   └── Resources/{Books,Articles,Papers,Standards}/   one summary per source (condense)
-        └── Resources/Themes/                        19 concept guides (synthesize across sources)  ← you are here
+      └── Resources/Themes/                        20 concept guides (synthesize across sources)  ← you are here
               └── skills/                            18 skill docs (operationalize for review; + tutor)
                     ├── ~/.claude/agents/mithril-*   canonical skills exposed under host names
                     ├── CONSTITUTION.md               write-time rules (prevent)

@@ -14,6 +14,7 @@ Design patterns earn their place twice: as **vocabulary** (saying "this is a Str
 - **Compound patterns** (HFDP ch. 12; PEAA web-presentation patterns) — MVC is not one pattern but Strategy + Composite + Observer cooperating; its web descendants (Page Controller, Front Controller, MVP/MVVM/Flux) are the same forces re-balanced for different UI stacks. Recognizing the composition prevents cargo-culting the acronym.
 - **Modern refinements** (Bloch, *Effective Java*) — minimize mutability (item 17: immutable value types shrink the state space — Theme 01's culprit again); composition over inheritance operationalized (item 18); static factories and Builders over telescoping constructors; language evolution absorbs patterns (enums as Singletons, lambdas as Strategies/Commands, try-with-resources as Disposal) — using the heavyweight form where the language has a lightweight one is itself a smell.
 - **The counterweight** (Ousterhout, APOSD ch. 19) — patterns are means, not merit badges. Applied without a genuine force to resolve, a pattern adds interfaces (cost) without implementation value — the definition of a shallow module. The named abuses: **Singleton** (global mutable state with a design-pattern alibi — hostile to tests and to reasoning), **Visitor** (double-dispatch machinery where a method or a match expression would do), factory indirection with a single concrete product. The skill's default question is not "which pattern fits here?" but "does anything here need a pattern at all?"
+- **Patterns emerge from pressure** (Martin, *Agile Software Development* chs. 6, 13–30) — the bowling episode and the Payroll, Weather Station, and ETS case studies introduce a pattern only after concrete code exposes a force such as deferred execution, substitutable behavior, or a stable structure with changing operations. This is the constructive half of Ousterhout's restraint: recognize the force, make the smallest refactoring that resolves it, and remove the pattern when that force no longer exists.
 
 ## Tensions worth keeping
 
@@ -27,6 +28,7 @@ Design patterns earn their place twice: as **vocabulary** (saying "this is a Str
 - [**Effective Java** — Bloch](../Books/Language-Specific/22-Effective-Java.md) — items 17–18 and the modern mechanics; patterns absorbed by the language.
 - [**A Philosophy of Software Design** — Ousterhout](../Books/Canon/06-A-Philosophy-of-Software-Design.md) — ch. 19: the over-patterning counterweight.
 - [**Refactoring** — Fowler](../Books/Canon/05-Refactoring.md) — patterns as refactoring destinations (Replace Conditional with Polymorphism et al.).
+- [**Agile Software Development** — Martin](../Books/Engineering-Culture-Process/44-Agile-Software-Development.md) — worked case studies in which patterns emerge from tests, refactoring, and observed variation; with modern cautions around Singleton, transparent Proxy, and inheritance-heavy Template Method.
 - [**Patterns of Enterprise Application Architecture** — Fowler](../Books/Domain-Systems-Design/11-Patterns-of-Enterprise-Application-Architecture.md) — the web-presentation compound family.
 
 ## What the skill encodes (operational checklist)
@@ -38,6 +40,7 @@ Design patterns earn their place twice: as **vocabulary** (saying "this is a Str
 - [ ] Composition-over-inheritance violations (deep hierarchies, fragile base classes, protected-field coupling) → name the compositional alternative.
 - [ ] Immutability first for value-like types; mutable "pattern" participants get scrutiny (an Observer mutating shared state is two findings).
 - [ ] When simpler-without wins, say so explicitly — "no pattern needed" is a valid, valuable review outcome.
+- [ ] When a pattern's original force is absent or has disappeared, recommend removing it; textbook-correct structure without a live justification is over-patterning.
 
 ## Connects to
 

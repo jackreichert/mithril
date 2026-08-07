@@ -59,6 +59,14 @@ Publisher: Pearson / Prentice Hall.
 | 21 | Head First Design Patterns (2nd ed.) | Freeman, Robson | 978-1492078005 | No |
 | 25 | Accelerate | Forsgren, Humble, Kim | 978-1942788331 | No (companion DORA reports free at <https://dora.dev>) |
 | 26 | Team Topologies | Skelton, Pais | 978-1942788812 | No (intro material free at <https://teamtopologies.com>) |
+| 44 | Agile Software Development: Principles, Patterns, and Practices | Robert C. Martin | 978-0135974445 | No |
+
+## Usability & Interaction Design
+
+| # | Title | Author | ISBN-13 | Publisher |
+|---|-------|--------|---------|-----------|
+| 45 | Don't Make Me Think, Revisited (3rd ed.) | Steve Krug | 978-0321965516 | New Riders / Pearson (2014) |
+| 46 | Rocket Surgery Made Easy | Steve Krug | 978-0321657299 | New Riders (2009) |
 
 ## Language-Specific
 

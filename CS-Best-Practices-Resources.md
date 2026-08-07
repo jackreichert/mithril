@@ -5,6 +5,8 @@ Foundation reading for clean-code skill synthesis. This file is the **per-resour
 > **Coverage note:** Not every book listed here drove the `/mithril` framework's synthesis. About 10 of the original core were deeply integrated into the agents (Clean Code, Refactoring, APOSD, Clean Architecture, GOOS, Art of Unit Testing, xUnit Test Patterns, Working Effectively with Legacy Code, DDD, Release It!). The remainder are listed for context, future reference, or because their concepts already filter through other primary sources. For the honest "what's actually synthesized vs. what's just listed" breakdown, see [`README.md`](README.md#whats-deliberately-not-synthesized).
 >
 > **2026-06 expansion:** 13 books (#29–41) were added to close named gaps — concurrency (JCiP), performance & query hygiene (SQL Performance Explained, Database Internals, Systems Performance), reliability/ops (SRE), functional discipline (Grokking Simplicity, Domain Modeling Made Functional), security-by-design (Building Secure and Reliable Systems, Threat Modeling), distributed/integration (Building Microservices, Enterprise Integration Patterns), change-economics (Tidy First?), and DDD how-to (Implementing DDD). Chapter summaries and THEMES.md are updated; skill integration follows.
+>
+> **2026-08 usability expansion:** Steve Krug's *Don't Make Me Think, Revisited* and *Rocket Surgery Made Easy* (#45–46) add task-centered interface heuristics and a lightweight observe-fix-retest practice. Theme 20 and `mithril-usability` own this material, alongside rather than inside the WCAG-focused accessibility layer.
 
 ---
 
@@ -63,6 +65,14 @@ Foundation reading for clean-code skill synthesis. This file is the **per-resour
 | 21 | **Head First Design Patterns** (2nd ed.) | Freeman, Robson | 2020 | Approachable GoF with OO design principles |
 | 25 | **Accelerate** | Forsgren, Humble, Kim | 2018 | DORA empirics: four key metrics, capabilities that drive elite delivery performance |
 | 26 | **Team Topologies** | Skelton, Pais | 2019 | Four team types, three interaction modes, Inverse Conway Maneuver, cognitive load |
+| 44 | **Agile Software Development: Principles, Patterns, and Practices** | Robert C. Martin | 2002 | XP feedback loops, SOLID, package principles, and patterns through worked case studies |
+
+### Usability & Interaction Design
+
+| # | Title | Author | Year | Focus |
+|---|-------|--------|------|-------|
+| 45 | **Don't Make Me Think, Revisited** (3rd ed.) | Steve Krug | 2014 | Task clarity, scanning, hierarchy, navigation, mobile usability, and inexpensive testing |
+| 46 | **Rocket Surgery Made Easy** | Steve Krug | 2009 | Lightweight usability testing, recruiting, facilitation, observation, prioritization, and retesting |
 
 ### Language-Specific (High Signal)
 
@@ -192,10 +202,10 @@ Foundation reading for clean-code skill synthesis. This file is the **per-resour
 |---------|-------------------|
 | Naming | Clean Code ch.2, APOSD, Art of Readable Code |
 | Function design | Clean Code ch.3, Code Complete |
-| SOLID | Uncle Bob articles + Clean Architecture |
-| Design patterns | GoF, Head First Design Patterns |
-| Refactoring | Fowler Refactoring 2nd ed., Working Effectively with Legacy Code, Tidy First? |
-| Testing / TDD | TDD by Example, GOOS, Art of Unit Testing, xUnit Test Patterns, Khorikov |
+| SOLID | Agile Software Development, Uncle Bob articles, Clean Architecture |
+| Design patterns | GoF, Head First Design Patterns, Agile Software Development |
+| Refactoring | Fowler Refactoring 2nd ed., Working Effectively with Legacy Code, Tidy First?, Agile Software Development |
+| Testing / TDD | TDD by Example, Agile Software Development, GOOS, Art of Unit Testing, xUnit Test Patterns, Khorikov |
 | Test doubles | Mocks Aren't Stubs (Fowler), Art of Unit Testing, xUnit Test Patterns ch.11 |
 | Test strategy / distribution | Test Pyramid (Fowler/Vocke), Diverse Fantastical Shapes (Fowler) |
 | Test quality / pillars | Khorikov Four Pillars, GOOS ch.18, Art of Unit Testing ch.7–9 |
@@ -212,6 +222,8 @@ Foundation reading for clean-code skill synthesis. This file is the **per-resour
 | Security | OWASP Top 10, ASVS, Threat Modeling, Building Secure and Reliable Systems |
 | Code review | Software Eng @ Google, Google Eng Practices |
 | Complexity management | APOSD, Out of the Tar Pit, No Silver Bullet |
+| Usability / interaction clarity | Don't Make Me Think, Revisited; Rocket Surgery Made Easy |
+| Lightweight user testing | Rocket Surgery Made Easy; Don't Make Me Think, Revisited chs.8–9 |
 
 ---
 

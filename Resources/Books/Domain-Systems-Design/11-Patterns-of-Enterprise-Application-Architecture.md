@@ -13,32 +13,32 @@ A pattern catalog for typical enterprise web/database applications. Predates the
 ## Part I — The Narrative (overview chapters)
 
 ### Ch 1 — Layering
-Three classic layers — Presentation, Domain Logic, Data Source. Distinct *responsibilities*, not just packages. Why layering matters: change isolation, deployability, comprehension.
+Enterprise applications commonly separate three layers: Presentation, Domain Logic, and Data Source. These layers represent distinct *responsibilities*, not merely packages or folders. Clear layering isolates changes, clarifies deployment choices, and makes the system easier to comprehend.
 
 ### Ch 2 — Organizing Domain Logic
-Three patterns for the domain layer:
+The structure of domain logic should match the complexity of the business rules it represents. The chapter compares three core patterns for that logic and also explains how a Service Layer defines the application's boundary. Choosing deliberately prevents a simple design from becoming tangled as behavior grows:
 - **Transaction Script** — straight-line procedure per use case. Easy until logic grows.
 - **Domain Model** — object graph where behavior lives on the entities. Powerful, requires ORM.
 - **Table Module** — one class per DB table; instances are rowsets. Common in .NET.
 - **Service Layer** wraps domain logic for the application boundary.
 
 ### Ch 3 — Mapping to Relational Databases
-ORM territory. **Active Record** (object owns its row) vs. **Data Mapper** (separate mapper). N+1, identity maps, lazy loading, inheritance mapping.
+Object-relational mapping connects an in-memory object model to relational database tables. **Active Record** lets an object own persistence for its row, while **Data Mapper** keeps persistence in a separate mapper. The chapter also explains recurring concerns such as N+1 queries, identity maps, lazy loading, and inheritance mapping.
 
 ### Ch 4 — Web Presentation
-**Model-View-Controller**, **Page Controller** vs **Front Controller**, **Template View** vs **Transform View**, **Application Controller**.
+Web presentation patterns divide request handling, navigation, and rendering into explicit responsibilities. **Model-View-Controller**, **Page Controller** versus **Front Controller**, and **Template View** versus **Transform View** offer different ways to make those responsibilities visible. **Application Controller** centralizes control over screen flow when navigation becomes too complex for individual pages.
 
 ### Ch 5 — Concurrency
-Optimistic vs. pessimistic locking. Transactional isolation levels. ACID. Long-running business transactions vs short DB transactions.
+Enterprise applications must coordinate concurrent work without confusing a business transaction with a database transaction. Optimistic locking detects conflicting updates, while pessimistic locking prevents them by reserving access in advance. Isolation levels and ACID properties govern short database transactions, but long-running business transactions require additional application-level strategies.
 
 ### Ch 6 — Session State
-Three approaches: **Client Session State**, **Server Session State**, **Database Session State**. Trade-offs in scalability, security, complexity.
+Session state can live in one of three places: the client, the application server, or a database. **Client Session State**, **Server Session State**, and **Database Session State** make different trade-offs in scalability, security, and complexity. The appropriate choice depends on how long the state must survive, how safely it can be trusted, and whether requests may reach different server processes.
 
 ### Ch 7 — Distribution Strategies
-Don't distribute objects unless you have to (cf. Waldo's "A Note on Distributed Computing"). **Remote Facade**, **Data Transfer Object**.
+Do not distribute objects unless the system genuinely requires a process or network boundary, as Waldo's "A Note on Distributed Computing" also cautions. Remote calls have different latency and failure behavior from local method calls, so fine-grained object interfaces become brittle when exposed over a network. **Remote Facade** provides a coarse-grained boundary, while **Data Transfer Object** packages data for efficient transfer across it.
 
 ### Ch 8 — Putting It All Together
-Decision rules for picking patterns: complexity of domain logic, scaling needs, team skill.
+Patterns should be selected as a coherent architecture rather than as isolated recipes. The main decision factors are the complexity of the domain logic, scaling needs, and the team's skill and experience. A simpler pattern is preferable when it satisfies those forces because every additional layer or mapping mechanism carries a cost.
 
 ## Part II — The Pattern Catalog (~40 patterns)
 

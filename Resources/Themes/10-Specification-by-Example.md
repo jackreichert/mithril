@@ -28,6 +28,7 @@ Most requirement failures aren't communication failures at review time — they'
 
 ## The sources
 
+- [**Agile Software Development** — Martin](../Books/Engineering-Culture-Process/44-Agile-Software-Development.md) — ch. 3 user stories as revisable planning units; ch. 4 acceptance tests as the executable definition of story completion; ch. 18 the Payroll iteration in practice.
 - ★ [**Specification by Example** — Adzic](../Books/Testing/28-Specification-by-Example.md) — the seven process patterns and the case-study evidence. (Given-When-Then grammar from Dan North's BDD and the Cucumber lineage, covered in the summary.)
 - [**The Clean Coder** — Martin](../Books/Clean-Architecture-Trilogy/09-The-Clean-Coder.md) — ch. 7: acceptance tests as the definition of done; ambiguity as professional negligence.
 - [**Continuous Delivery** — Humble & Farley](../Books/Engineering-Culture-Process/19-Continuous-Delivery.md) — ch. 8: the automated acceptance-test stage.

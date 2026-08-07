@@ -145,6 +145,7 @@ A task is complete only when **all** of the following hold. This is the checklis
 - [ ] **Security clear** — threat model for new surfaces; all external input validated; no secrets, PHI, or PII committed; lockfile/deps reviewed.
 - [ ] **Operability clear** — golden signals / logs / traces for new paths; expand-contract for schema/API breaks; shippable behind flags.
 - [ ] **UI accessibility clear** (when shipping interactive UI) — keyboard operable primary path; controls have accessible names; labels/errors associated; no keyboard trap; WCAG 2.2 AA intent (`/mithril a11y`).
+- [ ] **UI usability clear** (when shipping interactive UI) — important tasks are discoverable; labels and consequences are unambiguous; actions provide feedback and recovery; meaningful uncertainty is checked with realistic user tasks (`/mithril usability`).
 - [ ] **Precedence honored** — where rules conflicted, Article I's order was applied and the trade-off is explained.
 - [ ] **Reviewed** — `/mithril` run on the diff with no unresolved Critical findings.
 - [ ] **Committed cleanly** — atomic commit, no unrelated changes or generated artifacts, on a feature branch (never directly to a protected branch).

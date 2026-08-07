@@ -15,7 +15,7 @@ The reference book on distributed-data systems for application engineers. Combin
 ### Part I — Foundations of Data Systems
 
 **Ch 1 — Reliable, Scalable, and Maintainable Applications**
-The three primary concerns. Defines reliability (faults vs. failures), scalability (load parameters, performance metrics — percentiles, not averages), maintainability (operability, simplicity, evolvability).
+Data systems must remain reliable, scalable, and maintainable as their workloads and environments change. Reliability means tolerating faults before they become user-visible failures, while scalability requires explicit load parameters and percentile-based performance measurements rather than misleading averages. Maintainability depends on operability, simplicity, and evolvability so that people can understand, run, and safely change the system over time.
 
 **Ch 2 — Data Models and Query Languages**
 Relational vs. document vs. graph. Normalization, locality, schema-on-read vs. schema-on-write. Declarative vs. imperative. MapReduce.
@@ -41,7 +41,7 @@ Key-range, hash, hot-spot mitigation. Secondary index challenges. Rebalancing st
 ACID demystified. Read committed, snapshot isolation (MVCC), serializable. Lost updates, write skew, phantoms. Why "weak isolation" hides scary bugs.
 
 **Ch 8 — The Trouble with Distributed Systems**
-Network unreliability, clock unreliability (monotonic vs. wall clock), process pauses (GC, swap). The truth: there is no truly reliable wall clock.
+Distributed systems must operate despite unreliable networks, imperfect clocks, and processes that can pause unexpectedly because of garbage collection or swapping. Monotonic clocks can measure elapsed time, but wall clocks can jump and cannot establish a perfectly trustworthy global order. Robust distributed algorithms therefore treat timing and reachability as uncertain evidence rather than proof that another process has failed.
 
 **Ch 9 — Consistency and Consensus**
 Linearizability vs. serializability. Total order broadcast. Distributed transactions, 2PC, Paxos, Raft. Membership and coordination services (ZooKeeper, etcd).

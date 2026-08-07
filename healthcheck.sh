@@ -9,8 +9,9 @@
 #   2. ROUTING           — every subagent_type the orchestrator routes to has a
 #                          matching runtime skill (and no skill is orphaned)
 #   3. COUNT CLAIMS      — "N agent" figures in README.md / install.sh match reality
-#   4. DEPLOYED SYNC     — ~/.claude and ~/.grok agents match canonical skills
-#   5. DOC LINKS         — relative .md links AND plain-text ../ paths resolve
+#   4. SUMMARY DEPTH     — every chapter summary has at least three sentences
+#   5. DEPLOYED SYNC     — ~/.claude and ~/.grok agents match canonical skills
+#   6. DOC LINKS         — relative .md links AND plain-text ../ paths resolve
 #
 # Exit 0 = healthy, 1 = problems found.
 #
@@ -123,12 +124,23 @@ require_in_agent mithril-architecture 'Hyrum|expand-contract|additive' 'API cont
 require_in_agent mithril-architecture 'Class decomposition test|disjoint method/field clusters' 'class decomposition counterweight'
 require_in_agent mithril-test-quality 'Property-Based|property-based|PBT' 'property-based testing'
 require_in_agent mithril-test-quality 'shrink|Hypothesis|fast-check' 'PBT tooling / shrinking'
+require_in_agent mithril-test-quality 'Two Test Layers|Customer acceptance tests.*Programmer tests' 'customer/programmer test layers'
 require_in_agent mithril-specification 'Requirements gate before code review|Never reverse-engineer intended behavior' 'requirements-first specification gate'
+require_in_agent mithril-specification 'story or feature is complete|story acceptance criteria' 'acceptance tests define story completion'
 require_in_agent mithril-review 'Review Contract Precondition|Never infer intended behavior' 'requirements-first review contract'
 require_in_agent mithril-concurrency 'atomic|visibility|liveness' 'three concurrency hazards'
 require_in_agent mithril-performance 'USE method|Utilization' 'USE method (performance skill)'
 require_in_agent mithril-observability 'golden signals|saturation' 'golden signals (observability skill)'
 require_in_agent mithril-accessibility 'WCAG|keyboard|accessible name' 'WCAG / keyboard a11y'
+require_in_agent mithril-usability 'Observed.*Heuristic|Heuristic.*Observed' 'observed vs heuristic usability evidence'
+require_in_agent mithril-usability 'hierarchy|information scent|error recovery' 'task-centered usability checks'
+require_in_agent mithril-process 'Forecasts are not promises|measured delivery' 'measured replanning and forecast discipline'
+if grep -qE 'UI usability clear.*discoverable.*feedback and recovery' "$SCRIPT_DIR/CONSTITUTION.md"; then
+  ok "Constitution carries the UI usability gate"
+else
+  bad "Constitution missing UI usability Definition-of-Done gate"
+  parity_ok=0
+fi
 if grep -qE 'adds/changes classes, constructors, fields, collaborators, or public methods' "$CMD_SRC"; then
   ok "quality orchestrator routes existing class-structure changes to architecture"
 else
@@ -163,7 +175,48 @@ else
   warn "theme count may be stale (found $n_themes theme files) — check Themes/README + THEMES.md"
 fi
 
-# ---- 4. deployed sync ----------------------------------------------------------
+# ---- 4. chapter-summary depth --------------------------------------------------
+hdr "Chapter summary depth"
+summary_failures="$({
+  # shellcheck disable=SC2016 # awk owns these variables; Bash must not expand them.
+  find "$SCRIPT_DIR/Resources/Books" -type f -name '*.md' -print0 \
+    | xargs -0 awk '
+      function count_sentences(text, copy, count) {
+        copy = text
+        gsub(/([Ee]\.[Gg]|[Ii]\.[Ee])\./, "", copy)
+        gsub(/(^|[[:space:]])(vs|etc|[Mm]r|[Mm]rs|[Mm]s|[Dd]r|[Pp]rof|[Ss]r|[Jj]r)\./, " ", copy)
+        gsub(/[[:upper:]]\.[[:upper:]]\./, "", copy)
+        gsub(/[[:digit:]]+\.[[:digit:]]+/, "", copy)
+        count = gsub(/[.!?]["*)_]*([[:space:]]|$)/, "", copy)
+        return count
+      }
+      function flush() {
+        if (chapter != "" && count_sentences(body) < 3) {
+          print FILENAME ": " chapter " (" count_sentences(body) " sentences)"
+        }
+        chapter = ""
+        body = ""
+      }
+      FNR == 1 { flush() }
+      /^### Ch / || /^\*\*Ch [0-9]/ {
+        flush()
+        chapter = $0
+        body = (/^\*\*Ch [0-9]/ ? $0 : "")
+        next
+      }
+      chapter != "" && (/^### Part / || /^## /) { flush(); next }
+      chapter != "" { body = body " " $0 }
+      END { flush() }
+    '
+} 2>/dev/null)"
+if [[ -n "$summary_failures" ]]; then
+  while IFS= read -r failure; do bad "chapter summary below three sentences — ${failure#"$SCRIPT_DIR"/}"; done <<< "$summary_failures"
+else
+  n_chapters=$(grep -RhE '^(### Ch |\*\*Ch [0-9])' "$SCRIPT_DIR/Resources/Books" | wc -l | tr -d ' ')
+  ok "all $n_chapters chapter summaries contain at least three sentences"
+fi
+
+# ---- 5. deployed sync ----------------------------------------------------------
 check_deployed_sync() {
   local home="$1" label="$2"
   hdr "Deployed sync ($home — $label)"
@@ -199,7 +252,7 @@ check_deployed_sync() {
 check_deployed_sync "$CLAUDE_HOME" "Claude"
 check_deployed_sync "$GROK_HOME"   "Grok"
 
-# ---- 5. doc links --------------------------------------------------------------
+# ---- 6. doc links --------------------------------------------------------------
 hdr "Doc links"
 brk=0; checked=0
 while IFS= read -r f; do

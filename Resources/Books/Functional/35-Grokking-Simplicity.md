@@ -13,55 +13,55 @@ A practical, illustration-heavy introduction to functional thinking that skips t
 ## Per-chapter summary
 
 ### Ch 1 — Welcome to Grokking Simplicity
-Frames FP not as "avoid side effects" but as a discipline for *managing* them. Introduces the three categories — actions, calculations, data — as the book's organizing lens and the source of every later technique.
+Functional programming is framed not as a demand to avoid all side effects, but as a discipline for managing them. The chapter introduces actions, calculations, and data as three categories for understanding a program. That distinction becomes the book's organizing lens and the source of every later technique.
 
 ### Ch 2 — Functional thinking in action
-A guided tour of the toolbox via a running example, previewing both halves of the book: distinguishing the three categories and stratified design (Part 1), then first-class abstractions and timelines (Part 2). Sets expectations: skills, not theory.
+A running example provides a guided tour of the functional-thinking toolbox. The first half of the book will distinguish actions, calculations, and data and then introduce stratified design, while the second will cover first-class abstractions and timelines. The goal is to teach practical skills rather than formal theory.
 
 ### Ch 3 — Distinguishing actions, calculations, and data
-The foundational skill: classify every piece of code as action, calculation, or data. Actions spread through your codebase (anything that calls an action becomes one), so you want fewer of them; calculations are safe to call anywhere and trivial to test; data is the easiest to reason about.
+The foundational skill is classifying every piece of a program as an action, a calculation, or data. Actions depend on when or how often they run, and anything that calls an action becomes an action too, so their influence spreads through a codebase. Calculations are deterministic and easy to test, while inert data is the easiest category to inspect and reason about.
 
 ### Ch 4 — Extracting calculations from actions
-Refactor by pulling the decision/computation logic out of an action into a pure calculation, leaving the action as a thin shell that does I/O. Pass inputs as arguments and return outputs as values instead of reading/writing shared globals — this shrinks the action surface and makes the logic testable.
+Decision and computation logic should be pulled out of an action into a pure calculation. The remaining action becomes a thin shell responsible for input, output, or another unavoidable side effect. Passing inputs as arguments and returning outputs as values instead of using shared globals shrinks the action surface and makes the logic easy to test.
 
 ### Ch 5 — Improving the design of actions
-Apply design judgment to the actions that remain: eliminate implicit inputs/outputs (globals, mutation) by making them explicit arguments and return values. Extract calculations aggressively and keep each function operating at a single level of detail.
+The actions that remain still need deliberate design because side effects make them harder to reason about. Implicit inputs and outputs such as global reads and mutation should become explicit arguments and return values whenever possible. Calculations should be extracted aggressively, and each function should operate at a single level of detail.
 
 ### Ch 6 — Staying immutable in a mutable language
-Implement immutability without language support using **copy-on-write**: copy, modify the copy, return it. The three-step discipline (shallow copy → modify copy → return) turns mutating operations (write) into calculations (read) and keeps shared data from changing under you.
+Copy-on-write provides immutability even when the programming language permits mutation. Its three steps are to make a shallow copy, modify that copy, and return the new value. This discipline turns a mutating write into a calculation and prevents shared data from changing unexpectedly.
 
 ### Ch 7 — Staying immutable with untrusted code
-Guard the boundary between your immutable code and legacy/library code that mutates, using **defensive copying** — deep-copy data entering and leaving the untrusted zone. Copy-on-write is cheaper and preferred for code you control; defensive copying is the fallback at the edges you don't.
+Defensive copying protects immutable code from legacy or library code that may mutate its inputs. Data is deep-copied both when it enters and when it leaves the untrusted zone so neither side shares mutable references. Copy-on-write remains cheaper for code you control, while defensive copying is the fallback at boundaries you do not control.
 
 ### Ch 8–9 — Stratified design, parts 1 and 2
 Organize functions into layers of abstraction so each calls only the layer just below it, keeping every function at a consistent altitude. Four patterns guide it: straightforward implementations, abstraction barriers (hide a data structure behind an interface), minimal interfaces, and comfortable layers. The call graph reveals which code is stable, reusable, and worth investing in.
 
 ### Ch 10–11 — First-class functions, parts 1 and 2
-Make functions and language operations first-class values you can name, pass, and return, removing duplication that ordinary refactoring can't reach (e.g. wrapping `try/catch`, logging, or retries). Introduces higher-order functions and the replace-the-body-with-a-callback move, plus the trade-offs of this extra indirection.
+Functions and language operations can become first-class values that code can name, pass, and return. Higher-order functions remove duplication that ordinary extraction cannot reach, such as repeated `try/catch`, logging, or retry structures, by replacing the varying body with a callback. This extra indirection can be powerful, but it should be weighed against the additional effort required to follow the control flow.
 
 ### Ch 12 — Functional iteration
-Replace hand-written `for` loops with the three core functional tools — **map** (transform each element), **filter** (select elements), and **reduce** (combine to a single value). Each is a higher-order calculation over an immutable array, expressing intent declaratively instead of mechanically.
+Functional iteration replaces many hand-written `for` loops with three core tools. `map` transforms each element, `filter` selects elements, and `reduce` combines a collection into one result. Each tool is a higher-order calculation over an immutable array, so the code states its intent instead of spelling out loop mechanics.
 
 ### Ch 13 — Chaining functional tools
-Compose map/filter/reduce into pipelines that read as a sequence of transformations, naming intermediate steps and callbacks for clarity. Covers refactoring existing loops into chains and the readability-vs-efficiency trade-offs of multi-pass chains.
+`map`, `filter`, and `reduce` can be composed into pipelines that read as a sequence of data transformations. Clear names for intermediate values and callbacks help readers understand each stage. Refactoring loops into chains still requires judgment because a readable multi-pass pipeline may do more work than a fused loop.
 
 ### Ch 14 — Functional tools for nested data
-Extend the toolset to deeply nested objects/records with `update` (apply a function to a value at a key) and `nestedUpdate`, all built on copy-on-write so nothing is mutated. Warns about the "deep nesting" smell and uses abstraction barriers to keep the structure's depth from leaking everywhere.
+The functional toolset extends to nested objects and records through operations such as `update` and `nestedUpdate`. These helpers apply functions at a key or path while using copy-on-write so the original structure is not mutated. Deep nesting remains a design smell, so abstraction barriers should prevent knowledge of the structure's depth from leaking throughout the codebase.
 
 ### Ch 15 — Isolating timelines
-Introduces **timeline diagrams** to visualize concurrent sequences of actions and spot bugs from interleaving and shared resources. The fix: cut unnecessary sharing between timelines and make ordering explicit before reasoning about correctness.
+Timeline diagrams visualize concurrent sequences of actions and the different orders in which they may interleave. The diagrams expose bugs caused by hidden ordering assumptions or shared resources. Correctness becomes easier to establish after unnecessary sharing is removed and required ordering is made explicit.
 
 ### Ch 16 — Sharing resources between timelines
-Build concurrency primitives in plain JavaScript — a **Queue** to serialize access to a shared resource so only one timeline touches it at a time. Demonstrates eliminating races by confining the resource rather than locking it.
+The chapter builds a Queue in plain JavaScript to serialize access to a shared resource. Only one timeline touches the resource at a time, while other operations wait for their turn. This design eliminates races by confining access through the queue rather than exposing the resource behind a lock.
 
 ### Ch 17 — Coordinating timelines
-Make timelines wait for each other when order matters, building a reusable **Cut** primitive (a barrier that fires once all parties arrive) and a once-only wrapper. Shows how to combine independent async results without depending on which finishes first.
+Some concurrent timelines must wait for one another before a later action can proceed. A reusable Cut acts as a barrier that fires after every required party arrives, and a once-only wrapper prevents repeated completion. Together these tools combine independent asynchronous results without depending on which operation finishes first.
 
 ### Ch 18 — Reactive and onion architectures
-Two complementary patterns: **reactive architecture** decouples cause from effect via first-class state cells/observers (e.g. `ValueCell`) reacting to change; **onion architecture** layers the system so a pure functional core (calculations over data) sits inside, with actions and I/O at the outer shell — the explicit "push side effects to the boundaries" model that Article II encodes.
+Reactive architecture decouples cause from effect by using first-class state cells and observers, such as `ValueCell`, that react to change. Onion architecture places a pure functional core of calculations over data inside an outer shell of actions and input/output. These complementary patterns make the rule "push side effects to the boundaries" concrete at the system level, as Article II requires.
 
 ### Ch 19 — The functional journey ahead
-Closing chapter: how to keep growing — practice the skills, explore other paradigms, study math/theory if desired, and where FP fits among other approaches. Encourages applying actions/calculations/data incrementally rather than rewriting.
+The closing chapter describes how readers can continue growing through practice, other programming paradigms, and optional study of mathematical theory. Functional programming is presented as one useful approach among several rather than a complete replacement for every style. The actions-calculations-data model should be applied incrementally to existing work instead of used as a reason for wholesale rewrites.
 
 ## Critiques worth knowing
 - **Deliberately non-rigorous.** No monads, functors, or type-theory; some FP practitioners find it under-sells the paradigm. That's the point — it trades completeness for an on-ramp non-FP developers actually finish.
