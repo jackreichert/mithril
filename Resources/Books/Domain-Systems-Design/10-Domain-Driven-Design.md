@@ -13,18 +13,18 @@ The "Blue Book." Foundational text on aligning code with the business domain. Lo
 ## Part I — Putting the Domain Model to Work
 
 ### Ch 1 — Crunching Knowledge
-Models are negotiated artifacts between developers and domain experts. The model evolves through conversation and experimentation. Insight comes from "knowledge crunching."
+Models are negotiated artifacts between developers and domain experts. The model evolves through conversation and experimentation. Insight comes from "knowledge crunching," the repeated process of testing language and assumptions until the team reaches a more useful understanding of the business.
 
 ### Ch 2 — Communication and the Use of Language
-**Ubiquitous Language**: one language used by developers, domain experts, code, and conversation. Translation between dev-speak and biz-speak is friction; eliminate it.
+**Ubiquitous Language** is one shared language used by developers, domain experts, code, and conversation. Translation between dev-speak and biz-speak creates friction, so the team should eliminate it. When the language changes as understanding improves, the model and implementation must change with it.
 
 ### Ch 3 — Binding Model and Implementation
-**Model-Driven Design**: the model and the code reflect each other. If the model can't be implemented, change the model — don't fork it.
+In **Model-Driven Design**, the model and the code reflect each other. If the model can't be implemented, change the model — don't fork it. This binding lets insights discovered in code inform domain discussions and keeps the software from drifting away from the business concepts it represents.
 
 ## Part II — The Building Blocks of a Model-Driven Design
 
 ### Ch 4 — Isolating the Domain (Layered Architecture)
-Four layers: Presentation, Application, Domain, Infrastructure. Domain layer is the heart and must not depend on the others.
+Layered Architecture separates a system into four layers: Presentation, Application, Domain, and Infrastructure. The Domain layer is the heart and must not depend on the others. Isolating domain rules from user-interface and persistence concerns keeps the model understandable and allows technical details to change independently.
 
 ### Ch 5 — A Model Expressed in Software
 - **Entities** — identity matters across time and state changes.
@@ -38,18 +38,18 @@ Four layers: Presentation, Application, Domain, Infrastructure. Domain layer is 
 - **Repositories** — collection-like access to aggregates; hide persistence.
 
 ### Ch 7 — Using the Language: An Extended Example
-A worked cargo-shipping example showing how the building blocks compose into a model.
+A worked cargo-shipping example shows how the building blocks compose into a model. The example follows the team as it turns domain conversations into entities, value objects, services, aggregates, factories, and repositories. Its purpose is to demonstrate that the patterns reinforce one another when they are expressed through a consistent Ubiquitous Language.
 
 ## Part III — Refactoring Toward Deeper Insight
 
 ### Ch 8 — Breakthrough
-Domain insight comes in jumps. Be ready to *replace* a model when a better one appears.
+Domain insight often comes in jumps rather than through steady refinement. A breakthrough exposes a simpler or more expressive way to represent the business. Be ready to *replace* a model when a better one appears, even when doing so disrupts the current design.
 
 ### Ch 9 — Making Implicit Concepts Explicit
-Constraints, processes, and specifications often hide as inline conditions. Extract them as first-class objects.
+Constraints, processes, and specifications often hide as inline conditions. Extract them as first-class objects. Naming these concepts in the model makes important business rules visible, discussable, and reusable instead of leaving them buried in procedural code.
 
 ### Ch 10 — Supple Design
-Pliable, intention-revealing code. Patterns:
+Supple Design produces pliable, intention-revealing code that developers can safely reshape as domain knowledge grows. Its patterns reduce mental overhead by making operations predictable and keeping concepts close to their natural boundaries. The goal is not cleverness, but a model whose code communicates what it does and avoids surprising side effects. Patterns:
 - **Intention-Revealing Interfaces**
 - **Side-Effect-Free Functions**
 - **Assertions**
@@ -59,13 +59,13 @@ Pliable, intention-revealing code. Patterns:
 - **Specification** (predicate as object)
 
 ### Ch 11 — Applying Analysis Patterns
-Reuse vocabulary from cross-domain analysis (Fowler).
+Analysis patterns capture modeling ideas that recur across different business domains. Reusing this established vocabulary, including patterns described by Fowler, can accelerate knowledge crunching and expose questions a team might otherwise miss. These patterns are starting points that must be adapted to the current domain rather than copied mechanically.
 
 ### Ch 12 — Relating Design Patterns to the Model
-GoF patterns get domain-meaning when applied with model-driven thinking.
+General software design patterns from the Gang of Four gain domain meaning when applied with model-driven thinking. A pattern should clarify a domain concept or relationship rather than impose a technical structure for its own sake. The model determines how the pattern is named and shaped, keeping the implementation connected to the Ubiquitous Language.
 
 ### Ch 13 — Refactoring Toward Deeper Insight
-Deep models often appear after refactoring eliminates accidental complexity. Welcome the disruption.
+Deep models often appear after refactoring eliminates accidental complexity. Refactoring should pursue new domain insight, not merely rearrange code. Welcome the disruption when a clearer model replaces assumptions that the existing design had concealed.
 
 ## Part IV — Strategic Design
 
@@ -80,10 +80,11 @@ Deep models often appear after refactoring eliminates accidental complexity. Wel
 - **Domain Vision Statement**, **Highlighted Core**, **Cohesive Mechanisms**, **Segregated Core**, **Abstract Core**.
 
 ### Ch 16 — Large-Scale Structure
+Large systems need an organizing structure that helps teams understand how major parts relate without freezing the model in place. The structure should be minimal, conceptually coherent, and capable of evolving as domain knowledge changes. The chapter presents several ways to provide that system-wide orientation:
 - **Evolving Order**, **System Metaphor**, **Responsibility Layers**, **Knowledge Level**, **Pluggable Component Framework**.
 
 ### Ch 17 — Bringing the Strategy Together
-A continuous practice rather than a phase. Negotiate boundaries with the org chart.
+Strategic design is a continuous practice rather than a one-time project phase. Teams must combine context boundaries, distillation, and large-scale structure as the system and organization evolve. Negotiate boundaries with the org chart because model ownership and team relationships directly affect whether the strategy can work.
 
 ## Why it endures
 DDD-lite (entities, value objects, aggregates, repositories) is now table stakes. Strategic patterns (bounded contexts, context maps) became the vocabulary of microservices.

@@ -68,7 +68,7 @@ Flag same-release drops, direct renames, `NOT NULL` without default/backfill, or
 - Track trends and specific targets; distinguish detected rollbacks from incidents; measure MTTR per service. Flag unmeasured claims and deployment/release conflation.
 
 ### 9. Observability Prerequisites
-For new services/endpoints require structured logs, redacted high-cardinality identifiers, endpoint rate/error/p50-p95-p99 latency, trace propagation, and prebuilt dashboards. Instrument the **four golden signals: latency, traffic, errors, saturation** (pool/queue/disk/thread fullness). Alert on actionable user-visible SLO threats. Define SLIs/SLOs; use the **error budget** ($1-\mathrm{SLO}$) for velocity and freeze risk when exhausted. Route distributed tracing concerns to mithril-distributed.
+For new services/endpoints require structured logs, redacted high-cardinality identifiers, endpoint rate/error/p50-p95-p99 latency, trace propagation, and prebuilt dashboards. Instrument the **four golden signals: latency, traffic, errors, saturation** (pool/queue/disk/thread fullness). Alert on actionable user-visible SLO threats. Define SLIs/SLOs; use the **error budget** ($1-\mathrm{SLO}$) to govern deployment pace and freeze risk when exhausted. Route distributed tracing concerns to mithril-distributed.
 
 ### 10. Dependencies & Supply Chain
 - Pin exact dependencies and commit lockfiles; reject production git/local-path dependencies.

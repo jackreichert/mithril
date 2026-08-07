@@ -13,9 +13,9 @@ Each agent is a focused lens. The orchestrator picks which lenses are relevant t
 
 The framework is a **distillation of the canonical CS literature** into agent-executable form. The pipeline:
 
-1. **Source selection.** A reading list of ~24 canonical books plus key articles and papers (Clean Code, Refactoring, A Philosophy of Software Design, Clean Architecture, GOOS, Designing Data-Intensive Applications, PEAA, Release It!, Continuous Delivery, GoF, the OWASP standards, etc.) — the full inventory lives in [`CS-Best-Practices-Resources.md`](CS-Best-Practices-Resources.md).
-2. **Per-source summaries.** Each book/article was summarized into a structured note in [`Resources/`](Resources/) (Books, Articles, Papers, Standards, Originals). These summaries capture the principles, smell catalogs, patterns, and counterpoints from each source — not full reproductions, but enough to drive synthesis.
-3. **Cross-source themes.** The summaries are synthesized into **19 concept guides** in [`Resources/Themes/`](Resources/Themes/) (plus the one-file horizontal cut, [`THEMES.md`](THEMES.md)) — a Tier 1→5 curriculum (foundations → construction → design at scale → verification → systems in production). Each theme walks how the idea builds across its sources, names the real tensions instead of papering over them, and ends with the operational checklist its skill encodes. The learning on-ramp, and the reasoning layer the skills cite.
+1. **Source selection.** A reading list of 46 canonical books plus key articles and papers (Clean Code, Refactoring, A Philosophy of Software Design, Agile Software Development, Don't Make Me Think, Clean Architecture, GOOS, Designing Data-Intensive Applications, PEAA, Release It!, Continuous Delivery, GoF, the OWASP standards, etc.) — the full inventory lives in [`CS-Best-Practices-Resources.md`](CS-Best-Practices-Resources.md).
+2. **Per-source summaries.** Each book/article was summarized into a structured note in [`Resources/`](Resources/) (Books, Articles, Papers, Standards, Originals). Book chapter entries contain at least three sentences so a reader can understand the idea, why it matters, and how to apply or qualify it without prior knowledge.
+3. **Cross-source themes.** The summaries are synthesized into **20 concept guides** in [`Resources/Themes/`](Resources/Themes/) (plus the one-file horizontal cut, [`THEMES.md`](THEMES.md)) — a Tier 1→5 curriculum (foundations → construction → design at scale → verification → systems in production). Each theme walks how the idea builds across its sources, names the real tensions instead of papering over them, and ends with the operational checklist its skill encodes. The learning on-ramp, and the reasoning layer the skills cite.
 4. **Synthesis into skills.** The themes and summaries were synthesized into concise, source-grounded runtime prompts in [`skills/`](skills/). These are both the executable specialists and the sole content source.
 5. **Host compatibility.** Plugin manifests load `skills/*.md` directly; classic installs expose the same files under `~/.claude/agents/` and `~/.grok/agents/`.
 6. **Orchestration.** The `/mithril` slash command routes a diff to the relevant agents, runs them in parallel, normalizes severity, and aggregates the report.
@@ -72,7 +72,7 @@ Then run `/mithril` from Claude Code or Grok. Plugin and classic paths load the 
 
 `install.sh` deploys (Claude and Grok by default):
 
-- 18 agent files into `~/.claude/agents/mithril-*.md` and `~/.grok/agents/mithril-*.md`
+- 19 agent files into `~/.claude/agents/mithril-*.md` and `~/.grok/agents/mithril-*.md`
 - The `/mithril` orchestrator into `~/.claude/commands/mithril.md` and `~/.grok/commands/mithril.md`
 
 By default the installer links both host installations directly to `skills/`, so one edit updates every linked host. `--copy-agents` creates a frozen install instead. Re-running is idempotent.
@@ -143,6 +143,7 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `skills/performance.md` | Measure-then-change, USE method, latency percentiles, N+1/query cost, caches, bounded fan-out — Theme 18 | `~/.claude/agents/mithril-performance.md` |
 | `skills/observability.md` | Golden signals (incl. saturation), structured logs, traces, SLIs/SLOs/error budgets, alert hygiene — Theme 18 | `~/.claude/agents/mithril-observability.md` |
 | `skills/accessibility.md` | WCAG 2.2 AA UI review: keyboard, names/roles/values, labels/errors, contrast, APG widgets — Theme 19 | `~/.claude/agents/mithril-accessibility.md` |
+| `skills/usability.md` | Task discoverability, hierarchy, navigation, feedback, recovery, and lightweight user-testing evidence — Theme 20 | `~/.claude/agents/mithril-usability.md` |
 | _cross-cutting: `security-review` + `distributed` + `persistence` + `code-quality` + `performance`_ | Flow tracing — control + data flow from entry points to sinks: taint (source→sink), error propagation, resource/transaction lifecycle, N+1-across-chain, cross-boundary partial failure. Runs as Phase 2 of `/mithril deep`; standalone via `/mithril flow` | `~/.claude/agents/mithril-flow.md` |
 | `skills/tutor.md` | Grounded CS tutor — teaches a concept/theme from the library, or the principles at play in a PR/diff; cites sources, surfaces tensions, explains rather than reviews | — (inline via `/mithril tutor` \| `/mithril learn`) |
 
@@ -153,7 +154,7 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `README.md` | Sources, lineage, exclusions, and update guide for this framework | — |
 | `CS-Best-Practices-Resources.md` | Per-source index — every book, article, and paper that informed the framework, and which idea each one owns | — |
 | `THEMES.md` | Cross-cutting synthesis of the `Resources/` library — the themes that recur across sources, where they converge, and the documented tensions (with a resolution map keyed to the skills) | — |
-| `Resources/Themes/` | 19 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer between the per-source summaries and the skills; each theme names its tensions and the checklist its skill encodes | — |
+| `Resources/Themes/` | 20 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer between the per-source summaries and the skills; each theme names its tensions and the checklist its skill encodes | — |
 | `skills/process.md` | Planning discipline: pre-flight (edge cases, deps, alternatives) + post-validation (Big-O, requirements, assumptions) | `~/.claude/agents/mithril-process.md` |
 | `CONSTITUTION.md` | Write-time prevention layer — the skills distilled into always-on imperative rules, a conflict-precedence order, numeric gate thresholds, and a Definition of Done. Loaded via a `CLAUDE.md` `@`-import. | — |
 | `hooks/pre-commit` | Opt-in git hook that runs the fast gates (lint + complexity) on staged files and blocks the commit on a breach. See `hooks/README.md`. | — |
@@ -174,11 +175,11 @@ This mirrors the lesson of [unclebob/swarm-forge](https://github.com/unclebob/sw
 |--------------|---------|
 | `skills/review.md` | Started from the `code-reviewer` agent and absorbed the old `review-pr` orchestrator workflow |
 | `skills/refactor.md` | Synthesized from Fowler/Feathers and absorbed the old `code-simplifier` behavior-preserving cleanup mode |
-| `skills/process.md` | Built from the maintainer's CLAUDE.md "Planning Process" section, grounded in Code Complete + Pragmatic Programmer + Clean Coder + MMM + APOSD |
+| `skills/process.md` | Built from the maintainer's CLAUDE.md "Planning Process" section, grounded in Code Complete + Pragmatic Programmer + Clean Coder + Agile Software Development + MMM + APOSD |
 | `skills/delivery.md` | Synthesized fresh from Continuous Delivery + Trunk-Based Development + 12-Factor + Feature Toggles (Hodgson) — no prior agent ancestor |
 | `skills/distributed.md` | Synthesized fresh from DDIA + Waldo's "A Note on Distributed Computing" + Microservices/CQRS/Event Sourcing — no prior agent ancestor |
 | `skills/concurrency.md` | Synthesized fresh from Effective Java ch.11 (items 78–84) + DDIA ch.7 + Clean Code ch.13 + SICP ch.3 + Release It! (Blocked Threads) + Out of the Tar Pit — the in-process counterpart to `distributed.md`; no prior agent ancestor |
-| `skills/patterns.md` | Synthesized fresh from GoF + Head First Design Patterns + Effective Java refinements + APOSD ch.19 counterweight — no prior agent ancestor |
+| `skills/patterns.md` | Synthesized fresh from GoF + Head First Design Patterns + Agile Software Development case studies + Effective Java refinements + APOSD ch.19 counterweight — no prior agent ancestor |
 | `skills/persistence.md` | Synthesized fresh from PEAA pattern catalog + DDIA storage chapters + Effective Java resource-management items + DDD Repository — no prior agent ancestor |
 | `skills/security-review.md` | Adapted from the `security-auditor` agent and extended with explicit security standards references |
 
@@ -274,6 +275,10 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
   - Part III chs.7-11 SOLID Principles → SOLID section
   - Part IV chs.13-14 Component Principles → Component Principles section (REP, CCP, CRP, ADP, SDP, SAP)
   - Part V ch.22 The Clean Architecture → Dependency Architecture section (the layered diagram)
+- **Agile Software Development** — Robert C. Martin (2002)
+  - Part II chs.8-12 → worked SOLID reasoning
+  - Part IV ch.20 → original package cohesion/coupling principles
+  - Payroll case study → abstractions and package boundaries responding to observed change pressure
 - **Domain-Driven Design** — Eric Evans (2003)
   - Part II Building Blocks → DDD Patterns section (aggregates, repositories, domain services)
   - Part III Refactoring Toward Deeper Insight → Ubiquitous Language
@@ -339,6 +344,9 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
   - Outside-in TDD, Walking Skeleton → TDD Indicators section
 - **Test-Driven Development: By Example** — Kent Beck (2002)
   - Red-Green-Refactor cycle, baby steps, Three Laws of TDD → TDD Indicators section
+- **Agile Software Development** — Robert C. Martin (2002)
+  - ch.4 programmer tests vs. customer acceptance tests → Two Test Layers section
+  - ch.6 bowling episode → test-first design in a worked example
 - **The Art of Unit Testing 3rd ed.** — Roy Osherove (2023)
   - F.I.R.S.T. principles → F.I.R.S.T. section
   - AAA pattern → Structure section
@@ -444,6 +452,7 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
 - **Refactoring 2nd ed.** — Fowler (2018) → Smell→Pattern mapping (Replace Conditional with Polymorphism = Strategy/State)
 - **Effective Java 3rd ed.** — Bloch (2018) → Modern OO refinements (item 17 immutability, item 18 composition-over-inheritance)
 - **A Philosophy of Software Design** — Ousterhout (2018/2021) ch.19 → § 5 When NOT to Apply a Pattern (counterweight on over-patterning)
+- **Agile Software Development** — Martin (2002) chs.6, 13-30 → patterns emerging from tested, observed design pressure; remove patterns whose force disappears
 
 ### `skills/persistence.md`
 
@@ -484,6 +493,9 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
   - ch.16 No Silver Bullet → Principles (essence vs. accident)
 - **A Philosophy of Software Design** — John Ousterhout (2018/2021)
   - ch.11 Design It Twice → Pre-Flight checks 2, 5
+- **Agile Software Development** — Robert C. Martin (2002)
+  - ch.3 measured velocity and revisable iteration plans → forecast discipline and replanning
+  - ch.4 customer acceptance tests → story-completion evidence in post-validation
 
 **Articles & Papers**
 - **Painless Software Schedules** — Joel Spolsky → Pre-Flight check 5 (estimation discipline; weak signal in this skill but cited)
@@ -546,6 +558,7 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
 
 **Source:** Synthesized fresh — no prior agent ancestor. The layer upstream of `test-quality.md`: spec quality before code.
 - **Specification by Example** (Adzic, 2011) — the seven process patterns, key-example discipline, living documentation (`Resources/Books/Testing/28-Specification-by-Example.md`)
+- **Agile Software Development** (Martin, 2002) — user stories as revisable planning units and customer acceptance tests as the executable definition of story completion
 - **BDD / Given-When-Then** (Dan North) + **The Cucumber Book** (Wynne & Hellesøy) — Gherkin structure
 - **The Clean Coder** ch.8 + **Continuous Delivery** ch.8 — acceptance tests as executable specifications
 - **Domain-Driven Design** (Evans) — ubiquitous language
@@ -578,6 +591,14 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
 - HTML living standard semantics — buttons, labels, landmarks, headings
 - Inclusive design practice (GOV.UK / Inclusive Components patterns) — forms, dialogs, focus management
 
+### `skills/usability.md`
+
+**Source:** Synthesized 2026 usability expansion — Theme 20; task-centered UI review and direct-observation discipline.
+- **Don't Make Me Think, Revisited** — scanning and satisficing, visual hierarchy, navigation and orientation, concise content, mobile usability, goodwill, and low-cost testing
+- **Rocket Surgery Made Easy** — realistic tasks, representative-enough recruiting, neutral facilitation, shared observation, rapid debriefing, prioritized fixes, and retesting
+- **Specification by Example** — goal-centered examples and observable outcomes as inputs to research tasks, without scripting the interface path
+- **WCAG 2.2 / APG** — adjacent accessibility floor; usability review complements but never replaces it
+
 ---
 
 ## What's Deliberately Not Synthesized (vs absorbed)
@@ -608,6 +629,7 @@ The master resource list (`CS-Best-Practices-Resources.md`) is larger than the e
 | Observability Engineering, API Design Patterns, Supply-chain note | `observability` / `delivery` / `architecture` / `security-review` |
 | Systems Performance, SQL Performance Explained, SRE (ops half) | `performance` + `observability` + Theme 18 |
 | WCAG 2.2 / APG | `accessibility` + Theme 19 |
+| Don't Make Me Think, Rocket Surgery Made Easy | `usability` + Theme 20; `process` and `specification` for the feedback loop |
 | Google Eng Practices | `review` |
 | GOOS ch.18, Spec by Example | `test-quality`, `specification` |
 | Release It! | `architecture` resilience + `distributed` |

@@ -13,7 +13,7 @@ The definitive practitioner's guide to writing correct concurrent JVM code, feed
 ## Per-chapter summary
 
 ### Ch 1 — Introduction
-Frames the **benefits vs. risks** of threads: throughput and responsiveness against **safety, liveness, and performance hazards**. Concurrency bugs are non-deterministic and rarely reproduce, so design for correctness up front rather than debug interleavings later.
+Threads can improve throughput and responsiveness, but they also introduce **safety, liveness, and performance hazards**. Concurrency bugs depend on timing, which makes them non-deterministic and difficult to reproduce. Correctness must therefore be designed into synchronization, state ownership, and publication rather than reconstructed later from failing interleavings.
 
 ### Part I — Fundamentals
 
@@ -27,7 +27,7 @@ Synchronization is about **visibility**, not just mutual exclusion — without i
 Build thread-safe classes deliberately: define the **synchronization policy**, identify the **invariants**, and document the locking. Prefer **instance confinement** (guard state with a private lock) and the **Java monitor pattern**. Compose via **delegation** to already-thread-safe components, and **client-side locking** or wrapper classes only when you must add atomic compound actions.
 
 ### Ch 5 — Building Blocks
-Use the library: **concurrent collections** (`ConcurrentHashMap`, `CopyOnWriteArrayList`) over synchronized wrappers, **blocking queues** for producer-consumer, and **synchronizers** (`CountDownLatch`, `FutureTask`, `Semaphore`, `CyclicBarrier`) to coordinate threads. **Don't reinvent** these primitives — they encode hard-won correctness and scalability.
+Use the library: **concurrent collections** (`ConcurrentHashMap`, `CopyOnWriteArrayList`) over synchronized wrappers, **blocking queues** for producer-consumer, and **synchronizers** (`CountDownLatch`, `FutureTask`, `Semaphore`, `CyclicBarrier`) to coordinate threads. These building blocks let application code express how work should interact without implementing low-level thread coordination itself. **Don't reinvent** these primitives — they encode hard-won correctness and scalability.
 
 ### Part II — Structuring Concurrent Applications
 
@@ -38,10 +38,10 @@ Structure work around **tasks**, not raw threads. Unbounded thread creation kill
 Java has no safe forced stop; use **cooperative cancellation** via **interruption**. Never swallow `InterruptedException` — propagate it or restore the interrupt flag. Shut executors down gracefully, handle the **poison pill** / shutdown-now boundary, and account for threads blocked in non-interruptible I/O.
 
 ### Ch 8 — Applying Thread Pools
-**Size pools** to the task type (CPU-bound ≈ N+1, I/O-bound higher) and beware **thread-starvation deadlock** when pooled tasks wait on other pooled tasks. Tune queue type, **saturation/rejection policy**, and thread factory; tasks must be **independent** for the pool's assumptions to hold.
+**Size pools** to the task type (CPU-bound ≈ N+1, I/O-bound higher) and beware **thread-starvation deadlock** when pooled tasks wait on other pooled tasks. A thread pool is therefore a resource-management policy, not merely a faster replacement for creating threads directly. Tune queue type, **saturation/rejection policy**, and thread factory; tasks must be **independent** for the pool's assumptions to hold.
 
 ### Ch 9 — GUI Applications
-GUI toolkits are **single-threaded** confinement models — touch UI state only on the **event dispatch thread**. Push long work off the EDT and marshal results back; this is confinement, not locking, applied to a whole subsystem.
+GUI toolkits are **single-threaded** confinement models — touch UI state only on the **event dispatch thread**. Work that blocks this thread makes the interface appear frozen even when the rest of the application is healthy. Push long work off the EDT and marshal results back; this is confinement, not locking, applied to a whole subsystem.
 
 ### Part III — Liveness, Performance, and Testing
 
@@ -57,13 +57,13 @@ Test both **safety** (nothing bad happens) and **liveness** (something good even
 ### Part IV — Advanced Topics
 
 ### Ch 13 — Explicit Locks
-`ReentrantLock` adds **timed, interruptible, and non-block-structured** locking and **fairness** options beyond `synchronized` — at the cost of a mandatory `finally` unlock. Use it only when you need those features; `ReadWriteLock` helps read-heavy data.
+`ReentrantLock` adds **timed, interruptible, and non-block-structured** locking and **fairness** options beyond `synchronized` — at the cost of a mandatory `finally` unlock. Failing to release an explicit lock can permanently block every thread that later needs it. Use it only when you need those features; `ReadWriteLock` helps read-heavy data.
 
 ### Ch 14 — Building Custom Synchronizers
-Implement **state-dependent** classes with the **condition-predicate / wait-notify** pattern: always wait in a loop, test the predicate, and prefer `notifyAll`. `Condition` objects and `AbstractQueuedSynchronizer` (AQS) underpin the library's synchronizers — build on them rather than from scratch.
+Implement **state-dependent** classes with the **condition-predicate / wait-notify** pattern: always wait in a loop, test the predicate, and prefer `notifyAll`. The loop is necessary because a waiting thread may wake before the state it needs is actually available. `Condition` objects and `AbstractQueuedSynchronizer` (AQS) underpin the library's synchronizers — build on them rather than from scratch.
 
 ### Ch 15 — Atomic Variables and Nonblocking Synchronization
-**CAS** (compare-and-swap) enables **lock-free** algorithms via atomic classes (`AtomicInteger`, `AtomicReference`). Nonblocking algorithms avoid lock-related liveness hazards and scale better under contention, but are hard to get right — watch for the **ABA problem** and use them where the library hasn't already.
+**CAS** (compare-and-swap) enables **lock-free** algorithms via atomic classes (`AtomicInteger`, `AtomicReference`). CAS updates a value only when it still matches the state a thread previously observed, allowing that thread to retry instead of blocking. Nonblocking algorithms avoid lock-related liveness hazards and scale better under contention, but are hard to get right — watch for the **ABA problem** and use them where the library hasn't already.
 
 ### Ch 16 — The Java Memory Model
 The **JMM** defines the **happens-before** relation that makes writes visible across threads — the formal foundation under every prior chapter. **Synchronization, `volatile`, `Thread.start/join`, and final fields** all establish ordering edges. Properly constructed **immutable objects** are safe to share without synchronization because of final-field semantics.

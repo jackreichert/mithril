@@ -1,0 +1,22 @@
+# Golden case: ambiguous-billing-actions
+# Two usability defects in a semantically accessible settings screen.
+
+case: ambiguous-billing-actions
+defects:
+  - id: destructive-ambiguous-continue
+    agent: mithril-usability
+    file: src/ui/BillingSettings.tsx
+    severity_min: Important
+    match: "(Continue|cancel|subscription|destructive|consequence|ambiguous|label|confirmation|undo)"
+    note: A generic Continue button immediately cancels the subscription without stating the consequence, confirmation, or recovery.
+
+  - id: save-without-feedback
+    agent: mithril-usability
+    file: src/ui/BillingSettings.tsx
+    severity_min: Important
+    match: "(feedback|pending|loading|saving|success|error|failure|status|disabled)"
+    note: The asynchronous save provides no pending, success, or failure state, so users cannot tell whether the task completed.
+
+false_positive_budget: 1
+clean_bait:
+  - native labels, headings, form, and button semantics are accessible and should not be reported as WCAG failures

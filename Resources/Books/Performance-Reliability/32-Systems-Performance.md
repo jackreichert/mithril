@@ -49,7 +49,7 @@ Virtualization, containers, and multi-tenancy add **interference and the "noisy 
 Benchmarks lie by default. Avoid **active benchmarking** pitfalls: warm-up effects, caching, wrong workload, ignoring variance. **Run the analysis tools *during* the benchmark** to confirm it's exercising what you think. Report distributions and confidence, never a single number; a passing benchmark you don't understand is worthless.
 
 ### Ch 13 — perf
-The Linux **perf** profiler: hardware PMC sampling, software events, and tracepoints for CPU profiling and **flame-graph** generation. Master `perf record`/`report`/`stat` to find on-CPU hotspots with minimal overhead. The default first reach for "where is the CPU time going."
+The Linux **perf** profiler combines hardware PMC sampling, software events, and tracepoints for CPU profiling and **flame-graph** generation. Master `perf record`, `perf report`, and `perf stat` to find on-CPU hotspots with minimal overhead. It is the default first tool to reach for when investigating where CPU time is going.
 
 ### Ch 14 — Ftrace
 The built-in kernel tracer for **low-overhead function and event tracing** — function graphs, latency histograms, and per-event counts via tracepoints. Ideal for kernel-internal latency questions where perf is too coarse and BPF is overkill. Often available when nothing else can be installed.
@@ -58,7 +58,7 @@ The built-in kernel tracer for **low-overhead function and event tracing** — f
 **BPF/bcc/bpftrace** turn the kernel into a programmable, **production-safe** observability platform: custom in-kernel aggregation with negligible overhead. The future of tracing — answer arbitrary "why is this latency happening" questions with one-liners. Steep learning curve, unmatched power.
 
 ### Ch 16 — Case Study
-A narrated, end-to-end investigation showing the methodology in action: form a hypothesis, apply USE and drill-down, follow the latency, and verify the fix with data. The chapter that demonstrates **how the pieces combine** under real production pressure.
+A narrated, end-to-end investigation shows the methodology in action by forming a hypothesis, applying USE and drill-down analysis, following the latency, and verifying the fix with data. Each observation narrows the search instead of prompting an unrelated optimization. The chapter demonstrates **how the pieces combine** under real production pressure.
 
 ## Critiques worth knowing
 Deeply **Linux/kernel-centric** and tool-versioned — the BPF/perf tooling moves fast, so specific invocations date quickly while the methodology endures. The sheer breadth (~800 pages) makes it a reference, not a cover-to-cover read; for application developers the methodology chapters (2, 5, 12) carry most of the transferable value, and managed-runtime or fully-serverless stacks hide much of the OS detail it dwells on.

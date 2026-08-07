@@ -14,19 +14,19 @@ The encyclopedia of test smells and test patterns. ~900 pages, structured as: na
 
 A series of teaching chapters that introduce vocabulary and motivation:
 
-**Ch 1 — A Brief Tour**
-The xUnit framework family (JUnit, NUnit, PyUnit). What "automated developer testing" actually means.
+### Ch 1 — A Brief Tour
+The chapter introduces the xUnit framework family, including JUnit, NUnit, and PyUnit. These frameworks share a common architecture for defining, running, and reporting tests. The tour also explains what automated developer testing means in day-to-day software work.
 
-**Ch 2 — Test Smells Overview**
-Three categories: Code Smells (in test code), Behavior Smells (in test execution), and Project Smells (in the test suite as a whole).
+### Ch 2 — Test Smells Overview
+Test smells are recurring symptoms that indicate trouble in test code or its surrounding process. Code Smells appear in test source, while Behavior Smells appear during test execution. Project Smells describe problems in the test suite or development organization as a whole.
 
-**Ch 3 — Goals of Test Automation**
-Tests as *executable specs*. Tests as *bug filter*. Tests as *change-enablers*. Tests as *documentation*.
+### Ch 3 — Goals of Test Automation
+Automated tests can serve as *executable specifications* that state expected behavior in runnable form. They act as a *bug filter* and enable change by detecting regressions quickly. Well-written tests also become documentation that shows future readers how the system is intended to behave.
 
-**Ch 4 — Philosophy of Test Automation**
-**Test-first** vs **test-last** programming. The economics: cost of test maintenance vs. cost of catching a defect later.
+### Ch 4 — Philosophy of Test Automation
+The chapter compares **test-first** programming with writing tests after production code. Each approach affects design feedback, defect discovery, and the role tests play during development. The economic decision weighs ongoing test-maintenance cost against the greater cost of catching defects later.
 
-**Ch 5 — Principles of Test Automation**
+### Ch 5 — Principles of Test Automation
 - Write tests first.
 - Test concerns separately.
 - Communicate intent.
@@ -37,32 +37,32 @@ Tests as *executable specs*. Tests as *bug filter*. Tests as *change-enablers*. 
 - Avoid test code duplication.
 - Tests should be self-checking, repeatable, robust, sufficient, fast, maintainable, traceable.
 
-**Ch 6 — Test Automation Strategy**
-Per-test-class strategies, fixture sharing, picking patterns to fit your context.
+### Ch 6 — Test Automation Strategy
+A test automation strategy determines how tests are grouped and how their fixtures are managed. Per-test-class organization and fixture-sharing choices have different isolation and maintenance costs. Teams should select patterns that fit their system and constraints rather than apply one structure everywhere.
 
-**Ch 7 — XUnit Basics**
-Setup, exercise, verify, teardown — the four phases.
+### Ch 7 — XUnit Basics
+An xUnit test follows four recognizable phases. Setup creates the fixture, exercise invokes the behavior, verify checks the outcome, and teardown restores the environment. Keeping these phases clear makes a test easier to read and diagnose.
 
-**Ch 8 — Transient Fresh Fixtures**
-Each test creates and destroys its world.
+### Ch 8 — Transient Fresh Fixtures
+A transient fresh fixture gives every test a newly created test environment. Each test builds the state it needs and destroys that state afterward. This isolation prevents order dependence and stops one test's changes from leaking into another.
 
-**Ch 9 — Persistent Fresh Fixtures**
-DB-backed test isolation.
+### Ch 9 — Persistent Fresh Fixtures
+Persistent fresh fixtures provide isolated state for tests that use a database or another durable store. Each test receives known records even though the underlying technology preserves data beyond a process call. Careful setup and cleanup prevent persistent state from coupling otherwise independent tests.
 
-**Ch 10 — Result Verification**
-State vs. behavior verification. Custom assertions.
+### Ch 10 — Result Verification
+Result verification determines whether exercising the system produced the expected outcome. State verification inspects observable values, while behavior verification checks significant interactions. Custom assertions can express domain meaning and provide clearer failure diagnostics.
 
-**Ch 11 — Using Test Doubles**
-Five flavors: dummy, stub, spy, mock, fake. The terminology that everyone now uses.
+### Ch 11 — Using Test Doubles
+Test doubles replace dependencies that are inconvenient or inappropriate to use in a focused test. The five principal flavors are dummy, stub, spy, mock, and fake, and each serves a different purpose. This taxonomy provides the precise terminology now widely used to discuss isolated tests.
 
-**Ch 12 — Organizing Our Tests**
-Per-class, per-feature, per-fixture organization options.
+### Ch 12 — Organizing Our Tests
+Tests can be organized around production classes, features, or shared fixture needs. Each structure makes some relationships easy to see while hiding others. The appropriate choice depends on how the team searches for behavior and maintains the suite.
 
-**Ch 13 — Testing with Databases**
-Database sandboxes, transaction rollbacks, schema management.
+### Ch 13 — Testing with Databases
+Database tests need controlled schemas and data so that results remain repeatable. Database sandboxes separate test activity from development and production records. Transaction rollbacks and explicit schema management are two techniques for restoring a known state.
 
-**Ch 14 — A Roadmap to Effective Test Automation**
-How to introduce these patterns to a team without paralyzing it.
+### Ch 14 — A Roadmap to Effective Test Automation
+The final narrative chapter explains how to introduce the catalog's practices to a team. Adoption should address the most costly test problems first instead of attempting every pattern at once. This incremental roadmap improves automation without paralyzing ongoing delivery.
 
 ## Part II — The Test Smells Catalog ⭐
 

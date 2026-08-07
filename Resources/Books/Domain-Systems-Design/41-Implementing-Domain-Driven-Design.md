@@ -43,13 +43,13 @@ Domain-meaningful packages with high cohesion and low coupling, named in the Ubi
 The book's centerpiece. Four rules: model true invariants in consistency boundaries; design small aggregates; reference other aggregates by identity only; update other aggregates eventually (via Domain Events), not in the same transaction. One transaction = one aggregate. Fix large clusters by splitting on real invariants.
 
 ### Ch 11 — Factories
-Encapsulate complex creation so a fully valid aggregate is produced atomically, expressing intent in the Ubiquitous Language. Factory methods on Aggregate roots are often enough; reach for a standalone Factory only when creation logic is genuinely complex or spans concepts.
+Encapsulate complex creation so a fully valid aggregate is produced atomically, expressing intent in the Ubiquitous Language. A Factory protects callers from knowing the construction steps and prevents partially initialized domain objects from escaping. Factory methods on Aggregate roots are often enough; reach for a standalone Factory only when creation logic is genuinely complex or spans concepts.
 
 ### Ch 12 — Repositories
 Collection-oriented versus persistence-oriented repositories — one per aggregate root, hiding the storage mechanism behind a domain-shaped interface. Covers transactions, concurrency (optimistic locking), and use-case-optimal queries. Keep ORM/SQL concerns out of the domain.
 
 ### Ch 13 — Integrating Bounded Contexts
-How contexts actually talk: RESTful resources, messaging, and Domain Events over a bus, each with an Anticorruption Layer to translate foreign models. Embrace eventual consistency and idempotent handlers across the boundary; never let an external model corrupt your own.
+Bounded Contexts communicate through mechanisms such as RESTful resources, messaging, and Domain Events over a bus. Each boundary needs an Anticorruption Layer that translates the foreign model into concepts owned by the receiving context. Embrace eventual consistency and idempotent handlers across the boundary; never let an external model corrupt your own.
 
 ### Ch 14 — Application
 Application Services orchestrate use cases — transactions, security, and coordination — but hold no domain logic. Composing multiple Bounded Contexts, decoupled output (DTOs / Domain Payload Objects), and wiring via dependency injection / containers. The thin layer between the UI and the domain.

@@ -196,6 +196,7 @@ Parse `$ARGUMENTS` for aspect keywords:
 - `perf` or `performance` or `latency` → mithril-performance (USE method, query cost, measure-then-change)
 - `observability` or `o11y` or `telemetry` or `slo` → mithril-observability (golden signals, traces, SLOs, alert hygiene)
 - `a11y` or `accessibility` or `wcag` → mithril-accessibility (WCAG 2.2 AA UI review)
+- `usability` or `ux` → mithril-usability (task clarity, hierarchy, navigation, recovery, and user-testing evidence)
 - `gates` → mithril-gates (runs tools — lint, complexity, duplication, coverage, mutation — for pass/fail vs thresholds)
 - `spec` or `specification` → mithril-specification (acceptance-criteria / BDD feature-file quality)
 - `flow` or `flows` → mithril-flow (trace control + data flow from entry points to sinks; taint, error propagation, resource/transaction lifecycle, N+1-across-chain)
@@ -221,7 +222,7 @@ In **project mode**, signals come from the filtered file list (extensions, direc
 | ORM imports (`hibernate`, `sqlalchemy`, `prisma`, `typeorm`, `sequelize`, `mongoose`, `ActiveRecord`, `EntityFramework`) OR `*.sql`, `*.prisma`, schema files OR repository / DAO files OR raw SQL in diff | mithril-persistence |
 | Hot-path / cost signals — nested loops over collections, new caches/pools/queues, pagination, raw SQL/`EXPLAIN`, bulk processors, serializers on request path, `Promise.all` over lists — *project mode: same patterns* | mithril-performance |
 | Telemetry / ops signals — metrics/logging/tracing libraries, dashboard/alert config, OpenTelemetry, SLO/SLI mentions, new HTTP route handlers or queue consumers (ship golden signals) | mithril-observability |
-| UI signals — `*.tsx`/`*.jsx`/`*.vue`/`*.svelte`, `components/`, CSS modules for interactive UI, Storybook stories | mithril-accessibility |
+| UI signals — `*.tsx`/`*.jsx`/`*.vue`/`*.svelte`, `components/`, CSS modules for interactive UI, Storybook stories | mithril-accessibility + mithril-usability |
 | Behavior-affecting branch/change OR executable specs / acceptance criteria (`*.feature`, `features/`, `*.story`, Gherkin `Given`/`When`/`Then` in diff) OR a requirements/acceptance-criteria doc | mithril-specification (run first per Step 1.6) |
 | After other reviews complete (always last, on recently modified code) | mithril-refactor in Mode 1 (Simplify) |
 
@@ -232,7 +233,7 @@ In **project mode**, signals come from the filtered file list (extensions, direc
 - `mithril-review` — invoke via `/mithril review` for the full PR-style review with confidence scoring and lenses; redundant with the auto-selection above for normal pre-commit use
 - `mithril-flow` — invoke via `/mithril flow` to trace execution flows on demand, or it runs automatically as Phase 2 of `/mithril deep`. Not auto-spawned in normal diff review because whole-flow tracing is heavier than per-file review; reach for it when a bug spans methods/files, or on input→sink paths in security-sensitive code.
 - `mithril-gates` — invoke via `/mithril gates` to run the objective tool-measured floor (lint, complexity, duplication, coverage, mutation). Not auto-spawned because it executes tools that may not be installed; run it explicitly, in CI, or via the pre-commit hook (`hooks/`). It complements the reading agents — they judge, it measures.
-- Explicit aspect keywords still force `mithril-performance` / `mithril-observability` / `mithril-accessibility` even when auto-signals are weak.
+- Explicit aspect keywords still force `mithril-performance` / `mithril-observability` / `mithril-accessibility` / `mithril-usability` even when auto-signals are weak.
 
 **Suggestion behavior:** When auto-spawning produces findings, suggest follow-up agents that aren't auto-spawned:
 - If `mithril-code-quality` flags multiple smells (Switch on type code, Long Method with branches, etc.) → suggest `/mithril patterns` for prescribed pattern recognition AND `/mithril refactor` for Fowler moves
@@ -241,6 +242,7 @@ In **project mode**, signals come from the filtered file list (extensions, direc
 - If `mithril-performance` flags missing saturation/latency signals → suggest `/mithril observability`
 - If `mithril-code-quality` flags O(n²)/N+1 → ensure `mithril-performance` ran (or suggest `/mithril perf`)
 - If UI components lack keyboard/labels → ensure `mithril-accessibility` ran
+- If UI hierarchy, labels, navigation, feedback, or recovery obscure an important task → ensure `mithril-usability` ran
 - If `mithril-code-quality` or `mithril-distributed` flags shared mutable state, a race, a lock, or async/threads → suggest `/mithril concurrency` for the in-process interleaving review (the shared-memory counterpart to `mithril-distributed`'s cross-process review)
 - If `mithril-persistence` flags N+1 or migration issues → ensure `mithril-delivery` ran (or suggest it) for migration safety
 

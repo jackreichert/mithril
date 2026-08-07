@@ -20,7 +20,7 @@ Resources/
 │   └── Google-Engineering/            # google.github.io/eng-practices
 ├── Standards/                         # OWASP, 12-Factor, NASA Power of 10, style guides
 ├── Papers/                            # Parnas, Waldo, Moseley/Marks, Brooks
-├── Themes/                            # 19 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer
+├── Themes/                            # 20 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer
 └── Originals/
     ├── README.md                      # Canonical URLs for open-licensed sources
     └── Citations/                     # URLs / ISBNs / DOIs for copyrighted material
@@ -28,7 +28,7 @@ Resources/
 
 ## How to use
 
-- **Learning on-ramp**: start with [`Themes/`](Themes/README.md) — 19 concept guides that synthesize the summaries across sources (with the tensions named), each ending in the checklist its skill encodes. Read the theme, then drill into the summaries it cites.
+- **Learning on-ramp**: start with [`Themes/`](Themes/README.md) — 20 concept guides that synthesize the summaries across sources (with the tensions named), each ending in the checklist its skill encodes. Read the theme, then drill into the summaries it cites.
 - **Skill synthesis**: cross-reference summaries against `/mithril` agent prompts.
 - **Onboarding**: jump into a single resource without reading the whole book.
 - **Concept lookup**: see [`../CS-Best-Practices-Resources.md`](../CS-Best-Practices-Resources.md) for which resource owns which idea.

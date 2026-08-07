@@ -3,7 +3,7 @@
 # Mithril installer
 #
 # Deploys the /mithril framework into Claude Code and Grok Build (first-class on both):
-#   - 18 canonical skill files into ~/.claude/agents/ and ~/.grok/agents/,
+#   - 19 canonical skill files into ~/.claude/agents/ and ~/.grok/agents/,
 #     linked by default or copied with --copy-agents
 #   - 1 orchestrator command into ~/.claude/commands/ and ~/.grok/commands/ (mithril.md)
 #

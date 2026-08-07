@@ -93,9 +93,10 @@ The token value is estimated from bytes and is useful for trend comparison, not 
 | `unbounded-pool` | Thread pool with unbounded queue + hot-path O(n²) over full customer list; clean path uses bounded executor + keyset page | mithril-performance |
 | `silent-endpoint` | New HTTP handler ships with no metrics/logs/trace context; structured healthz is the clean bait | mithril-observability |
 | `div-button-trap` | Custom div-"button" without keyboard/name; modal focus trap with no Escape; labeled form is clean bait | mithril-accessibility |
+| `ambiguous-billing-actions` | Generic destructive CTA with hidden consequence; async save has no pending/success/error feedback; semantic native controls are clean bait | mithril-usability |
 | `happy-path-only-codec` | Pure encode/decode algebra covered by one happy-path unit test only; no round-trip property / edge generators | mithril-test-quality |
 
-Coverage note: the suite aims for ≥1 seed case per specialist domain (including performance, observability, accessibility). Add harder variants when a model consistently passes a case with no false positives.
+Coverage note: the suite aims for ≥1 seed case per specialist domain (including performance, observability, accessibility, and usability). Add harder variants when a model consistently passes a case with no false positives.
 
 ## Why cases live as file trees, not `.patch` files
 

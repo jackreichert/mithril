@@ -31,6 +31,13 @@ Test pain is design feedback. Report symptom and routed cause.
 | 4+ mocks | Excess responsibility | `mithril-architecture` |
 | Order matters | Shared state | this (Shared Fixture) |
 
+## Two Test Layers
+*Sources: Agile Software Development ch.4; GOOS*
+
+- **Customer acceptance tests** start the outer loop: they express business-visible story completion and remain independent of implementation structure. Route ambiguity, imperative scenarios, and missing story criteria to `mithril-specification`.
+- **Programmer tests** drive the inner loop: they shape interfaces, protect refactoring, and provide fast local feedback through red-green-refactor.
+- Neither layer substitutes for the other. Flag a behavior change whose unit tests pass but whose acceptance criterion has no executable evidence, and flag acceptance-only coverage that leaves non-trivial internal rules without focused feedback.
+
 ## F.I.R.S.T. Principles
 - **Fast:** flag >100ms unit tests/hidden I/O.
 - **Isolated:** each runs alone/in any order; no shared mutable state.
@@ -38,7 +45,7 @@ Test pain is design feedback. Report symptom and routed cause.
 - **Self-validating:** pass/fail without human inspection.
 - **Timely:** post-hoc tests tend to lock in implementation.
 
-**Three Laws of TDD:** (1) code only for a failing test; (2) only enough test to fail; (3) only enough code to pass. **Two Hats:** never refactor red or mix refactor/behavior changes.
+**Three Laws of TDD:** (1) code only for a failing test; (2) only enough test to fail; (3) only enough code to pass. These govern the inner programmer-test loop; the outer loop begins with a failing customer acceptance test. **Two Hats:** never refactor red or mix refactor/behavior changes.
 
 ## Structure — AAA
 Arrange → Act → Assert; one clear Act and one logical assertion (multiple assertions may describe one outcome). Split multiple behaviors.

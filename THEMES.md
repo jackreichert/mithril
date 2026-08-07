@@ -1,8 +1,8 @@
 # Cross-Cutting Themes — What the Whole Library Agrees (and Disagrees) On
 
-A synthesis *across* the resource summaries in [`Resources/`](Resources/). Where [`CS-Best-Practices-Resources.md`](CS-Best-Practices-Resources.md) is the **per-resource index** ("which book owns which idea") and [`CONSTITUTION.md`](CONSTITUTION.md) is the **write-time rule set**, this document is the **horizontal cut**: the ideas that recur across many sources, the sources that back each one, and — most usefully — the places where the canon openly disagrees with itself. For the vertical cut — **19** per-theme deep guides in a Tier 1→5 curriculum, each ending in the operational checklist its skill encodes — see [`Resources/Themes/`](Resources/Themes/README.md) (including Theme 18 — Performance & Operability and Theme 19 — Accessibility).
+A synthesis *across* the resource summaries in [`Resources/`](Resources/). Where [`CS-Best-Practices-Resources.md`](CS-Best-Practices-Resources.md) is the **per-resource index** ("which book owns which idea") and [`CONSTITUTION.md`](CONSTITUTION.md) is the **write-time rule set**, this document is the **horizontal cut**: the ideas that recur across many sources, the sources that back each one, and — most usefully — the places where the canon openly disagrees with itself. For the vertical cut — **20** per-theme deep guides in a Tier 1→5 curriculum, each ending in the operational checklist its skill encodes — see [`Resources/Themes/`](Resources/Themes/README.md) (including Theme 18 — Performance & Operability, Theme 19 — Accessibility, and Theme 20 — Usability).
 
-> **How it was built.** Six readers each read one cluster of the library in full (Canon + Language; Architecture + Domain; Testing; Culture/Process; Articles; Standards + Papers) and extracted themes-with-citations. This document merges those into cross-cutting themes. Every theme lists the sources that actually state it — not generalized from memory. *(Extended 2026-06: 13 further books — concurrency, performance & reliability, functional programming, security, and distributed/DDD depth — were summarized and woven into the themes, tensions, and references below.)*
+> **How it was built.** Six readers each read one cluster of the library in full (Canon + Language; Architecture + Domain; Testing; Culture/Process; Articles; Standards + Papers) and extracted themes-with-citations. This document merges those into cross-cutting themes. Every theme lists the sources that actually state it — not generalized from memory. *(Extended 2026-06 with 13 books spanning concurrency, performance, reliability, functional programming, security, and distributed/DDD depth; extended 2026-08 with Martin's Agile Software Development, expanded standalone chapter summaries across the book library, and Krug's usability and lightweight user-testing practice.)*
 >
 > **How to read it.** Each theme is one paragraph of claim + the sources that converge on it + the tension, if any. The two most valuable sections are at the end: **§XI Map of Cross-Source Tensions** (where to expect a judgment call) and **§XII Near-Universal Consensus** (what you can treat as settled). When two themes pull apart, the tie-break order is [`CONSTITUTION.md` Article I](CONSTITUTION.md#article-i--conflict-precedence-the-tie-break-order).
 
@@ -44,7 +44,7 @@ Brooks is **pessimistic** about headroom (little accidental complexity left to r
 
 **One reason to change (SRP / cohesion) — distinct from "small."** Uncle Bob's own file corrects the common misreading: "a class can be large"; SRP is about the *axis* of change, not line count. *(Principles of OOD; Clean Code ch.10; Code Complete ch.7; Refactoring's Divergent Change / Shotgun Surgery smells.)*
 
-**Dependencies point inward, toward stability and abstractions (SOLID/DIP).** The Dependency Rule (Clean Architecture), ports-defined-by-the-core (Hexagonal / Cockburn), DIP "is about source-code dependency direction, not DI containers" (Uncle Bob). No dependency cycles; depend toward stability (SDP/ADP). *(+ Effective Java composition-over-inheritance; GoF "program to an interface.")*
+**Dependencies point inward, toward stability and abstractions (SOLID/DIP).** Martin's **Agile Software Development** gives the worked class-level derivation and package-level REP/CCP/CRP + ADP/SDP/SAP principles; the Dependency Rule (Clean Architecture) and ports-defined-by-the-core (Hexagonal / Cockburn) scale the same idea into system boundaries. DIP is about source-code dependency direction, not DI containers, but abstractions should answer observed change pressure rather than every imaginable future. No dependency cycles; depend toward stability. *(+ Effective Java composition-over-inheritance; GoF "program to an interface.")*
 
 **Isolate the domain from frameworks, UI, and the database.** "The Database/Web/Framework is a Detail" (Clean Architecture ch.30–32); Screaming Architecture; DDD's persistence-ignorant Repository; Hexagonal's core that "knows nothing about HTTP, DB, queues." *(YAGNI check, from the Hexagonal file itself: a 200-line CLI does not need ports and adapters.)*
 
@@ -74,13 +74,15 @@ Brooks is **pessimistic** about headroom (little accidental complexity left to r
 
 **Tests are the safety net that makes all other change safe.** The precondition for refactoring and the definition of legacy code ("code without tests" — Feathers). *(Refactoring ch.4; WEWLC; Clean Code ch.9; Pragmatic Programmer; Khorikov "sustainable growth"; xUnit Patterns "change-enablers"; Joel Test.)*
 
-**TDD: red → green → refactor, test-first.** Canonical in **Beck**; the **Three Laws** (Uncle Bob); the nested acceptance/unit loop (GOOS). Disagreement is over *rigor*, not value — Uncle Bob frames it as near-mandatory professional discipline; Osherove notes teams adopt and abandon it; APOSD rates TDD "good but can be tactical."
+**TDD: red → green → refactor, test-first.** Canonical in **Beck**; the **Three Laws** (Uncle Bob); the nested acceptance/unit loop (GOOS). **Agile Software Development** makes the two layers explicit: programmer tests guide design and protect refactoring, while customer acceptance tests decide whether a story is complete. Disagreement is over *rigor*, not value — Uncle Bob frames it as near-mandatory professional discipline; Osherove notes teams adopt and abandon it; APOSD rates TDD "good but can be tactical."
 
 **Test behavior, not implementation.** The crux pillar — a valid refactor must leave the suite green. *(Khorikov "resistance to refactoring"; GOOS ch.24; Osherove over-specification; xUnit "Fragile Test"; Spec by Example "automation leaking into specs.")* This theme **is** the classical/London fault line (see §XI).
 
 **Test quality beats test quantity — and coverage is a weak signal.** F.I.R.S.T., AAA, intention-revealing names, no logic in tests, refactor tests like production code. Coverage measures what *ran*, not what was *asserted* — a negative indicator only; **mutation testing** is the real oracle. The pyramid-vs-honeycomb-vs-trophy debate is "largely semantic" (Fowler). *(Osherove; xUnit Patterns smell catalog; Khorikov pillars 3–4; Fowler Test Pyramid + Diverse Shapes; "a flaky test is worse than no test" — Eradicating Non-Determinism.)*
 
 **Tests double as executable specification and living documentation.** **Specification by Example's** "key example" does three jobs at once (requirement + test + never-stale docs); Given/When/Then; the Three Amigos. *(+ xUnit "tests as executable specs"; GOOS "test as specification"; Clean Coder acceptance tests; behavior-named tests.)*
+
+**Acceptance tests and usability tests answer different questions.** An acceptance test proves that specified behavior works; it does not prove that a person can discover the path, understand the choices, or recover from a mistake. **Don't Make Me Think** supplies the heuristic layer — scanning, hierarchy, information scent, orientation, concise labels, and visible state — while **Rocket Surgery Made Easy** supplies the evidence loop: observe representative-enough participants attempting realistic goals, fix the most serious repeated breakdowns, and retest. A heuristic review identifies plausible risk, and a few qualitative sessions diagnose causes, but neither can support statistical prevalence claims or universal statements about users.
 
 **The test-double vocabulary is shared; *when to mock* is not.** Everyone uses Meszaros's five flavors (dummy/stub/spy/mock/fake) and "stubs answer, mocks verify." The split: mock *only the outer, unmanaged boundary* and use real objects/state inside (Khorikov, classical; Fowler self-identifies here) vs. *mock internal roles outside-in* to discover collaborators (GOOS, London). A concrete method-level disagreement rides along: **Khorikov rejects transaction-rollback** test teardown (use a real DB + cleanup) while **xUnit Patterns endorses Transaction Rollback Teardown** as a named pattern.
 
@@ -136,6 +138,8 @@ Brooks is **pessimistic** about headroom (little accidental complexity left to r
 
 **Professionalism: honest commitments, realistic estimates, unchanged discipline under pressure.** "I'll try is a lie"; estimation ≠ commitment (PERT/Wideband Delphi); don't code tired. *(Clean Coder — the file flags its own preachier chapters as lower-signal than its TDD/estimation material; + Joel's Painless Schedules.)*
 
+**Plans are revisable; feedback is not optional.** **Agile Software Development** turns evidence-based estimation into an iteration loop: user stories keep scope negotiable, measured delivery velocity informs the next plan, and customer acceptance tests define completion. This complements commitment discipline rather than weakening it — distinguish a forecast that should update from a concrete promise that should be renegotiated explicitly when evidence changes.
+
 **Build for change / evolvability — and know when up-front design earns its keep.** YAGNI and "build for current needs" (Beck rule 4, Is-Design-Dead, "you shouldn't start with microservices") — *but* high-reversal-cost decisions (security, schema, framework) warrant deliberate up-front thought. The exception is the rule's necessary companion.
 
 ---
@@ -172,6 +176,7 @@ The library is not monolithic. These are the documented disagreements — each i
 | 13 | **Reversibility ideal vs. leaks** | Hexagonal/Clean — swap any technology cleanly | Leaky Abstractions / DDIA — N+1, query plans, partial failure leak through | Design for reversibility *and* understand the layer below; don't trust the swap to be free. |
 | 14 | **Reliability vs. security on failure** | Release It! / SRE — degrade gracefully, fail *open* to stay available | Security — fail *closed*; deny on uncertainty | **Building Secure and Reliable Systems**: name the property each component optimizes — auth/secrets/authorization fail closed; non-critical reads may fail open behind a circuit breaker. |
 | 15 | **Reliability target** | Release It! — engineer for stability, "design so it doesn't fail" | SRE — 100% is the wrong target; spend an explicit *error budget* to move faster | Set an SLO; while the budget is spent, freeze risk and harden; with budget to spare, ship. Reliability is a feature with a cost, not an absolute. |
+| 16 | **Usability convention vs. innovation** | Krug — familiar conventions minimize cognitive effort and make actions self-evident | Novel interactions can create value unavailable through familiar patterns | Innovation must earn its learning cost on an important task and be tested with representative users; reviewer preference alone proves neither clarity nor confusion. |
 
 ⭐ = the two headline disagreements, both flagged inside the source summaries themselves.
 
@@ -198,6 +203,7 @@ Where essentially every source that addresses the topic agrees — treat these a
 - **Validate untrusted input at the boundary; never commit secrets; least privilege.**
 - **Config in the environment; observability is a prerequisite, not an afterthought.**
 - **Small, reviewable units of work; review for net-positive code health.**
+- **Interactive interfaces should make important tasks discoverable, provide visible feedback and recovery, and be observed with representative users when uncertainty matters.**
 - **Minimize mutable/shared state, especially under concurrency** — and where sharing is unavoidable, guard atomicity, visibility, and liveness explicitly (in-process ≠ cross-process; *Java Concurrency in Practice* is the canonical reference).
 
 ---
@@ -288,6 +294,14 @@ Every source cited above by short name (e.g. "APOSD," "DDIA," "Waldo"), with its
 | **Head First Design Patterns** | Freeman & Robson (2020). *Head First Design Patterns*, 2nd ed. O'Reilly. ISBN 978-1492078005 | [21](Resources/Books/Engineering-Culture-Process/21-Head-First-Design-Patterns.md) |
 | **Accelerate / DORA** | Forsgren, Humble, Kim (2018). *Accelerate*. IT Revolution. ISBN 978-1942788331. Reports: <https://dora.dev> | [25](Resources/Books/Engineering-Culture-Process/25-Accelerate.md) |
 | **Team Topologies** | Skelton & Pais (2019). *Team Topologies*. IT Revolution. ISBN 978-1942788812. <https://teamtopologies.com> | [26](Resources/Books/Engineering-Culture-Process/26-Team-Topologies.md) |
+| **Martin / Agile** | Robert C. Martin (2002). *Agile Software Development: Principles, Patterns, and Practices*. Prentice Hall. ISBN 978-0135974445 | [44](Resources/Books/Engineering-Culture-Process/44-Agile-Software-Development.md) |
+
+### Books — Usability & Interaction Design
+
+| Short name | Full citation | Summary |
+|------------|---------------|---------|
+| **Don't Make Me Think / Krug** | Steve Krug (2014). *Don't Make Me Think, Revisited*, 3rd ed. New Riders / Pearson. ISBN 978-0321965516 | [45](Resources/Books/Usability/45-Dont-Make-Me-Think-Revisited.md) |
+| **Rocket Surgery / Krug** | Steve Krug (2009). *Rocket Surgery Made Easy*. New Riders. ISBN 978-0321657299 | [46](Resources/Books/Usability/46-Rocket-Surgery-Made-Easy.md) |
 
 ### Books — Language-Specific
 

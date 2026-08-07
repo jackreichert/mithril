@@ -4,7 +4,7 @@
 
 ## The idea in one paragraph
 
-Accessibility is not a coat of paint after design: it is **whether the interface is perceivable, operable, understandable, and robust** (POUR — WCAG). The durable rule is *prefer platform semantics* — real buttons, links, labels, and headings — over reinventing widgets with `div` and ARIA. When custom widgets are necessary, WAI-ARIA Authoring Practices define the keyboard and state contracts. Color alone never carries meaning; focus must be visible; names/roles/values must match what users see. In this library, a11y sits with verification (like review and security): it is a gate on *shipping UI*, not a substitute for domain design. Cross-link Theme 12 when "security" controls (CAPTCHA, timeout) break operable access.
+Accessibility is not a coat of paint after design: it is **whether the interface is perceivable, operable, understandable, and robust** (POUR — WCAG). The durable rule is *prefer platform semantics* — real buttons, links, labels, and headings — over reinventing widgets with `div` and ARIA. When custom widgets are necessary, WAI-ARIA Authoring Practices define the keyboard and state contracts. Color alone never carries meaning; focus must be visible; names/roles/values must match what users see. In this library, a11y sits with verification (like review and security): it is a gate on *shipping UI*, not a substitute for domain design or usability testing. Cross-link Theme 20 for task clarity and user observation, and Theme 12 when "security" controls (CAPTCHA, timeout) break operable access.
 
 ## The arc
 
@@ -39,4 +39,4 @@ Accessibility is not a coat of paint after design: it is **whether the interface
 
 ## Connects to
 
-[03 — Readable Code](03-Readable-Code.md) (names for humans include AT users) · [11 — Code Review](11-Code-Review.md) (UI CL review dimensions) · [12 — Security](12-Security-Review.md) (don't break a11y with hostile UX) · [10 — Specification](10-Specification-by-Example.md) (acceptance examples should include AT-critical flows when relevant).
+[20 — Usability](20-Usability-and-User-Testing.md) (task clarity and direct user observation complement the accessibility floor) · [03 — Readable Code](03-Readable-Code.md) (names for humans include AT users) · [11 — Code Review](11-Code-Review.md) (UI CL review dimensions) · [12 — Security](12-Security-Review.md) (don't break a11y with hostile UX) · [10 — Specification](10-Specification-by-Example.md) (acceptance examples should include AT-critical flows when relevant).
