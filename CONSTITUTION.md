@@ -48,6 +48,15 @@ Before the first structural or cross-boundary edit:
 - If authoritative repository sources disagree, surface the contradiction before editing.
 - Never introduce a new package, service, schema, protocol field, or deployment unit merely
   because it is the framework's default organization.
+  
+## Simplification Gate
+
+After a solution is planned and *before* implementation begins:
+
+- Explicitly ask: “Can this be made simpler while still satisfying the requirements and Article I precedence?”
+- Prefer the design that removes the most complexity (code, concepts, moving parts, or indirection) without sacrificing correctness, security, or the next clear step.
+- If a simpler alternative exists that still meets the acceptance criteria, adopt it. Document the rejected more-complex option only when the trade-off is non-obvious.
+- Never add abstraction, configuration, or generality “just in case.” 
 
 ---
 
