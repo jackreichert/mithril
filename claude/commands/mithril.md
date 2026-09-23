@@ -1,6 +1,6 @@
 ---
 description: "Code quality framework — runs targeted quality agents against your current git diff or full project. Usage: /mithril [aspects] | /mithril project [path] [aspects] | /mithril deep [path] (file→method→flow pass)"
-argument-hint: "[project [path]] [deep] [code] [arch] [refactor] [tests] [security] [simplify] [process] [delivery] [distributed] [concurrency] [patterns] [persistence] [perf] [observability] [a11y] [gates] [spec] — or omit for all"
+argument-hint: "[project [path]] [deep] [code] [arch] [refactor] [tests] [security] [simplify] [delivery] [distributed] [concurrency] [persistence] [perf] [observability] [a11y] [gates] — or omit for all"
 allowed-tools: ["Bash", "Glob", "Grep", "Read", "Task"]
 ---
 
@@ -170,7 +170,7 @@ A reviewer cannot conclude that code is correct without first knowing the behavi
   - If the evidence is sufficient and internally consistent, label the contract `CONFIRMED FROM REPO/REQUEST` and cite its sources.
   - If key behavior is missing, contradictory, or requires a product decision, label it `UNCONFIRMED`, present the smallest set of clarifying questions or candidate scenarios, and **stop before issuing code-correctness findings or a ship verdict**. Ask the user/product owner to confirm; never reverse-engineer intended behavior from the diff.
   - You may still report requirement-independent facts (for example, an exposed secret or definite data race), but clearly state that functional correctness was not reviewable.
-5. **Review the specification first when one exists.** Spawn `mithril-specification` before the code agents. If it reports a Critical ambiguity or untestable outcome, stop and clarify. Otherwise, include the confirmed Review Contract and specification findings in every Step-4 agent prompt so each reviewer judges the same intended behavior.
+5. **Share the contract.** Include the Review Contract in every Step-4 agent prompt so each reviewer judges the same intended behavior. Acceptance-scenario quality (`.feature` files) is reviewed by `mithril-test-quality`.
 6. **Validate executable examples.** If the repository already has acceptance scenarios and a documented narrow command for them, run it before the final verdict. A feature file that is never executed is documentation, not a living specification.
 
 This gate is intentionally proportional: a typo or behavior-preserving rename needs a one-line preserved-behavior contract; a new billing rule needs collaboratively validated key examples. The Three Amigos conversation (business, development, testing) is the source of truth. Gherkin records that conversation; it does not replace it.
@@ -187,18 +187,17 @@ Parse `$ARGUMENTS` for aspect keywords:
 - `tests` or `test` → mithril-test-quality
 - `security` → mithril-security-review
 - `review` → mithril-review (confidence-scored review with PR lenses)
-- `process` → mithril-process
 - `delivery` or `deploy` → mithril-delivery
 - `distributed` or `dist` → mithril-distributed
 - `concurrency` or `concurrent` or `threads` or `async` → mithril-concurrency (in-process: races, locks, visibility, deadlock, async/event-loop)
-- `patterns` or `pattern` → mithril-patterns
+- `patterns` or `pattern` → mithril-code-quality (pattern misuse)
 - `persistence` or `db` or `database` → mithril-persistence
-- `perf` or `performance` or `latency` → mithril-performance (USE method, query cost, measure-then-change)
+- `perf` or `performance` or `latency` → mithril-code-quality (performance) + mithril-persistence when queries are involved
 - `observability` or `o11y` or `telemetry` or `slo` → mithril-observability (golden signals, traces, SLOs, alert hygiene)
 - `a11y` or `accessibility` or `wcag` → mithril-accessibility (WCAG 2.2 AA UI review)
 - `usability` or `ux` → mithril-usability (task clarity, hierarchy, navigation, recovery, and user-testing evidence)
 - `gates` → mithril-gates (runs tools — lint, complexity, duplication, coverage, mutation — for pass/fail vs thresholds)
-- `spec` or `specification` → mithril-specification (acceptance-criteria / BDD feature-file quality)
+- `spec` or `specification` → mithril-test-quality (acceptance scenarios)
 - `flow` or `flows` → mithril-flow (trace control + data flow from entry points to sinks; taint, error propagation, resource/transaction lifecycle, N+1-across-chain)
 - `tutor` or `learn` → **Tutor Mode** — teaches the CS principle/theme, or the principles at play in a diff. Does NOT spawn a review agent or aggregate findings; runs inline and conversational (see the Tutor Mode section). It explains; it does not review or fix.
 - No arguments / `all` → run all applicable agents (see rules below)
@@ -220,27 +219,23 @@ In **project mode**, signals come from the filtered file list (extensions, direc
 | Service-to-service HTTP/gRPC calls (`axios`, `fetch`, `http.Client`, `requests`, `RestTemplate`, `grpc`) OR message-queue imports (`kafka`, `rabbitmq`, `sqs`, `pubsub`, `nats`, `eventbridge`) OR files under `services/` crossing service boundaries | mithril-distributed |
 | In-process concurrency primitives in the diff — `Thread`/`Runnable`/`ExecutorService`/`goroutine`/`go func`, `synchronized`/`Lock`/`Mutex`/`RLock`, `volatile`/`Atomic*`/`compare-and-set`, `async`/`await`/`Promise.all`/`asyncio`/coroutines, thread pools, or shared mutable statics/singletons/caches written from concurrent paths — *project mode: same primitives in file content* | mithril-concurrency |
 | ORM imports (`hibernate`, `sqlalchemy`, `prisma`, `typeorm`, `sequelize`, `mongoose`, `ActiveRecord`, `EntityFramework`) OR `*.sql`, `*.prisma`, schema files OR repository / DAO files OR raw SQL in diff | mithril-persistence |
-| Hot-path / cost signals — nested loops over collections, new caches/pools/queues, pagination, raw SQL/`EXPLAIN`, bulk processors, serializers on request path, `Promise.all` over lists — *project mode: same patterns* | mithril-performance |
 | Telemetry / ops signals — metrics/logging/tracing libraries, dashboard/alert config, OpenTelemetry, SLO/SLI mentions, new HTTP route handlers or queue consumers (ship golden signals) | mithril-observability |
 | UI signals — `*.tsx`/`*.jsx`/`*.vue`/`*.svelte`, `components/`, CSS modules for interactive UI, Storybook stories | mithril-accessibility + mithril-usability |
-| Behavior-affecting branch/change OR executable specs / acceptance criteria (`*.feature`, `features/`, `*.story`, Gherkin `Given`/`When`/`Then` in diff) OR a requirements/acceptance-criteria doc | mithril-specification (run first per Step 1.6) |
+| Executable specs (`*.feature`, `features/`, Gherkin `Given`/`When`/`Then` in diff) | mithril-test-quality |
 | After other reviews complete (always last, on recently modified code) | mithril-refactor in Mode 1 (Simplify) |
 
 **Opt-in only — never auto-spawned:**
 - `mithril-refactor` in Mode 2 (full plan) — invoke via `/mithril refactor` when smells need named refactoring moves prescribed
-- `mithril-process` — invoke via `/mithril process` when reviewing planning discipline of a significant change
-- `mithril-patterns` — invoke via `/mithril patterns` for pattern recognition / anti-pattern audit (auto-detection of "this should be a Strategy" is unreliable; prefer explicit invocation, often after `mithril-code-quality` finds smells)
 - `mithril-review` — invoke via `/mithril review` for the full PR-style review with confidence scoring and lenses; redundant with the auto-selection above for normal pre-commit use
 - `mithril-flow` — invoke via `/mithril flow` to trace execution flows on demand, or it runs automatically as Phase 2 of `/mithril deep`. Not auto-spawned in normal diff review because whole-flow tracing is heavier than per-file review; reach for it when a bug spans methods/files, or on input→sink paths in security-sensitive code.
 - `mithril-gates` — invoke via `/mithril gates` to run the objective tool-measured floor (lint, complexity, duplication, coverage, mutation). Not auto-spawned because it executes tools that may not be installed; run it explicitly, in CI, or via the pre-commit hook (`hooks/`). It complements the reading agents — they judge, it measures.
-- Explicit aspect keywords still force `mithril-performance` / `mithril-observability` / `mithril-accessibility` / `mithril-usability` even when auto-signals are weak.
+- Explicit aspect keywords still force `mithril-observability` / `mithril-accessibility` / `mithril-usability` even when auto-signals are weak.
 
 **Suggestion behavior:** When auto-spawning produces findings, suggest follow-up agents that aren't auto-spawned:
-- If `mithril-code-quality` flags multiple smells (Switch on type code, Long Method with branches, etc.) → suggest `/mithril patterns` for prescribed pattern recognition AND `/mithril refactor` for Fowler moves
-- If significant changes were made → suggest `/mithril process` for planning audit
+- If `mithril-code-quality` flags multiple smells (Switch on type code, Long Method with branches, etc.) → suggest `/mithril refactor` for Fowler moves
 - If `mithril-distributed` flags partial-failure issues → suggest `/mithril arch` for the underlying resilience patterns
-- If `mithril-performance` flags missing saturation/latency signals → suggest `/mithril observability`
-- If `mithril-code-quality` flags O(n²)/N+1 → ensure `mithril-performance` ran (or suggest `/mithril perf`)
+- If `mithril-code-quality` flags a new pool/queue/cache without saturation or latency signals → suggest `/mithril observability`
+- If `mithril-code-quality` flags N+1 or query cost → ensure `mithril-persistence` ran
 - If UI components lack keyboard/labels → ensure `mithril-accessibility` ran
 - If UI hierarchy, labels, navigation, feedback, or recovery obscure an important task → ensure `mithril-usability` ran
 - If `mithril-code-quality` or `mithril-distributed` flags shared mutable state, a race, a lock, or async/threads → suggest `/mithril concurrency` for the in-process interleaving review (the shared-memory counterpart to `mithril-distributed`'s cross-process review)
@@ -409,7 +404,6 @@ Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 
 **Suggest next steps if applicable:**
 - If `mithril-code-quality` flagged smells: suggest `/mithril refactor` for prescribed moves
-- If significant changes were made: suggest `/mithril process` for planning audit
 - If results were strong: confirm ready to commit
 
 ---
@@ -551,13 +545,10 @@ The framework's teaching leg: where the review agents *catch* and the Constituti
 /mithril tests                        # Test suite quality audit
 /mithril security                     # OWASP/CWE adversarial scan + SAST/SCA tools
 /mithril review                       # Confidence-scored PR-style review with lenses
-/mithril process                      # Planning discipline — edge cases, deps, Big-O
 /mithril delivery                     # CD pipeline readiness, 12-Factor, migrations
 /mithril distributed                  # Service boundaries, idempotency, replication
-/mithril patterns                     # GoF pattern recognition + anti-pattern audit
 /mithril persistence                  # ORM patterns, N+1, transactions, migrations
 /mithril gates                        # Objective tool-measured floor: lint, complexity, dup, coverage, mutation
-/mithril spec                         # Acceptance-criteria / BDD feature-file quality
 /mithril flow                         # Trace control + data flow from entry points to sinks
 /mithril tutor deep modules           # Learn a concept/theme from the library (cited)
 /mithril learn "classical vs london"  # Same — teaches both sides of a documented tension
@@ -601,17 +592,14 @@ The framework's teaching leg: where the review agents *catch* and the Constituti
 - **`/mithril tests`** — when tests feel brittle. Find the smells before a refactor breaks them.
 - **`/mithril security`** — before any code touching auth, payments, user input, or external API surface goes live.
 - **`/mithril review`** — full PR-style review with the Google design-first priority order; ideal before opening a PR.
-- **`/mithril process`** — for significant features. Audits whether edge cases, dependencies, alternatives, and Big-O were considered.
 - **`/mithril simplify`** — final polish pass. Run it last, after other reviews pass.
 - **`/mithril delivery`** — when touching schema migrations, deployment config, feature flags, or anything that affects the deploy pipeline. Catches deploy-coupled changes that break rolling deploys.
 - **`/mithril distributed`** — when crossing service boundaries (HTTP, gRPC, queues) or touching replication, partitioning, distributed transactions. Reduces every distributed bug to one of Waldo's four categories.
 - **`/mithril concurrency`** — the in-process counterpart to `distributed`. When the diff has threads, locks, atomics, `volatile`, async/await, coroutines, thread pools, or shared mutable state. Reduces every interleaving bug to one of three hazards — atomicity, visibility, liveness — and catches the races, deadlocks, and event-loop blocks that single-threaded tests never see.
-- **`/mithril patterns`** — after `/mithril code` finds smells. Names the GoF pattern that prescribes the fix, OR flags pattern misuse (Singleton-as-global, Visitor abuse). Often invoked alongside `refactor`.
 - **`/mithril persistence`** — when ORM, repositories, queries, or migrations are in the diff. Catches N+1, deploy-coupled migrations, missing transaction boundaries, persistence leaking into domain.
 - **`/mithril gates`** — the objective floor. Runs real tools (lint, cyclomatic complexity, duplication, coverage, mutation) and reports pass/fail against thresholds rather than opinions. Run it in CI or via the pre-commit hook (`hooks/`) to *block* breaches, not just flag them. The reading agents judge; gates measure. See [`CONSTITUTION.md`](../../CONSTITUTION.md) Article VII for the thresholds and `hooks/` for the git hook.
 - **`/mithril flow`** — trace execution, not structure. Follows control + data flow from each entry point (route, handler, `main`, consumer) to its sinks, catching bugs that live in the path between methods: untrusted input reaching a sink, errors swallowed mid-flow, leaked resources/locks, a transaction that doesn't wrap the unit of work, N+1 visible only across the call chain, partial failure across a boundary. Runs automatically as Phase 2 of `/mithril deep`; invoke alone when chasing a cross-method/cross-file bug. Complements `/mithril arch` (structure) — not a substitute for it.
 - **`/mithril deep`** — the deep traversal. Where default `/mithril` runs one agent per aspect in parallel, deep mode walks file → method, then traces flows from entry point to sink, then synthesizes one summary. Use it to onboard a subsystem, audit a critical path, or scrutinize a large feature before merge. Expensive — scope it to a path (`/mithril deep src/services` or `/mithril deep project src/`). Defaults to writing detail to a report file and showing only the summary; override with `--inline` / `--summary`.
-- **`/mithril spec`** — upstream of code. Reviews acceptance criteria and BDD/Gherkin feature files for the qualities that make a spec a reliable single source of truth: concrete key examples, declarative (not UI-scripted) phrasing, ubiquitous language, and executable/living specs. Run it before building a feature, or when `.feature` files are in the diff. Behavior-affecting branch reviews run it first; a Critical ambiguity blocks the functional-correctness verdict. Where `/mithril tests` checks the tests verify the code, `/mithril spec` checks the spec expresses the right behavior.
 - **`/mithril tutor`** (alias `/mithril learn`) — the teaching leg. Where the review agents *catch* and the Constitution *prevents*, the tutor *explains* — grounded in the curated library and citing its sources. Name a concept or theme to learn it (`/mithril tutor deep modules`), or run it on a diff/finding to learn the principles at play in your actual code. It explains rather than reviews (no findings, no fixes — those are the other agents), surfaces documented tensions (both sides + how the framework resolves them), and stays conversational for follow-ups.
 
 ### Common multi-aspect combinations
@@ -619,5 +607,5 @@ The framework's teaching leg: where the review agents *catch* and the Constituti
 - `/mithril persistence delivery` — DB code + migration safety. Run together when touching schema.
 - `/mithril distributed arch` — service-to-service work + the resilience patterns underneath.
 - `/mithril concurrency code` — multi-threaded or async code: interleaving hazards + the naming/structure/error-handling underneath.
-- `/mithril code patterns refactor` — when reviewing structural code: smells + pattern recognition + prescribed moves.
+- `/mithril code refactor` — when reviewing structural code: smells + prescribed moves.
 - `/mithril security review` — pre-PR pass on any user-facing or auth code.

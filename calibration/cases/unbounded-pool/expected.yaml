@@ -4,14 +4,14 @@
 case: unbounded-pool
 defects:
   - id: unbounded-fanout-listAll
-    agent: mithril-performance
+    agent: mithril-concurrency   # uncapped Promise.all; mithril-code-quality may also flag
     file: src/customers/exportService.ts
     severity_min: Critical
     match: "(unbounded|listAll|full table|fan.?out|Promise\\.all|pool|saturation|backpressure|memory)"
     note: exportAllWithDedup loads entire table and Promise.all over every row with no concurrency bound
 
   - id: on-squared-dedup
-    agent: mithril-performance
+    agent: mithril-code-quality
     file: src/customers/exportService.ts
     severity_min: Important
     match: "(O\\(n\\^?2\\)|nested|n.?squared|quadratic|filter.*loop|per.?customer.*scan)"

@@ -1,6 +1,6 @@
 # 07 — Design Patterns, with Restraint
 
-> **Tier 3 · Design at scale.** The GoF catalog as shared vocabulary and smell-triggered toolset — plus the modern refinements and the explicit counterweight against using patterns as a substitute for thought. **Skill:** [`skills/patterns.md`](../../skills/patterns.md) · agent `mithril-patterns`.
+> **Tier 3 · Design at scale.** The GoF catalog as shared vocabulary and smell-triggered toolset — plus the modern refinements and the explicit counterweight against using patterns as a substitute for thought. **Skill:** pattern misuse is checked by [`skills/code-quality.md`](../../skills/code-quality.md) · agent `mithril-code-quality` (the standalone patterns agent was retired).
 
 ## The idea in one paragraph
 

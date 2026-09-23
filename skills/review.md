@@ -18,7 +18,7 @@ Pre-commit/push: staged diff; working tree: unstaged diff; full PR: `<target_bra
 
 Establish behavior from the request, confirmed key examples, reproduction, API contract, or behavior-named tests. For preservation work, state unchanged observable invariants. **Never infer intended behavior from the implementation under review.**
 
-Missing/contradictory requirements: ask targeted questions; withhold functionality/ship verdicts. Report independent defects but mark correctness unreviewable. Given/When/Then is useful; Cucumber optional. Route ambiguity to `mithril-specification`.
+Missing/contradictory requirements: ask targeted questions; withhold functionality/ship verdicts. Report independent defects but mark correctness unreviewable. Given/When/Then is useful; Cucumber optional.
 
 ## Review Modes
 

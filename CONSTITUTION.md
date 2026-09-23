@@ -61,7 +61,7 @@ After a solution is planned and *before* implementation begins:
 ---
 
 ## Article II — Code
-*Deep reference: [`skills/code-quality.md`](skills/code-quality.md), [`skills/patterns.md`](skills/patterns.md), [`skills/concurrency.md`](skills/concurrency.md)*
+*Deep reference: [`skills/code-quality.md`](skills/code-quality.md), [`skills/concurrency.md`](skills/concurrency.md)*
 
 - **Names reveal intent.** A reader infers purpose in <3 seconds. Nouns for classes, verbs for methods. Units and constraints in the name (`timeout_ms`, `max_retries`). No `Manager`/`Processor`/`Data`/`Info` filler. No magic numbers.
 - **Functions do one thing.** One responsibility, ~20–30 lines as a soft ceiling. Extract a nested block only when its name genuinely *abstracts* — not to hit a line count.
@@ -90,7 +90,7 @@ After a solution is planned and *before* implementation begins:
 - **Persistence stays at the edge.** No N+1 queries; explicit columns over `SELECT *`; indexes matched to `WHERE`/`ORDER BY`; explicit transaction boundaries; ORM mappings don't leak into the domain.
 
 ## Article IV — Tests (write them *with*, or *before*, the code)
-*Deep reference: [`skills/test-quality.md`](skills/test-quality.md), [`skills/specification.md`](skills/specification.md), [`skills/process.md`](skills/process.md)*
+*Deep reference: [`skills/test-quality.md`](skills/test-quality.md), [`skills/review.md`](skills/review.md)*
 
 - **Specify behavior before building it.** For non-trivial features, capture the requirement as concrete, declarative **key examples** (Given/When/Then) — the shared source of truth a developer, tester, and businessperson all read the same way. Specify *what*, not UI mechanics; parameterize only what varies.
 - **Establish a review contract before judging code.** For behavior changes, confirm the goal plus key happy-path, boundary, and failure examples; for refactors, state the behavior that must remain unchanged. Never infer intended behavior from the diff. Missing or contradictory requirements block a functional-correctness verdict until clarified. Gherkin records the agreement; Cucumber automation is optional and proportional.

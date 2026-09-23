@@ -34,7 +34,8 @@ Test pain is design feedback. Report symptom and routed cause.
 ## Two Test Layers
 *Sources: Agile Software Development ch.4; GOOS*
 
-- **Customer acceptance tests** start the outer loop: they express business-visible story completion and remain independent of implementation structure. Route ambiguity, imperative scenarios, and missing story criteria to `mithril-specification`.
+- **Customer acceptance tests** start the outer loop: they express business-visible story completion and remain independent of implementation structure.
+- **Acceptance scenarios (`.feature` / Given-When-Then), when present:** each behavior change needs happy-path, boundary, and failure examples with definite observable outcomes; state business intent, not clicks, selectors, or sleeps; every example value must affect the outcome (mutating it should fail the scenario); a scenario nothing executes is documentation, not a test.
 - **Programmer tests** drive the inner loop: they shape interfaces, protect refactoring, and provide fast local feedback through red-green-refactor.
 - Neither layer substitutes for the other. Flag a behavior change whose unit tests pass but whose acceptance criterion has no executable evidence, and flag acceptance-only coverage that leaves non-trivial internal rules without focused feedback.
 
@@ -73,7 +74,7 @@ Use `[method]_[scenario]_[expectedBehavior]` or `should [behavior] when [conditi
 |----------|-------------------------------|
 | Readability | **Obscure Test** (setup/AAA/name unclear); **Eager Test** (unrelated behaviors); **Irrelevant Information** (decorative setup); **Hard-Coded Test Data** (unnamed magic values). |
 | Reliability | **Mystery Guest** (hidden external state); **Shared Fixture** (mutable cross-test state); **Fragile Test** (internal changes break it); **Slow Test** (>100ms unit); **Flaky Test** (time/thread/order dependent). |
-| Coverage | **Missing Negative Test**; **Missing Boundary Test** (0/-1/null/empty/MAX); **Test for Implementation** (private/internal assertions instead of public behavior). |
+| Coverage | **Missing Negative Test**; **Missing Boundary Test** (0/-1/null/empty/MAX); **Missing Failure-Edge Test** (network failure, partial write, retry, duplicate delivery); **Test for Implementation** (private/internal assertions instead of public behavior). |
 
 ## Test Pyramid (and Trophy)
 *Source: Mike Cohn, SE@Google chs.11-14, Kent C. Dodds for Trophy*

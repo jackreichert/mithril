@@ -72,7 +72,7 @@ Then run `/mithril` from Claude Code or Grok. Plugin and classic paths load the 
 
 `install.sh` deploys (Claude and Grok by default):
 
-- 19 agent files into `~/.claude/agents/mithril-*.md` and `~/.grok/agents/mithril-*.md`
+- 15 agent files into `~/.claude/agents/mithril-*.md` and `~/.grok/agents/mithril-*.md`
 - The `/mithril` orchestrator into `~/.claude/commands/mithril.md` and `~/.grok/commands/mithril.md`
 
 By default the installer links both host installations directly to `skills/`, so one edit updates every linked host. `--copy-agents` creates a frozen install instead. Re-running is idempotent.
@@ -136,11 +136,8 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `skills/delivery.md` | CD pipeline readiness, trunk-based dev, 12-Factor compliance, feature flags, expand-contract migrations, observability prereqs | `~/.claude/agents/mithril-delivery.md` |
 | `skills/distributed.md` | Waldo's four differences, replication/consistency, idempotency, partitioning, microservice boundaries, CQRS/ES tradeoffs | `~/.claude/agents/mithril-distributed.md` |
 | `skills/concurrency.md` | In-process concurrency: the three hazards (atomicity, visibility, liveness), shared mutable state, races, locking discipline & deadlock, high-level utilities, async/event-loop, thread-safety contracts, testing concurrent code | `~/.claude/agents/mithril-concurrency.md` |
-| `skills/patterns.md` | GoF + HFDP pattern recognition vocabulary, anti-patterns (Singleton/Visitor abuse), modern alternatives | `~/.claude/agents/mithril-patterns.md` |
 | `skills/persistence.md` | PEAA pattern catalog: Active Record vs Data Mapper, Unit of Work, Repository, Lazy Load + N+1, transactions, migrations | `~/.claude/agents/mithril-persistence.md` |
 | `skills/gates.md` | Objective tool-measured floor: lint, cyclomatic complexity, function length, duplication, coverage, mutation score, CRAP — runs tools and reports pass/fail vs explicit thresholds | `~/.claude/agents/mithril-gates.md` |
-| `skills/specification.md` | Acceptance-criteria / BDD feature-file quality: key examples, declarative phrasing, ubiquitous language, executable & living specs, acceptance-level mutation | `~/.claude/agents/mithril-specification.md` |
-| `skills/performance.md` | Measure-then-change, USE method, latency percentiles, N+1/query cost, caches, bounded fan-out — Theme 18 | `~/.claude/agents/mithril-performance.md` |
 | `skills/observability.md` | Golden signals (incl. saturation), structured logs, traces, SLIs/SLOs/error budgets, alert hygiene — Theme 18 | `~/.claude/agents/mithril-observability.md` |
 | `skills/accessibility.md` | WCAG 2.2 AA UI review: keyboard, names/roles/values, labels/errors, contrast, APG widgets — Theme 19 | `~/.claude/agents/mithril-accessibility.md` |
 | `skills/usability.md` | Task discoverability, hierarchy, navigation, feedback, recovery, and lightweight user-testing evidence — Theme 20 | `~/.claude/agents/mithril-usability.md` |
@@ -155,7 +152,6 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `CS-Best-Practices-Resources.md` | Per-source index — every book, article, and paper that informed the framework, and which idea each one owns | — |
 | `THEMES.md` | Cross-cutting synthesis of the `Resources/` library — the themes that recur across sources, where they converge, and the documented tensions (with a resolution map keyed to the skills) | — |
 | `Resources/Themes/` | 20 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer between the per-source summaries and the skills; each theme names its tensions and the checklist its skill encodes | — |
-| `skills/process.md` | Planning discipline: pre-flight (edge cases, deps, alternatives) + post-validation (Big-O, requirements, assumptions) | `~/.claude/agents/mithril-process.md` |
 | `CONSTITUTION.md` | Write-time prevention layer — the skills distilled into always-on imperative rules, a conflict-precedence order, numeric gate thresholds, and a Definition of Done. Loaded via a `CLAUDE.md` `@`-import. | — |
 | `hooks/pre-commit` | Opt-in git hook that runs the fast gates (lint + complexity) on staged files and blocks the commit on a breach. See `hooks/README.md`. | — |
 
@@ -175,11 +171,9 @@ This mirrors the lesson of [unclebob/swarm-forge](https://github.com/unclebob/sw
 |--------------|---------|
 | `skills/review.md` | Started from the `code-reviewer` agent and absorbed the old `review-pr` orchestrator workflow |
 | `skills/refactor.md` | Synthesized from Fowler/Feathers and absorbed the old `code-simplifier` behavior-preserving cleanup mode |
-| `skills/process.md` | Built from the maintainer's CLAUDE.md "Planning Process" section, grounded in Code Complete + Pragmatic Programmer + Clean Coder + Agile Software Development + MMM + APOSD |
 | `skills/delivery.md` | Synthesized fresh from Continuous Delivery + Trunk-Based Development + 12-Factor + Feature Toggles (Hodgson) — no prior agent ancestor |
 | `skills/distributed.md` | Synthesized fresh from DDIA + Waldo's "A Note on Distributed Computing" + Microservices/CQRS/Event Sourcing — no prior agent ancestor |
 | `skills/concurrency.md` | Synthesized fresh from Effective Java ch.11 (items 78–84) + DDIA ch.7 + Clean Code ch.13 + SICP ch.3 + Release It! (Blocked Threads) + Out of the Tar Pit — the in-process counterpart to `distributed.md`; no prior agent ancestor |
-| `skills/patterns.md` | Synthesized fresh from GoF + Head First Design Patterns + Agile Software Development case studies + Effective Java refinements + APOSD ch.19 counterweight — no prior agent ancestor |
 | `skills/persistence.md` | Synthesized fresh from PEAA pattern catalog + DDIA storage chapters + Effective Java resource-management items + DDD Repository — no prior agent ancestor |
 | `skills/security-review.md` | Adapted from the `security-auditor` agent and extended with explicit security standards references |
 
@@ -438,7 +432,7 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
 - **Eradicating Non-Determinism in Tests** — Fowler (martinfowler.com) → § 9 Testing Concurrent Code (flaky-test discipline)
 - **Java Concurrency in Practice** — Goetz et al. (informal reference) → locking discipline, safe publication, and the memory-model framing throughout
 
-### `skills/patterns.md`
+### Patterns (retired — pattern misuse folded into `code-quality`)
 
 **Books**
 - **Design Patterns: Elements of Reusable Object-Oriented Software** — Gamma, Helm, Johnson, Vlissides / GoF (1994)
@@ -471,7 +465,7 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
 - **Effective Java 3rd ed.** — Bloch (2018) items 7-9 → Connection & Resource Management section
 - **Domain-Driven Design** — Evans (2003) → Repository pattern grounding
 
-### `skills/process.md`
+### Process (retired — failure-edge coverage folded into `test-quality`)
 
 **Books**
 - **Code Complete 2nd ed.** — Steve McConnell (2004)
@@ -554,7 +548,7 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
 - **CRAP** metric — Savoia & Evans (2007), `crap4j` (see `Resources/Originals/Citations/Articles.md`); the one gate sourced outside the book canon, included because it measures the complex-*and*-undertested interaction nothing else in the set catches
 - Enforceable-gate framing adapted from the constitution/engineering model in [unclebob/swarm-forge](https://github.com/unclebob/swarm-forge)
 
-### `skills/specification.md`
+### Specification (retired — acceptance scenarios folded into `test-quality`, the review contract into the router and `review`)
 
 **Source:** Synthesized fresh — no prior agent ancestor. The layer upstream of `test-quality.md`: spec quality before code.
 - **Specification by Example** (Adzic, 2011) — the seven process patterns, key-example discipline, living documentation (`Resources/Books/Testing/28-Specification-by-Example.md`)
@@ -564,7 +558,7 @@ Below: the books, articles, and chapters that drove each skill's content. Citati
 - **Domain-Driven Design** (Evans) — ubiquitous language
 - Acceptance-level (Gherkin) mutation adapted from `gherkin-mutator` in [unclebob/swarm-forge](https://github.com/unclebob/swarm-forge)
 
-### `skills/performance.md`
+### Performance (retired — folded into `code-quality` and `persistence`)
 
 **Source:** Synthesized 2026 audit — primary home for Theme 18's *speed/cost* half (was scattered across code-quality / persistence).
 - **Systems Performance** (Gregg) — USE method (Utilization / Saturation / Errors); measure-then-change
@@ -676,7 +670,7 @@ The orchestrator:
   - Goal: an authenticated user can retrieve only that user's orders
   - Key examples: own orders returned; another user's ID denied; unknown user handled with the agreed error
   - If those outcomes are absent or contradictory in the request/spec, asks for confirmation before issuing a functional verdict
-4. Runs `mithril-specification` first for this behavior-affecting change. Given/When/Then is the shared format; a Cucumber suite is required only if the team chooses to keep these as executable living documentation.
+4. Shares that contract with every agent it spawns.
 5. Auto-selects the remaining agents based on detectable signals:
    - `mithril-code-quality` (always, source files changed)
    - `mithril-architecture` (new function/endpoint adds structural surface)

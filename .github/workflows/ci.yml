@@ -38,10 +38,9 @@ jobs:
           expected_agents=(
             mithril-accessibility mithril-architecture mithril-code-quality
             mithril-concurrency mithril-delivery mithril-distributed
-            mithril-flow mithril-gates mithril-observability mithril-patterns
-            mithril-performance mithril-persistence mithril-process
-            mithril-refactor mithril-review mithril-security-review
-            mithril-specification mithril-test-quality
+            mithril-flow mithril-gates mithril-observability
+            mithril-persistence mithril-refactor mithril-review
+            mithril-security-review mithril-test-quality mithril-usability
           )
           for home in /tmp/fake-claude /tmp/fake-grok; do
             test -f "$home/agents/.mithril-agents" \

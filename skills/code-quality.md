@@ -64,7 +64,13 @@ Resolve common tensions by reader effort:
 
 - Flag realistic O(n²), repeated scans, N+1 queries, wrong lookup/queue structures, unnecessary materialization, and caches without invalidation or bounds.
 - Require measured evidence for optimization and p95/p99 for latency claims.
+- Flag a sequential remote/DB call per item when a batch API exists, materializing a huge collection that could stream, and caches without TTL/max size/invalidation or stampede control on hot keys. Performance findings state the failure as "load X → outcome Y".
 - Apply the USE method to saturable resources: **Utilization, Saturation, Errors** must be observable.
+
+### Pattern Misuse
+
+- Flag a mutable process-wide Singleton/registry used instead of an injected dependency (hidden state, test isolation loss); Observer chains without unsubscribe (leak) or 3+ hops deep; Builder for 2–3 mandatory args; Visitor or Strategy classes where the language has pattern matching or first-class functions.
+- A pattern that needs a comment to justify its existence, or whose varying force has disappeared, is ceremony: recommend removing it.
 
 ### Structure and Contracts
 

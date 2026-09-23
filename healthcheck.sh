@@ -125,16 +125,12 @@ require_in_agent mithril-architecture 'Class decomposition test|disjoint method/
 require_in_agent mithril-test-quality 'Property-Based|property-based|PBT' 'property-based testing'
 require_in_agent mithril-test-quality 'shrink|Hypothesis|fast-check' 'PBT tooling / shrinking'
 require_in_agent mithril-test-quality 'Two Test Layers|Customer acceptance tests.*Programmer tests' 'customer/programmer test layers'
-require_in_agent mithril-specification 'Requirements gate before code review|Never reverse-engineer intended behavior' 'requirements-first specification gate'
-require_in_agent mithril-specification 'story or feature is complete|story acceptance criteria' 'acceptance tests define story completion'
 require_in_agent mithril-review 'Review Contract Precondition|Never infer intended behavior' 'requirements-first review contract'
 require_in_agent mithril-concurrency 'atomic|visibility|liveness' 'three concurrency hazards'
-require_in_agent mithril-performance 'USE method|Utilization' 'USE method (performance skill)'
 require_in_agent mithril-observability 'golden signals|saturation' 'golden signals (observability skill)'
 require_in_agent mithril-accessibility 'WCAG|keyboard|accessible name' 'WCAG / keyboard a11y'
 require_in_agent mithril-usability 'Observed.*Heuristic|Heuristic.*Observed' 'observed vs heuristic usability evidence'
 require_in_agent mithril-usability 'hierarchy|information scent|error recovery' 'task-centered usability checks'
-require_in_agent mithril-process 'Forecasts are not promises|measured delivery' 'measured replanning and forecast discipline'
 if grep -qE 'UI usability clear.*discoverable.*feedback and recovery' "$SCRIPT_DIR/CONSTITUTION.md"; then
   ok "Constitution carries the UI usability gate"
 else

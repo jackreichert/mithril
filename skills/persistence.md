@@ -85,7 +85,7 @@ Require reversible/tested rollback; expand-contract (`DROP COLUMN` later); backf
 - Flag loop opens, error-path leaks, copied pool sizes, or connections held across HTTP/user think-time.
 
 ### 10. Query Patterns and SQL Hygiene
-- Parameterize all input; no SQL concatenation. Match indexes to `WHERE`/`ORDER BY`; consider covering hot reads; inspect `EXPLAIN ANALYZE` for hot new queries.
+- Parameterize all input; no SQL concatenation. Match indexes to `WHERE`/`ORDER BY`; keep predicates sargable (no function or cast on the indexed column); consider covering hot reads; inspect `EXPLAIN ANALYZE` for hot new queries.
 - No production `SELECT *`; bound results with `LIMIT`; use keyset/seek over OFFSET at scale; use bulk APIs.
 - Flag unbounded/user-controlled results and per-row insert loops.
 

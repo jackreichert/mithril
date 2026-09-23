@@ -2,6 +2,8 @@
 
 Dated results for the calibration suite. Record one row per case, agent, and model after every prompt change or model upgrade.
 
+Rows dated before 2026-09-23 may name agents since retired (`mithril-specification`, `mithril-patterns`, `mithril-performance`); `expected.yaml` now targets their successors.
+
 Scoring convention: `Caught` and `Missed` count seeded defects from each case's `expected.yaml`. `Critical/Important FPs` counts post-adjudication Critical/Important findings outside the expected list; Minors are not counted.
 
 | Date | Prompt/version | Model | Case | Target agent | Caught | Missed | Critical/Important FPs | Notes |
