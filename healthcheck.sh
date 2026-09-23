@@ -149,6 +149,12 @@ else
   bad "quality orchestrator missing requirements-first review gate"
   parity_ok=0
 fi
+if grep -qE 'Look Here First' "$CMD_SRC"; then
+  ok "quality orchestrator includes Look Here First human inspection brief"
+else
+  bad "quality orchestrator missing Look Here First section"
+  parity_ok=0
+fi
 (( parity_ok )) && ok "all required skill checklists present in agents"
 
 # ---- 3. count claims -----------------------------------------------------------
