@@ -7,7 +7,9 @@ This repo is a **code-quality framework** — the canonical CS literature distil
 - **Review-time (catch).** A set of specialized review agents — for code quality, architecture, refactoring, testing, security, delivery, distributed systems, design patterns, persistence, and process discipline — run against your current `git diff` and aggregate their findings into a severity-ranked verdict (`SHIP IT` / `NEEDS WORK` / `SIGNIFICANT ISSUES`). This layer runs first-class inside [Claude Code](https://docs.claude.com/claude-code) and [Grok Build](https://docs.x.ai) via the `/mithril` slash command (parallel subagent orchestration + tool execution).
 - **Write-time (prevent).** The always-on [Constitution](CONSTITUTION.md) compiles the same canon into terse imperative rules an agent obeys *while writing*. It's plain markdown, so it's portable: Claude Code, Grok, GitHub Copilot, and Codex are wired natively by `install.sh --link`, and any other agentic tool (Cursor, Continue, Windsurf, Cline, Aider, Zed, …) adopts it through that tool's project-instructions file (see [Multi-tool reach](#multi-tool-reach)).
 
-Each agent is a focused lens. The orchestrator picks which lenses are relevant to the diff, runs them in parallel, deduplicates overlap, and returns one report.
+Each agent is a focused lens. The orchestrator picks which lenses are relevant to the diff, runs them in parallel, re-checks every blocking finding against the code, deduplicates overlap, and returns one report.
+
+**Prompts carry rules, not the canon.** The runtime prompts in `skills/` hold only what changes a capable model's behavior: thresholds, detection heuristics, tool invocations, anti-false-positive calibration, confidence and severity rules, and output formats. The books, principles, and tensions stay in `Resources/` and `THEMES.md` for the tutor and for humans. Restating the canon in a review prompt adds tokens and turns principle lists into checklists to satisfy, which produces false positives. Keep new rules to what the model would not do unprompted, and verify changes with `calibration/`.
 
 ## How it was created
 
@@ -127,21 +129,21 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 
 | File | Focus | Agent file |
 |------|-------|-----------|
-| `skills/code-quality.md` | Naming, functions, smells, comments, complexity, FP, error handling, performance, structure, formatting | `~/.claude/agents/mithril-code-quality.md` |
-| `skills/architecture.md` | SOLID, dependency direction, component principles, coupling/cohesion, info hiding, DDD, resilience patterns | `~/.claude/agents/mithril-architecture.md` |
-| `skills/refactor.md` | Dual-mode: Mode 1 simplify (light) + Mode 2 full Fowler-catalog refactor plan, plus Branch by Abstraction & Strangler Fig | `~/.claude/agents/mithril-refactor.md` |
-| `skills/review.md` | Confidence-scored code review with quick, full-PR, and targeted-follow-up modes; Google design-first priority | `~/.claude/agents/mithril-review.md` |
-| `skills/security-review.md` | Adversarial security review using OWASP Top 10, CWE, and selected OWASP ASVS control families | `~/.claude/agents/mithril-security-review.md` |
-| `skills/test-quality.md` | F.I.R.S.T., AAA, naming, test doubles, xUnit Pattern smells, coverage; GOOS Listen-to-the-Tests as organizing principle | `~/.claude/agents/mithril-test-quality.md` |
-| `skills/delivery.md` | CD pipeline readiness, trunk-based dev, 12-Factor compliance, feature flags, expand-contract migrations, observability prereqs | `~/.claude/agents/mithril-delivery.md` |
-| `skills/distributed.md` | Waldo's four differences, replication/consistency, idempotency, partitioning, microservice boundaries, CQRS/ES tradeoffs | `~/.claude/agents/mithril-distributed.md` |
-| `skills/concurrency.md` | In-process concurrency: the three hazards (atomicity, visibility, liveness), shared mutable state, races, locking discipline & deadlock, high-level utilities, async/event-loop, thread-safety contracts, testing concurrent code | `~/.claude/agents/mithril-concurrency.md` |
-| `skills/persistence.md` | PEAA pattern catalog: Active Record vs Data Mapper, Unit of Work, Repository, Lazy Load + N+1, transactions, migrations | `~/.claude/agents/mithril-persistence.md` |
-| `skills/gates.md` | Objective tool-measured floor: lint, cyclomatic complexity, function length, duplication, coverage, mutation score, CRAP — runs tools and reports pass/fail vs explicit thresholds | `~/.claude/agents/mithril-gates.md` |
-| `skills/observability.md` | Golden signals (incl. saturation), structured logs, traces, SLIs/SLOs/error budgets, alert hygiene — Theme 18 | `~/.claude/agents/mithril-observability.md` |
-| `skills/accessibility.md` | WCAG 2.2 AA UI review: keyboard, names/roles/values, labels/errors, contrast, APG widgets — Theme 19 | `~/.claude/agents/mithril-accessibility.md` |
-| `skills/usability.md` | Task discoverability, hierarchy, navigation, feedback, recovery, and lightweight user-testing evidence — Theme 20 | `~/.claude/agents/mithril-usability.md` |
-| _cross-cutting: `security-review` + `distributed` + `persistence` + `code-quality` + `performance`_ | Flow tracing — control + data flow from entry points to sinks: taint (source→sink), error propagation, resource/transaction lifecycle, N+1-across-chain, cross-boundary partial failure. Runs as Phase 2 of `/mithril deep`; standalone via `/mithril flow` | `~/.claude/agents/mithril-flow.md` |
+| `skills/code-quality.md` | Size-as-prompt calibration, reuse and placement, names, errors, contracts, performance (load X → outcome Y), pattern misuse | `~/.claude/agents/mithril-code-quality.md` |
+| `skills/architecture.md` | Dependency direction, cycles, public-contract evolution (Hyrum / expand-contract), class decomposition, domain integrity, integration-point resilience | `~/.claude/agents/mithril-architecture.md` |
+| `skills/refactor.md` | Opt-in. Mode 1 simplify (light) + Mode 2 named, test-first refactor plan with the WELC seam ranking, Branch by Abstraction & Strangler Fig | `~/.claude/agents/mithril-refactor.md` |
+| `skills/review.md` | Confidence-scored review (quick / full-PR / follow-up), per-commit review of sliced PRs, and the Look Here First human inspection brief | `~/.claude/agents/mithril-review.md` |
+| `skills/security-review.md` | Tool-first SAST/SCA/secrets, OWASP/ASVS checklist, tenant scoping, PHI exposure, exact-match allowlists, exploit-or-downgrade | `~/.claude/agents/mithril-security-review.md` |
+| `skills/test-quality.md` | False confidence, behavior-vs-internals, determinism, failure-edge coverage, acceptance scenarios, property-based testing | `~/.claude/agents/mithril-test-quality.md` |
+| `skills/delivery.md` | Deploy/rollback safety: expand-contract, build-once, config and secrets, process hygiene, feature flags, lockfiles | `~/.claude/agents/mithril-delivery.md` |
+| `skills/distributed.md` | Waldo categories, timeouts and retries, idempotency, outbox/sagas, ordering, consistency, boundaries, trace context | `~/.claude/agents/mithril-distributed.md` |
+| `skills/concurrency.md` | The three hazards (atomicity, visibility, liveness) and a high-signal flag list, including async mutation across `await` | `~/.claude/agents/mithril-concurrency.md` |
+| `skills/persistence.md` | Lost updates, transactions, N+1, query cost (sargable, keyset), migration safety, connection handling | `~/.claude/agents/mithril-persistence.md` |
+| `skills/gates.md` | Objective tool-measured floor: lint, cyclomatic complexity, function length, duplication, coverage, CRAP, mutation — pass/fail vs explicit thresholds; SKIPPED is never PASS | `~/.claude/agents/mithril-gates.md` |
+| `skills/observability.md` | Golden signals incl. saturation (USE method on pools/queues), structured logs without PHI, trace propagation, jobs/consumers, alert hygiene | `~/.claude/agents/mithril-observability.md` |
+| `skills/accessibility.md` | WCAG 2.2 AA: semantic-first controls, keyboard, accessible names, dialogs and APG widgets, contrast | `~/.claude/agents/mithril-accessibility.md` |
+| `skills/usability.md` | Observed / Heuristic / Preference evidence rule; hierarchy, labels, orientation, feedback and error recovery | `~/.claude/agents/mithril-usability.md` |
+| `skills/flow.md` | Flow tracing — control + data flow from entry points to sinks: taint (source→sink), error propagation, resource/transaction lifecycle, N+1-across-chain, cross-boundary partial failure. Runs as Phase 2 of `/mithril deep`; standalone via `/mithril flow` | `~/.claude/agents/mithril-flow.md` |
 | `skills/tutor.md` | Grounded CS tutor — teaches a concept/theme from the library, or the principles at play in a PR/diff; cites sources, surfaces tensions, explains rather than reviews | — (inline via `/mithril tutor` \| `/mithril learn`) |
 
 ### Workflow & Supporting Docs
@@ -221,7 +223,7 @@ Two caveats. (1) Like Copilot, tools that can't reference an *external* file wan
 
 ## Sources by Skill
 
-Below: the books, articles, and chapters that drove each skill's content. Citations also appear inline next to the specific sections they informed.
+Below: the books, articles, and chapters that drove each skill's content. Section names refer to the fuller pre-2026-09 prompts; the canon still informs the rules, but the runtime prompts no longer restate it (see [Prompts carry rules, not the canon](#what-this-is)).
 
 ### `skills/code-quality.md`
 
@@ -623,9 +625,9 @@ The master resource list (`CS-Best-Practices-Resources.md`) is larger than the e
 | Observability Engineering, API Design Patterns, Supply-chain note | `observability` / `delivery` / `architecture` / `security-review` |
 | Systems Performance, SQL Performance Explained, SRE (ops half) | `performance` + `observability` + Theme 18 |
 | WCAG 2.2 / APG | `accessibility` + Theme 19 |
-| Don't Make Me Think, Rocket Surgery Made Easy | `usability` + Theme 20; `process` and `specification` for the feedback loop |
+| Don't Make Me Think, Rocket Surgery Made Easy | `usability` + Theme 20 |
 | Google Eng Practices | `review` |
-| GOOS ch.18, Spec by Example | `test-quality`, `specification` |
+| GOOS ch.18, Spec by Example | `test-quality` (acceptance scenarios) + the router's review contract |
 | Release It! | `architecture` resilience + `distributed` |
 | Mythical Man-Month, Joel schedules / never-rewrite | `process`, `refactor` |
 
@@ -669,24 +671,24 @@ The orchestrator:
 3. Establishes the Review Contract before judging the code:
   - Goal: an authenticated user can retrieve only that user's orders
   - Key examples: own orders returned; another user's ID denied; unknown user handled with the agreed error
-  - If those outcomes are absent or contradictory in the request/spec, asks for confirmation before issuing a functional verdict
+  - If those outcomes are absent or contradictory, labels the contract ASSUMED, reviews against it, and lists the open questions at the top of the report
 4. Shares that contract with every agent it spawns.
 5. Auto-selects the remaining agents based on detectable signals:
    - `mithril-code-quality` (always, source files changed)
    - `mithril-architecture` (new function/endpoint adds structural surface)
    - `mithril-test-quality` (test file in diff)
-   - `security-auditor` (file in `routes/` path)
-   - `mithril-refactor` Mode 1 (last, polish pass)
-6. Passes the confirmed Review Contract to the code agents and spawns the applicable agents in parallel via `Task`
-7. Each returns severity-tagged findings
-8. Orchestrator deduplicates, normalizes severity, aggregates
+   - `mithril-security-review` (file in `routes/` path)
+   - `mithril-flow` (new route handler: traces request → service → DB)
+6. Spawns the applicable agents in parallel via `Task`
+7. Each returns findings tagged Critical / Important / Minor
+8. Orchestrator re-reads every Critical/Important finding against the code, demotes any without a concrete failure scenario, deduplicates, and aggregates
 
 ### Step 2 — Read the report
 
 Hypothetical output:
 ```
 ## Critical — Fix Before Committing
-- [security-auditor] src/routes/users.ts:18 — IDOR: no ownership check;
+- [mithril-security-review] src/routes/users.ts:18 — IDOR: no ownership check;
   user A can fetch user B's orders by changing the path param
 
 ## Important — Fix Before PR

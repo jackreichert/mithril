@@ -27,6 +27,8 @@ claude/commands/mithril.md ──── ~/.claude/commands/ and ~/.grok/commands
 
 ### Editing skill content (canonical `.md` files)
 
+Prompts carry load-bearing rules only (thresholds, heuristics, tool steps, confidence/severity, output format), not restated canon. Every agent uses the shared vocabulary — `[CRITICAL]/[IMPORTANT]/[MINOR]` and `Verdict: SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES` — which `healthcheck.sh` enforces.
+
 1. Edit the canonical file, for example `skills/code-quality.md`.
 2. Run `bash bundle.sh --check` and `bash healthcheck.sh`.
 3. Symlink installs update immediately. Re-run `bash install.sh --copy-agents` for frozen installs.
