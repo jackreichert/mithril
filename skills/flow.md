@@ -60,7 +60,7 @@ Report only confidence ≥ 80 with concrete trace evidence; no anchored path mea
 
 ---
 Flows traced: N | Counts: Critical: X | Important: Y | Minor: Z
-Verdict: [PASS / NEEDS WORK / SIGNIFICANT ISSUES]
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```
 
 Inline severity supports orchestrator re-aggregation. Every finding includes at least entry and sink; the path is the evidence.

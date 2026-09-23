@@ -757,7 +757,7 @@ echo "// test comment" >> src/some-file.ts
 | Agent returns nothing useful | Diff is empty or trivial | Verify `git diff` shows substantive changes |
 | Agent times out | Diff too large | Run targeted aspect on subset: `/mithril code` on specific file |
 | Severity counts don't match findings | Some agent didn't tag severity inline | Check that agent file has the `[CRITICAL]/[IMPORTANT]/[MINOR]` tagging instruction |
-| Security findings get swallowed | CVSS not normalizing correctly | Check the orchestrator's severity-normalization table — `~/.claude/commands/mithril.md` or `~/.grok/commands/mithril.md` |
+| An agent reports `PASS`, `High`, or another off-vocabulary word | That agent's output format drifted from the shared vocabulary | Every agent uses `[CRITICAL]/[IMPORTANT]/[MINOR]` and `SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES`; `bash healthcheck.sh` asserts it |
 | Output is severity-grouped but I want category-grouped | Default is severity-grouped (orchestrator); per-agent reports are category-grouped | Run agents directly via `Task` (Claude) or `spawn_subagent` (Grok) for per-agent category view |
 | Agents disagree about a finding | Expected — different lenses | Orchestrator preserves the most severe rating during deduplication |
 | Grok can't find `mithril-*` agents | Classic install skipped Grok, or plugin disabled | `bash install.sh --grok-only` or `grok plugin enable mithril` |

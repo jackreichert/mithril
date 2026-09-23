@@ -45,5 +45,5 @@ Risk: [low / medium / high] — why
 
 Refactor readiness: tests cover the area [yes / partial / no]; seams needed [list]
 Counts: Critical: X | Important: Y | Minor: Z
-Verdict: [PASS / NEEDS WORK / SIGNIFICANT ISSUES]
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```

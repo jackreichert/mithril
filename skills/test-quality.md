@@ -43,5 +43,5 @@ Report only confidence ≥80: a test weakness with a concrete consequence (a nam
 - [what the suite does well]
 
 Counts: Critical: X | Important: Y | Minor: Z
-Verdict: [PASS / NEEDS WORK / SIGNIFICANT ISSUES]
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```

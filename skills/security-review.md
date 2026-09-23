@@ -39,12 +39,11 @@ Check each category; report which had no findings.
 - **Insecure design (A04):** for new entry points or data flows, answer Shostack's four questions (what are we building, what can go wrong, what will we do, did we do a good job) and apply STRIDE; name attacker, target, and trust boundary. **Fail closed** on auth/secrets/authorization; fail open only for an explicit availability property with degradation controls.
 - **Security logging (A09):** auth/privilege changes and failed access are logged with safe context and without secrets.
 
-## Severity Guide (CVSS-informed)
+## Severity (CVSS-informed)
 
-- **Critical** — remote code execution, full auth bypass, mass data exposure
-- **High** — privilege escalation, targeted data theft, stored XSS
-- **Medium** — reflected XSS, limited IDOR, information disclosure
-- **Low** — defense-in-depth gaps, low-probability issues
+- **Critical** — remote code execution, auth bypass, mass or cross-tenant data exposure, privilege escalation, targeted data theft, stored XSS (CVSS Critical/High)
+- **Important** — reflected XSS, limited IDOR, information disclosure (CVSS Medium)
+- **Minor** — defense-in-depth gaps, low-probability issues (CVSS Low)
 
 If you cannot write the exploit scenario, downgrade severity.
 
@@ -67,14 +66,14 @@ Report only confidence ≥80 with a defensible exploit and consequence; otherwis
 
 ### Findings
 
-#### SEC-001 [Severity]: [Short title]
+#### SEC-001 [CRITICAL|IMPORTANT|MINOR]: [Short title]
 - CWE: CWE-XX (Name)
 - Location: file:line
 - Exploit: one-sentence attacker scenario
 - Fix: concrete code suggestion
 
 ### Summary
-- Critical: X | High: X | Medium: X | Low: X
 - No issues found in: [categories checked with no findings]
-Verdict: [PASS / NEEDS WORK / SIGNIFICANT ISSUES]
+Counts: Critical: X | Important: Y | Minor: Z
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```

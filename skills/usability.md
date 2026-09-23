@@ -46,7 +46,7 @@ Report only confidence ≥80; each finding names the affected task and its concr
 - …
 
 Counts: Critical: X | Important: Y | Minor: Z
-Verdict: [SHIP IT / NEEDS TESTING / NEEDS WORK / SIGNIFICANT ISSUES]
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]   (unvalidated heuristic risks go under Evidence Gaps, not a separate verdict)
 ```
 
 If nothing reaches the bar, say so, and distinguish "no heuristic issue found" from "validated with users".

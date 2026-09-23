@@ -40,5 +40,5 @@ Report only confidence ≥80 with a concrete consequence (what breaks or gets ha
 - [structural decisions done well]
 
 Counts: Critical: X | Important: Y | Minor: Z
-Verdict: [PASS / NEEDS WORK / SIGNIFICANT ISSUES]
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```

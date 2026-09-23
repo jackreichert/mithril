@@ -36,5 +36,5 @@ Report only confidence ≥80, with the breaking interleaving spelled out step by
 - [confinement, immutability, proper utilities]
 
 Counts: Critical: X | Important: Y | Minor: Z
-Verdict: [PASS / NEEDS WORK / SIGNIFICANT ISSUES]
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```

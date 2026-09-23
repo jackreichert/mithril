@@ -38,5 +38,5 @@ Report only confidence ≥80 with a concrete deploy or rollback failure.
 
 Counts: Critical: X | Important: Y | Minor: Z
 Deploy-safe: [YES / NO — with caveats]
-Verdict: [PASS / NEEDS WORK / SIGNIFICANT ISSUES]
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```

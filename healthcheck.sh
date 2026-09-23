@@ -158,6 +158,17 @@ else
   bad "quality orchestrator missing Look Here First section"
   parity_ok=0
 fi
+vocab_ok=1
+for f in "$AGENTS_SRC"/*.md; do
+  [[ "$(basename "$f")" == "tutor.md" ]] && continue
+  name="mithril-$(basename "$f" .md)"
+  grep -qE '^Verdict: \[SHIP IT / (NEEDS WORK / )?SIGNIFICANT ISSUES\]' "$f" \
+    || { bad "$name — verdict line is not the shared SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES vocabulary"; vocab_ok=0; parity_ok=0; }
+  if grep -qE '\[(SUGGESTION|HIGH|MEDIUM|LOW)\]|NEEDS TESTING|PARTIAL\]' "$f"; then
+    bad "$name — uses an off-vocabulary severity or verdict word"; vocab_ok=0; parity_ok=0
+  fi
+done
+(( vocab_ok )) && ok "all agents use the shared severity and verdict vocabulary"
 (( parity_ok )) && ok "all required skill checklists present in agents"
 
 # ---- 3. count claims -----------------------------------------------------------

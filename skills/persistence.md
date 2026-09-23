@@ -37,5 +37,5 @@ Report only confidence ≥80 with a concrete consequence.
 Counts: Critical: X | Important: Y | Minor: Z
 N+1 detected: [yes / no — locations]
 Migration safety: [safe / coupled-deploy-only / unsafe]
-Verdict: [PASS / NEEDS WORK / SIGNIFICANT ISSUES]
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```

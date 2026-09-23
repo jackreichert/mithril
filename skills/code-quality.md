@@ -41,7 +41,7 @@ Each Critical/Important finding: evidence, concrete consequence, smallest fix 鈥
 - [what's done well]
 
 Counts: Critical: X | Important: Y | Minor: Z
-Verdict: [PASS / NEEDS WORK / SIGNIFICANT ISSUES]
+Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```
 
 Categories: Naming 路 Design 路 Reuse 路 Errors 路 Contracts 路 Performance 路 Patterns 路 Scope.

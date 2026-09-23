@@ -64,13 +64,12 @@ Stack detected: [languages / toolchain]
 ### Skipped (tool not available)
 - [Gate] tool not found. Install: `<command>`, then `<run command>`
 
-### Verdict
-[PASS / FAIL / PARTIAL]
+Gates skipped: [N — list]
+Verdict: [SHIP IT / SIGNIFICANT ISSUES]
 ```
 
-**Verdict rules:**
+**Verdict rules:** per-gate results are `PASS`/`FAIL`/`FLAG`/`SKIPPED`; the overall verdict uses the shared vocabulary.
 
-- Any `FAIL` → overall **FAIL** (change blocked).
-- All measurable gates `PASS` but some `SKIPPED` → **PARTIAL** (surface what couldn't be measured).
-- All measurable `PASS`, nothing skipped → **PASS**.
+- Any `FAIL` → **SIGNIFICANT ISSUES** (change blocked); each FAIL is a Critical finding.
+- No `FAIL` → **SHIP IT**, with every `SKIPPED` gate listed so the unmeasured surface is visible.
 - `FLAG` never blocks on its own.
