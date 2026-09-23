@@ -30,7 +30,9 @@ Check each category; report which had no findings.
 - **Injection:** trace untrusted input to SQL/NoSQL, OS command, LDAP, XPath, and template sinks; verify parameterization or context-safe handling.
 - **Authentication & session:** hardcoded credentials, weak token randomness, missing auth, session fixation, weak password hashing, missing auth rate limits; `HttpOnly`/`Secure`/`SameSite`; rotate on login/privilege change.
 - **Access control:** IDOR, missing ownership/tenant checks, horizontal/vertical escalation, unprotected admin/internal endpoints. Deny by default; server-side checks on every sensitive read/write.
-- **Sensitive data exposure:** secrets in source, deprecated crypto (MD5/SHA1/ECB), secrets or PII in logs/errors, unencrypted transport.
+- **Tenant scoping:** the tenant/agency id comes from the authenticated session, never from the request body, query, or path; scope is enforced in the query itself (`WHERE agency_id = $1`), not by filtering results after the fetch; list, export, search, and aggregate endpoints are scoped too. A scoping check that fails open when its input is missing, or compares ids of different entity types, is Critical.
+- **Allowlists and route guards:** exact or anchored matching only — a substring or prefix match on a path (`includes('verify')`) is an auth bypass.
+- **Sensitive data exposure:** secrets in source, deprecated crypto (MD5/SHA1/ECB), unencrypted transport. **PHI** (patient names, MRNs, dates of birth, diagnoses, visit or care notes, addresses, contact details) in logs, error bodies, analytics events, test fixtures, or seed data is Critical; use placeholders (`fake_id_123`). Opaque EMR surrogate/external ids are not PHI; the display fields beside them are.
 - **XSS / CSRF:** unescaped HTML/DOM sinks; CSRF protection on mutations.
 - **Insecure deserialization:** untrusted `pickle`/`yaml.load`/`ObjectInputStream`, unsafe type coercion.
 - **SSRF / path traversal / open redirect:** user-controlled fetch targets (including metadata endpoints), filesystem paths, redirect destinations.

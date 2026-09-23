@@ -10,7 +10,7 @@ Could an on-call engineer detect and debug a failure on the changed path without
 ## Rules
 
 1. **Golden signals** on changed paths: latency as percentiles (flag average-only), traffic, errors, and **saturation**. Every new pool, queue, or rate limiter exposes utilization, saturation (wait/queue depth), and errors (the USE method).
-2. **Structured logs** carry request/trace id, route, status, and version at the right level. No secrets and no raw personal data in log fields or messages.
+2. **Structured logs** carry request/trace id, route, status, and version at the right level. No secrets, raw personal data, or PHI in log fields, messages, or span attributes — log opaque ids, not the display fields beside them.
 3. **Trace context** propagates across HTTP, RPC, and queue hops; failed spans record the error.
 4. **Jobs and consumers:** success/failure counts, duration, queue lag or age, and dead-letter visibility.
 5. **Alerts** fire on user-visible symptoms or SLO burn, not internal counters; every page is actionable and owned. A 100% SLO target is a finding.

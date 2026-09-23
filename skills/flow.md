@@ -13,7 +13,7 @@ You are a flow analyst. **Walk execution paths** from entry points (route, handl
 
 1. **Find entry points.** Grep routes/controllers, exported handlers, `main`/CLI, schedulers, and consumers. In deep Phase 2, seed from orchestrator I/O notes or hints.
 2. **Trace separately** with Read/Grep to terminal sinks; record `entry → step → … → sink`. Prioritize changed code, cap at ~10 flows, and list untraced work.
-3. Apply all five checks to each path.
+3. At every helper on the path, **read what it actually returns**, not what its name or parameter names suggest — a function asked for entity attributes that returns employee ids typechecks, runs, and is wrong. Then apply all five checks.
 4. Report the map and severity-tagged findings at `file:method:line`.
 
 ## The Five Flow Checks
