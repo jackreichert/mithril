@@ -127,6 +127,8 @@ require_in_agent mithril-test-quality 'Two test layers|acceptance-level evidence
 require_in_agent mithril-test-quality 'Confidence and Severity' 'confidence threshold'
 require_in_agent mithril-persistence 'sargable' 'sargable predicates'
 require_in_agent mithril-review 'Review Contract Precondition|Never infer intended behavior' 'requirements-first review contract'
+require_in_agent mithril-review 'Look Here First' 'human PR inspection brief'
+require_in_agent mithril-observability 'USE method' 'USE method on pools/queues'
 require_in_agent mithril-concurrency 'atomic|visibility|liveness' 'three concurrency hazards'
 require_in_agent mithril-observability 'golden signals|saturation' 'golden signals (observability skill)'
 require_in_agent mithril-accessibility 'WCAG|keyboard|accessible name' 'WCAG / keyboard a11y'
