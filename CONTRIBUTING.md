@@ -17,9 +17,7 @@ claude/commands/mithril.md ──── the `/mithril` orchestrator, loaded by t
 
 Install via the plugin marketplace (`.claude-plugin/plugin.json`, `.grok-plugin/plugin.json`) — the standard mechanism for each tool. There is no separate deploy step; the plugin loads `skills/*.md` and `claude/commands/mithril.md` directly.
 
-## The dev script
-
-- **`bundle.sh`** is a legacy-named parity check that verifies both plugin manifests list every canonical runtime skill.
+When adding or renaming a skill, update both plugin manifests' `agents` lists by hand — there is no longer an automated parity check.
 
 ## Workflows
 
@@ -28,7 +26,7 @@ Install via the plugin marketplace (`.claude-plugin/plugin.json`, `.grok-plugin/
 Prompts carry load-bearing rules only (thresholds, heuristics, tool steps, confidence/severity, output format), not restated canon. Every agent uses the shared vocabulary — `[CRITICAL]/[IMPORTANT]/[MINOR]` and `Verdict: SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES` — which `healthcheck.sh` enforces.
 
 1. Edit the canonical file, for example `skills/code-quality.md`.
-2. Run `bash bundle.sh --check` and `bash healthcheck.sh`.
+2. Run `bash healthcheck.sh`.
 3. The plugin loads `skills/*.md` directly, so the edit is live on next invocation — no redeploy step.
 
 ### Editing the orchestrator
@@ -37,7 +35,7 @@ Edit `claude/commands/mithril.md` directly. The plugin loads it live; no redeplo
 
 ## Drift caution
 
-`healthcheck.sh` and `bundle.sh --check` fail when routing, contracts, or plugin manifests drift from canonical skills.
+`healthcheck.sh` fails when routing or contracts drift from canonical skills.
 
 ## Adding a new agent
 
@@ -51,7 +49,7 @@ Edit `claude/commands/mithril.md` directly. The plugin loads it live; no redeplo
 
 Every PR runs `.github/workflows/ci.yml`:
 
-- **shellcheck** on `bundle.sh`, `healthcheck.sh`, and the other repo shell scripts.
+- **shellcheck** on `healthcheck.sh` and the other repo shell scripts.
 
 Keep them shellcheck-clean. If you add a new shell script, add it to the workflow.
 

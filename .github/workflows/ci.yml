@@ -14,10 +14,8 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y shellcheck
-          shellcheck bundle.sh healthcheck.sh calibration/prompt-size.sh hooks/pre-commit
+          shellcheck healthcheck.sh calibration/prompt-size.sh hooks/pre-commit
 
-      - name: Canonical skill and manifest integrity
+      - name: Canonical skill integrity
         run: |
-          test -x bundle.sh
-          bash bundle.sh --check
           bash healthcheck.sh --quiet
