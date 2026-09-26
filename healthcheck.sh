@@ -8,7 +8,7 @@
 #                          ${CLAUDE_PLUGIN_ROOT} skill references point at real files
 #   2. ROUTING           — every subagent_type the orchestrator routes to has a
 #                          matching runtime skill (and no skill is orphaned)
-#   3. COUNT CLAIMS      — "N agent" figures in README.md / install.sh match reality
+#   3. COUNT CLAIMS      — "N agent" figures in README.md match reality
 #   4. SUMMARY DEPTH     — every chapter summary has at least three sentences
 #   5. DEPLOYED SYNC     — ~/.claude and ~/.grok agents match canonical skills
 #   6. DOC LINKS         — relative .md links AND plain-text ../ paths resolve
@@ -174,14 +174,14 @@ done
 # ---- 3. count claims -----------------------------------------------------------
 hdr "Count claims"
 claims_ok=1
-for doc in README.md install.sh; do
+for doc in README.md; do
   while IFS= read -r n; do
     [[ -z "$n" ]] && continue
     [[ "$n" -eq "$n_agents" ]] \
       || { bad "$doc claims $n agents; $n_agents canonical runtime skills exist (stale count)"; claims_ok=0; }
   done < <(grep -ohE '[0-9]+ agent' "$SCRIPT_DIR/$doc" 2>/dev/null | grep -oE '^[0-9]+' | sort -u)
 done
-(( claims_ok )) && ok "README/install agent counts match reality ($n_agents)"
+(( claims_ok )) && ok "README agent counts match reality ($n_agents)"
 # Theme count: Themes/README claims N guides
 n_themes=$(find "$SCRIPT_DIR/Resources/Themes" -maxdepth 1 -name '[0-9]*.md' | wc -l | tr -d ' ')
 if grep -qE "${n_themes} cross-source|${n_themes} concept|\\*\\*${n_themes}\\*\\* per-theme|${n_themes} per-theme" \
@@ -247,7 +247,7 @@ check_deployed_sync() {
       if diff -q "$f" "$dst" >/dev/null 2>&1; then
         ok "$label: mithril-$name deployed & in sync"
       else
-        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (edit skills/, then re-run install.sh for copy installs)"
+        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (edit skills/ and reinstall)"
       fi
     fi
   done
@@ -263,7 +263,7 @@ check_deployed_sync() {
     fi
     rm -f "$expected_command"
   fi
-  (( deployed_any )) || warn "nothing deployed to $home — run install.sh (repository checks passed)"
+  (( deployed_any )) || warn "nothing deployed to $home (repository checks passed)"
 }
 check_deployed_sync "$CLAUDE_HOME" "Claude"
 check_deployed_sync "$GROK_HOME"   "Grok"

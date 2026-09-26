@@ -2,7 +2,7 @@
 
 The `/mithril` agents and the `/mithril gates` runner are *invoked*. This hook makes a fast subset of the gates *automatic*: it runs on every `git commit` and **blocks the commit** when staged code breaches a threshold. It's the difference between catching problems and preventing them — the write-time enforcement the [Constitution](../CONSTITUTION.md) (Article VII) describes.
 
-It is **opt-in**. Nothing here is installed by `install.sh`. You enable it per-repo, deliberately.
+It is **opt-in**. Nothing here is installed automatically. You enable it per-repo, deliberately.
 
 ## What `pre-commit` checks
 

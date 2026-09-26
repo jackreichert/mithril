@@ -106,9 +106,8 @@ A symlink works if the repo allows.
 
 **Claude Code:**
 ```bash
-ls ~/.claude/agents/mithril-*.md         # 15 agents
-ls ~/.claude/commands/mithril.md         # orchestrator
-# In a repo: /mithril
+/plugin
+# confirm mithril is installed and enabled, then in a repo: /mithril
 ```
 
 **Copilot (VS Code):**
@@ -149,7 +148,7 @@ These are inherent to Copilot's architecture, not gaps in this framework.
 ## Maintenance
 
 When canonical skills (`skills/code-quality.md`, `skills/architecture.md`, etc.) are updated:
-1. Linked Claude/Grok installs update immediately; rerun `install.sh` for copy installs.
+1. The Claude/Grok plugin installs load `skills/` directly, so the edit is live on next invocation.
 2. Mirror relevant changes to the corresponding Copilot prompt file (`copilot/prompts/mithril-*.prompt.md`).
 3. If the change affects high-level priorities or stance, update `copilot/global-instructions.md` and `copilot/AGENTS.md`.
 
