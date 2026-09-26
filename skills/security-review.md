@@ -25,7 +25,7 @@ Tools are recommended, not required; manual review still produces a verdict. Mat
 
 ## Checklist
 
-Check each category; report which had no findings.
+Run the scanners, then read the code. Report a category only when it has a finding. A category with nothing to say is silence, not a section.
 
 - **Injection:** trace untrusted input to SQL/NoSQL, OS command, LDAP, XPath, and template sinks; verify parameterization or context-safe handling.
 - **Authentication & session:** hardcoded credentials, weak token randomness, missing auth, session fixation, weak password hashing, missing auth rate limits; `HttpOnly`/`Secure`/`SameSite`; rotate on login/privilege change.
@@ -38,7 +38,7 @@ Check each category; report which had no findings.
 - **SSRF / path traversal / open redirect:** user-controlled fetch targets (including metadata endpoints), filesystem paths, redirect destinations.
 - **Dependencies:** run SCA; inspect lockfile diffs for CVEs, typosquatting, and suspicious additions.
 - **Misconfiguration:** production debug/stack traces, default credentials, permissive CORS, missing security headers.
-- **Insecure design (A04):** for new entry points or data flows, answer Shostack's four questions (what are we building, what can go wrong, what will we do, did we do a good job) and apply STRIDE; name attacker, target, and trust boundary. **Fail closed** on auth/secrets/authorization; fail open only for an explicit availability property with degradation controls.
+- **Fail closed:** auth, secrets, and authorization deny on uncertainty. Fail open only for an explicit availability property with degradation controls. Do not write a STRIDE or four-question threat model for a new entry point.
 - **Security logging (A09):** auth/privilege changes and failed access are logged with safe context and without secrets.
 
 ## Severity (CVSS-informed)

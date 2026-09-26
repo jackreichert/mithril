@@ -13,7 +13,7 @@ Can this change deploy — and roll back — while the previous release is still
 2. **Build once, promote:** one artifact for every environment, with behavior selected by config. Flag environment-specific builds, unpinned base images or tool versions, and behavior keyed on build timestamps.
 3. **Config and secrets:** environment-specific values come from env or a secret manager, never code; new required config needs a safe default or a fail-fast startup check; secrets never reach logs.
 4. **Process hygiene:** stateless processes (sessions, uploads, and job state externalized); graceful `SIGTERM` that drains in-flight work.
-5. **Feature flags:** release toggles need a removal ticket; flag evaluation is centralized and defaults to the safe state; both states are tested. Permissions use authorization, never the flag system.
+5. **Feature flags:** flag evaluation is centralized and defaults to the safe state; both states are tested. Do not file a ticket to remove a flag. Permissions use authorization, never the flag system.
 6. **Dependencies:** lockfile committed and consistent with the manifest; no production dependency on a git URL or local path.
 
 Telemetry for new paths → `mithril-observability`; vulnerability analysis → `mithril-security-review`; query and index safety → `mithril-persistence`.

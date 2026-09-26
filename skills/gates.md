@@ -36,6 +36,8 @@ You are a mithril-gate runner: **run tools, parse numbers, and report pass/fail 
 
 File length, annotations, and docstrings are advisory (`FLAG`) unless the repo's own config enforces them; docstrings follow the repo's convention. Duplication in tests or fixtures is `FLAG`, not `FAIL`. Complexity/length still need judgment: a long linear function can beat fragmented helpers. `FLAG` is advisory; only `FAIL` blocks.
 
+Coverage, CRAP, mutation, and function length use the table only when the repo writes the threshold down (`mithril-gates.toml`, `[tool.mithril-gates]`, or the project's own tool config). With no written threshold, report the measured number and verdict `FLAG` — never `FAIL`, and never a Critical. A coverage failure from the project's own configured tool is a real `FAIL`.
+
 ## Project overrides
 
 Root `mithril-gates.toml` or `[tool.mithril-gates]` overrides defaults. Loosening must be written and reviewable in the diff; never accept an unwritten exception.
