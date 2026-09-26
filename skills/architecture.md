@@ -1,7 +1,7 @@
 ---
 name: mithril-architecture
-description: Invoke when new modules, classes, or structural changes appear in a diff, or when reviewing dependency/layering decisions. Reviews dependency direction, cycles, public-contract evolution, module boundaries, and resilience at integration points.
-model: opus
+description: Invoke when a diff adds a module or an import that crosses a layer, or when reviewing dependency direction. Not for a class or method edit inside an existing module. Reviews dependency direction, cycles, public-contract evolution, and timeouts at integration points.
+model: sonnet
 tools: Read, Grep, Glob, Bash
 ---
 

@@ -108,20 +108,22 @@ A reviewer cannot call code correct without knowing the behavior it must impleme
 | Signal | Agent |
 |---|---|
 | Any source files | mithril-code-quality (always) |
-| New files, import/dependency changes, or diff adds/changes classes, constructors, fields, collaborators, or public methods | mithril-architecture |
+| A new module, or a new import that crosses a layer (domain importing DB, HTTP, or a framework). Not a class, constructor, field, or public-method edit inside an existing module | mithril-architecture |
 | Test files (`*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) or executable specs (`*.feature`, Given/When/Then) | mithril-test-quality |
 | Auth/payment/api paths, input handling, sessions, secrets, tenant/agency scoping, logging of request or patient data | mithril-security-review |
 | New or changed route handlers, controllers, queue consumers, or jobs | mithril-flow |
 | Migrations (`migrations/`, `db/migrate/`, `alembic/`, `prisma/migrations/`), Dockerfiles, k8s, CI/CD config, feature-flag config, `.env*` templates | mithril-delivery |
 | Service-to-service HTTP/gRPC calls or queue clients (`kafka`, `rabbitmq`, `sqs`, `pubsub`, `nats`, `eventbridge`) | mithril-distributed |
-| Concurrency primitives: threads/executors/goroutines, locks, atomics/`volatile`, `async`/`await`/`Promise.all`, shared mutable statics or caches | mithril-concurrency |
+| A lock, atomic, shared mutable static or cache, or a write to shared state across an `await`. Not the mere presence of `async`/`await` | mithril-concurrency |
 | ORM imports, `*.sql`, schema files, repositories/DAOs, raw SQL | mithril-persistence |
-| Metrics/logging/tracing libraries, alert/dashboard config, new route handlers or consumers | mithril-observability |
+| A new or changed metric, log, trace, or alert. Not every new route handler or consumer | mithril-observability |
 | `*.tsx`/`*.jsx`/`*.vue`/`*.svelte`, `components/`, interactive CSS | mithril-accessibility + mithril-usability |
+
+The table is an exact match, not a keyword search. A weak or partial signal does not select the agent.
 
 **Opt-in only:** mithril-refactor (both modes — `/mithril simplify` or `/mithril refactor`), mithril-review (overlaps the auto-selected set; use for a PR-style pass), mithril-gates (executes tools that may not be installed; also runs from `hooks/pre-commit` and CI). Explicit keywords always force an agent even when signals are weak.
 
-When in doubt: mithril-code-quality only.
+When in doubt: mithril-code-quality only. That line wins over a weak row in the table.
 
 ---
 
@@ -161,12 +163,15 @@ Spawn all selected agents at once. On diffs over ~500 changed lines, give each s
 ## Step 5 — Adjudicate and Aggregate
 
 **Rules:**
-- **Adjudicate before printing (false-positive gate).** For every Critical and Important finding, re-read the relevant diff hunk or file region yourself and confirm the code does what the finding claims and the consequence is plausible on this path. Drop what doesn't survive and report `Adjudicated: N findings dropped on re-read`. Minor findings pass through.
+- **Adjudicate before printing (false-positive gate).** For every Critical and Important finding, re-read the relevant diff hunk and any helper it calls. Drop the finding only if the claimed fact is false or the consequence cannot happen on this path. Minor findings pass through. Two cases:
+  - **Invented claim — drop.** The agent says a line does something and the line does not, or the named consequence cannot occur here. Example: "this query interpolates user input" when the query is parameterized.
+  - **Absence claim — keep unless disproved.** The agent says a control is missing: an uncalled validator, a missing tenant or entity predicate, or a helper that returns a different id than the caller asked for. Not seeing the bug in the hunk is what a correct absence finding looks like. Drop it only when the re-read finds that control on the path. Confirm a helper-return mismatch by reading the helper, not by looking for the bad value at the call site.
+  Report `Adjudicated: N findings dropped on re-read`, and count only invented or implausible findings. Do not count an absence the re-read could not disprove. This rule is not satisfied by deleting every finding that is not a visible bad line.
 - **Failure scenario required at Critical/Important.** Each must state *given what inputs/state → what wrong outcome*. A principle alone ("violates SRP", "not thread-safe") is not a scenario. If neither the agent nor your re-read can articulate one, **demote to Minor**.
 - **Deduplicate:** same file within ±3 lines and a similar description is one finding; keep the clearest wording, credit both agents, keep the higher severity.
 - **Shared vocabulary:** every agent tags findings `[CRITICAL]`/`[IMPORTANT]`/`[MINOR]` and ends with `Verdict: SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES`; no normalization is needed. Treat any other word as a defect in that agent.
 - **Conflict precedence** when two findings pull opposite ways, earlier wins: **(1) correctness → (2) security & data safety → (3) consistency with the repository's established conventions → (4) readability for the next maintainer → (5) simplicity → (6) performance.** Say which finding you overrode and why.
-- **mithril-gates:** a gate `FAIL` is a Critical finding. Skipped gates are a note, not a block.
+- **mithril-gates:** a gate `FAIL` is a Critical finding. A number reported against a generic default, with no project threshold, is a note, not a FAIL and not a block. Skipped gates are a note, not a block.
 - **Look Here First (required on feature-branch / PR-scope reviews).** After aggregating, write a human inspection brief — where residual risk and judgment live, not a second findings list. Rank 3–7 concrete `path:line` (or hunk) targets, each with a risk class and the question the human should answer there. Prefer behavior/contract/auth/money/PII/persistence, concurrency/retries/idempotency, migrations/public API/flags, dense logic that looks right, and new behavior whose tests don't prove it. Skip generated, lock, format-only, and mechanical files. Tiny and obvious change → `Look Here: none — mechanical / fully covered`. The first 3 items are the 10-minute pass. Don't repeat Critical/Important issues unless a judgment call remains that the agents cannot close. When mithril-review ran, prefer its list and add only targets other agents uniquely justified.
 - **Verdict** (post-adjudication): any Critical → `SIGNIFICANT ISSUES`; no Critical but ≥2 Important, or 1 Important that is security- or correctness-sourced → `NEEDS WORK`; otherwise `SHIP IT` (the bar is net improvement, not perfection).
 
@@ -206,13 +211,11 @@ Suggest follow-ups only when earned: smells needing named moves → `/mithril re
 
 ## Deep Mode (`/mithril deep` | `/mithril trace`)
 
-A sequential file → method → flow traversal for auditing a critical path or onboarding a subsystem. Expensive: if the in-scope list (after the Case C exclusions) exceeds **40 files**, require a narrower path or explicit confirmation.
+A flow pass on a critical path, plus the specialists Step 2 would select for those files. Expensive: if the in-scope list (after the Case C exclusions) exceeds **40 files**, require a narrower path or explicit confirmation. Do not walk every method for inputs and outputs. Flow greps its own entry points.
 
-**Phase 1 — per file.** Batch ≤ ~6 small files per `mithril-code-quality` agent (one agent per large file) with: *"Walk each file method by method. Report findings keyed to `method:line`, and for each non-trivial method its inputs and outputs/side effects (DB writes, network calls, mutations) — these seed flow tracing. Skip trivial getters/setters."* Also spawn mithril-security-review on sensitive files, mithril-persistence on ORM/SQL files, mithril-concurrency on files with concurrency primitives. All in parallel.
+Spawn in parallel: `mithril-flow` on the in-scope entry points, and the Step 2 specialists whose signals match (security on auth, tenant scope, or secrets; persistence on SQL; concurrency on a lock or a mutation across `await`). Not a method-by-method code-quality dump, and not architecture unless the diff adds a module or a layer-crossing import.
 
-**Phase 2 — flows.** After Phase 1 completes, spawn `mithril-flow` with the per-method I/O notes and entry-point hints (grep for routes, handlers, `main`, consumers). Structural rot it notices → suggest `/mithril arch`; flow does not judge structure.
-
-**Phase 3 — summary (do not delegate).** Flow map (entry → key paths → sinks), findings by severity tagged `file:method:line` under Step 5's rules, cross-cutting flow findings, verdict.
+**Summary (do not delegate).** Flow map (entry → key paths → sinks), findings by severity tagged `file:method:line` under Step 5's rules, verdict. Structural notes from flow are suggestions, not findings.
 
 **Detail destination** — ask unless `--report`, `--inline`, or `--summary` was passed: **Report file** (default) writes full detail to `.mithril/deep-{timestamp}.md` with the Write tool (create the dir; suggest adding `.mithril/` to `.gitignore`) and shows only the summary; **Inline** prints everything; **Summary** discards the detail.
 
@@ -239,7 +242,7 @@ Teaching, not review: runs **inline in the main thread** (no agent, no findings,
 /mithril refactor                # named, test-first refactor plan (opt-in)
 /mithril gates                   # tool-measured lint/complexity/duplication/coverage/mutation
 /mithril project src/ code       # project scan of a subtree
-/mithril deep src/services       # file → method → flow traversal
+/mithril deep src/services       # flow on that path, plus the specialists the files would select
 /mithril deep --summary          # skip the detail-destination prompt
 /mithril tutor N+1               # learn a concept from the library
 ```
