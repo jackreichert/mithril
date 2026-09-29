@@ -55,6 +55,12 @@ All entries © Joel Spolsky / Fog Creek / Stack Exchange.
 
 Joel's articles are a relevant exception worth noting: his older posts have been reprinted in book collections (*Joel on Software*, *More Joel on Software*, *Smart and Gets Things Done*) which are the canonical "buy if you want offline" form.
 
+## Jon Skeet — codeblog.jonskeet.uk
+
+| Article | URL |
+|---------|-----|
+| Storing UTC is not a silver bullet (2019) | <https://codeblog.jonskeet.uk/2019/03/27/storing-utc-is-not-a-silver-bullet/> |
+
 ## Software Metrics
 
 | Metric | Source |

@@ -17,6 +17,7 @@ Resources/
 │   ├── Martin-Fowler/                 # martinfowler.com / refactoring.com
 │   ├── Robert-Martin/                 # blog.cleancoder.com
 │   ├── Joel-Spolsky/                  # joelonsoftware.com
+│   ├── Jon-Skeet/                     # codeblog.jonskeet.uk
 │   └── Google-Engineering/            # google.github.io/eng-practices
 ├── Standards/                         # OWASP, 12-Factor, NASA Power of 10, style guides
 ├── Papers/                            # Parnas, Waldo, Moseley/Marks, Brooks
