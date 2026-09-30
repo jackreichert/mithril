@@ -88,15 +88,15 @@ The token value is estimated from bytes and is useful for trend comparison, not 
 | `mock-internals` | Test spies on the SUT's own private method + asserts call order; sleep-based async wait | mithril-test-quality |
 | `missing-timeout` | POST with no timeout; retry loop around a non-idempotent payment capture with no idempotency key | mithril-distributed, mithril-flow |
 | `shallow-module-pile` | Direct function call wrapped in pass-through controller/mapper/service classes with no added policy or abstraction | mithril-code-quality, mithril-architecture |
-| `ui-scripted-gherkin` | Business acceptance scenario written as imperative browser steps with selectors, colors, and sleeps | mithril-specification |
-| `singleton-global` | Constructor-injected policy replaced by a mutable process-wide Singleton registry | mithril-patterns, mithril-architecture |
-| `unbounded-pool` | Thread pool with unbounded queue + hot-path O(n²) over full customer list; clean path uses bounded executor + keyset page | mithril-performance |
+| `ui-scripted-gherkin` | Business acceptance scenario written as imperative browser steps with selectors, colors, and sleeps | mithril-test-quality |
+| `singleton-global` | Constructor-injected policy replaced by a mutable process-wide Singleton registry | mithril-code-quality, mithril-architecture |
+| `unbounded-pool` | Thread pool with unbounded queue + hot-path O(n²) over full customer list; clean path uses bounded executor + keyset page | mithril-concurrency, mithril-code-quality |
 | `silent-endpoint` | New HTTP handler ships with no metrics/logs/trace context; structured healthz is the clean bait | mithril-observability |
 | `div-button-trap` | Custom div-"button" without keyboard/name; modal focus trap with no Escape; labeled form is clean bait | mithril-accessibility |
 | `ambiguous-billing-actions` | Generic destructive CTA with hidden consequence; async save has no pending/success/error feedback; semantic native controls are clean bait | mithril-usability |
 | `happy-path-only-codec` | Pure encode/decode algebra covered by one happy-path unit test only; no round-trip property / edge generators | mithril-test-quality |
 
-Coverage note: the suite aims for ≥1 seed case per specialist domain (including performance, observability, accessibility, and usability). Add harder variants when a model consistently passes a case with no false positives.
+Coverage note: the suite aims for ≥1 seed case per specialist domain (including observability, accessibility, and usability). Add harder variants when a model consistently passes a case with no false positives.
 
 ## Why cases live as file trees, not `.patch` files
 

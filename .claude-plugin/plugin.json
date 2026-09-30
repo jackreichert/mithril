@@ -1,6 +1,6 @@
 {
   "name": "mithril",
-  "description": "The canonical CS literature distilled into agent-executable review form: the /mithril orchestrator plus 19 specialist review agents (code quality, architecture, concurrency, refactoring, tests, security, delivery, distributed, patterns, persistence, performance, observability, accessibility, usability, gates, specification, flow, process, review), each grounded in a cited knowledge base of books, papers, and standards.",
+  "description": "The canonical CS literature distilled into agent-executable review form: the /mithril orchestrator plus 15 specialist review agents (code quality, architecture, concurrency, refactoring, tests, security, delivery, distributed, persistence, observability, accessibility, usability, gates, flow, review), each grounded in a cited knowledge base of books, papers, and standards.",
   "version": "1.1.0",
   "author": {
     "name": "Jack Reichert"
@@ -19,14 +19,10 @@
     "./skills/flow.md",
     "./skills/gates.md",
     "./skills/observability.md",
-    "./skills/patterns.md",
-    "./skills/performance.md",
     "./skills/persistence.md",
-    "./skills/process.md",
     "./skills/refactor.md",
     "./skills/review.md",
     "./skills/security-review.md",
-    "./skills/specification.md",
     "./skills/test-quality.md",
     "./skills/usability.md"
   ]

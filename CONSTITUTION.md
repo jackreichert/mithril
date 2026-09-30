@@ -24,11 +24,11 @@ Each article is a *summary*. The authoritative, citation-rich reasoning lives in
 When two rules pull in opposite directions, resolve in this fixed order — **earlier wins**. This is the global arbiter for the cross-skill tensions the skills document individually (e.g. Clean Code's small functions vs. APOSD's deep modules).
 
 1. **Correctness** — the code does what it must; tests pass. Nothing below matters if this fails.
-2. **Security & data safety** — no injection, no leaked secrets, no PHI exposure, validated input. A security finding outranks a style or simplicity preference.
-3. **Readability for the next maintainer** — optimize for time-to-understanding six months out, not for line counts or cleverness.
-4. **Simplicity** — the simplest design that supports current behavior and leaves clear options for the next step. Prefer deleting over adding.
-5. **Consistency** — match the surrounding code's idioms, naming, and structure over importing a personal preference.
-6. **Performance** — correct big-O for realistic `n`; pick the right data structure; cache deliberately and invalidate correctly; avoid N+1 and needless nested loops. Profile before micro-optimizing, and never trade away 1–4 for speed you haven't measured.
+2. **Security & data safety** — no injection, no leaked secrets, validated input. A security finding outranks a style or simplicity preference. Patient-data policy is enforced outside this file.
+3. **Consistency** — match the repository's established conventions: its idioms, naming, and structure over importing a personal preference. Readability and simplicity preferences apply *within* local convention, not against it.
+4. **Readability for the next maintainer** — optimize for time-to-understanding six months out, not for line counts or cleverness.
+5. **Simplicity** — the simplest design that supports current behavior and leaves clear options for the next step. Prefer deleting over adding.
+6. **Performance** — correct big-O for realistic `n`; pick the right data structure; cache deliberately and invalidate correctly; avoid N+1 and needless nested loops. Profile before micro-optimizing, and never trade away 1–5 for speed you haven't measured.
 
 > Apply the **scalpel, not the sledgehammer**: targeted changes beat large rewrites. Preserve existing behavior unless a change is explicitly requested.
 
@@ -61,17 +61,16 @@ After a solution is planned and *before* implementation begins:
 ---
 
 ## Article II — Code
-*Deep reference: [`skills/code-quality.md`](skills/code-quality.md), [`skills/patterns.md`](skills/patterns.md), [`skills/concurrency.md`](skills/concurrency.md)*
+*Deep reference: [`skills/code-quality.md`](skills/code-quality.md), [`skills/concurrency.md`](skills/concurrency.md)*
 
-- **Names reveal intent.** A reader infers purpose in <3 seconds. Nouns for classes, verbs for methods. Units and constraints in the name (`timeout_ms`, `max_retries`). No `Manager`/`Processor`/`Data`/`Info` filler. No magic numbers.
-- **Functions do one thing.** One responsibility, ~20–30 lines as a soft ceiling. Extract a nested block only when its name genuinely *abstracts* — not to hit a line count.
-- **0–2 arguments ideal, ≤3.** No boolean flags that select behavior — split the function.
+- **Names reveal intent.** A reader infers purpose from the name. Units and constraints belong in the name (`timeout_ms`, `max_retries`). Follow the repo's names. A generic word is a finding only when a neighbor already uses a clearer domain word. No magic numbers.
+- **Functions do one thing.** Extract a nested block only when its name hides a real abstraction. Line count is not a reason to split.
+- **Arguments.** A boolean that selects behavior is two functions. Do not treat argument count as a finding.
 - **DRY, but not prematurely.** Before adding a function, check whether the logic already exists or belongs in a shared module — don't bury general-purpose code where the next person will re-implement it. Two copies that will diverge are a smell; two that coincidentally match are not (Rule of Three).
 - **Comments explain *why*, not *what*.** Capture invariants, trade-offs, and constraints code can't express. Delete comments that paraphrase the code.
-- **Functional discipline.** Prefer pure functions and immutability. Push I/O and side effects to the boundaries; keep the core deterministic. Separate **actions** (I/O), **calculations** (pure), and **data** (immutable values) — calculations are easy to test; actions are thin shells (*Grokking Simplicity*). Declarative (`map`/`filter`/`reduce`) over imperative loops where it reads clearer. Early returns over nested conditionals. Prefer encoding failure in a `Result`/sum type over `null`/magic values when the language supports it (*Domain Modeling Made Functional*).
 - **Concurrency: eliminate sharing before guarding it.** Prefer immutability and confinement (no shared mutable state → no locks). Where state must be shared across threads, every access is explicitly **atomic** (no check-then-act/read-modify-write races), **visible** (`volatile`/atomic/safe publication — no relying on a plain field crossing threads), and **deadlock-free** (consistent lock ordering, no blocking or alien calls under a lock, bounded waits). Never block the event loop; every `await`/`future` has a timeout and a cancellation path. In-process sharing ≠ cross-process (Article III) — they have different fixes. Apply the same hazards under non-JVM models (Go channels/goroutines, Rust ownership, JS event-loop + workers) — the memory model changes, the three hazards do not.
-- **Fail fast, fail loud.** Raise specific, meaningful exceptions early; never silently swallow them; never signal errors with `None` or magic values — raise, or return a Result. Log at the appropriate level (debug/info/warn/error).
-- **Performance: measure, then change.** Correct big-O for realistic `n`; right data structure; no N+1 or needless nested loops. For each saturable resource (CPU, memory, disk, network, thread/connection pool), keep **Utilization, Saturation, and Errors** visible (*Systems Performance* USE method). Profile against a measured bottleneck before micro-optimizing; never trade away Articles I.1–4 for speed you haven't measured.
+- **Fail fast, fail loud.** Raise specific, meaningful exceptions early; never silently swallow them. Follow the repo's error style. Do not introduce a `Result` type the repo does not already use. Log at the appropriate level (debug/info/warn/error).
+- **Performance: measure, then change.** Correct big-O for realistic `n`; right data structure; no N+1 or needless nested loops. Profile against a measured bottleneck before micro-optimizing; never trade away Articles I.1–5 for speed you haven't measured.
 - **Apply Beck's four rules of simple design, in order:** passes all tests → no duplication → expresses intent → fewest classes/methods.
 - **Two hats** *(Fowler, Refactoring ch.2)*: never add behavior and refactor in the same step — wear one hat at a time, and never refactor while a test is red. Keep refactoring commits separate from feature commits. Prefer small structure tidyings in their own PR when coupling cost warrants it (*Tidy First?*).
 
@@ -90,28 +89,25 @@ After a solution is planned and *before* implementation begins:
 - **Persistence stays at the edge.** No N+1 queries; explicit columns over `SELECT *`; indexes matched to `WHERE`/`ORDER BY`; explicit transaction boundaries; ORM mappings don't leak into the domain.
 
 ## Article IV — Tests (write them *with*, or *before*, the code)
-*Deep reference: [`skills/test-quality.md`](skills/test-quality.md), [`skills/specification.md`](skills/specification.md), [`skills/process.md`](skills/process.md)*
+*Deep reference: [`skills/test-quality.md`](skills/test-quality.md), [`skills/review.md`](skills/review.md)*
 
-- **Specify behavior before building it.** For non-trivial features, capture the requirement as concrete, declarative **key examples** (Given/When/Then) — the shared source of truth a developer, tester, and businessperson all read the same way. Specify *what*, not UI mechanics; parameterize only what varies.
-- **Establish a review contract before judging code.** For behavior changes, confirm the goal plus key happy-path, boundary, and failure examples; for refactors, state the behavior that must remain unchanged. Never infer intended behavior from the diff. Missing or contradictory requirements block a functional-correctness verdict until clarified. Gherkin records the agreement; Cucumber automation is optional and proportional.
+- **Establish a review contract before judging code.** For behavior changes, state the goal and the examples you are reviewing against; for refactors, state the behavior that must remain unchanged. Do not invent that contract from the implementation under review. If the request does not pin it, label the contract assumed, tag findings that depend on it, and list the open questions. Do not halt the review, and do not require Gherkin or a story-level acceptance test before judging.
 
 - **TDD where it pays:** for non-trivial logic, follow Uncle Bob's **Three Laws** — (1) no production code except to make a failing test pass; (2) no more test than is sufficient to fail; (3) no more production code than is sufficient to pass. That is the Red → Green → Refactor cycle. Tests written after the fact tend to test implementation, not behavior.
 - **Test behavior, not internals.** A safe refactor must leave the suite green; a behavior change must turn it red. Mock only externals (I/O, clock, network, randomness) — never your own code.
 - **F.I.R.S.T.** — Fast, Isolated, Repeatable, Self-validating, Timely. A unit test >100ms is hiding real I/O.
 - **AAA structure, one logical assertion, intention-revealing names** (`method_scenario_expectedBehavior`).
-- **Property-based tests for algebraic code.** Where behavior has an invariant (round-trip encode/decode, sort properties, parsers, money/calendar math), add property-based tests alongside examples (Hypothesis, fast-check, QuickCheck, …). Examples document known cases; properties explore the space.
+- **Property-based tests, only where the repo already uses them.** Do not flag a missing property test in a suite that has none.
 - **The Beyoncé Rule:** if the team relies on a behavior, it has a test that fails when the behavior breaks. "Tested manually once" does not count.
 - **Coverage is a floor (~80% on core logic), not a ceiling.** Mutation score is the real oracle of test strength — see Article VII.
 
 ## Article V — Security & Secrets
 *Deep reference: [`skills/security-review.md`](skills/security-review.md)*
 
-- **Threat-model before you ship shape.** For non-trivial changes, answer Shostack's four questions: what are we building, what can go wrong, what do we do about it, did we do a good job? At minimum: attacker, target, trust boundary. Enumerate threats with **STRIDE** (Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege) on new entry points and data flows — design flaws (OWASP A04) outrank style fixes.
-- **Validate and sanitize all external input** at the boundary. Treat every input as hostile until proven otherwise.
+- **Validate external input** at the boundary. Treat every input as hostile until proven otherwise.
 - **Never commit secrets.** No keys, passwords, or connection strings in code — env vars or a secret manager only. Never read or echo `.env*` files.
-- **Least privilege everywhere.** Strong password hashing (Argon2id/bcrypt). Pin and audit dependencies; review lockfile diffs; prefer verified/signed artifacts and SBOMs for production builds (supply chain is a security control, not ops trivia).
-- **No PHI / PII in prompts, logs, or fixtures.** Use placeholders (`$1`, `fake_id_123`, `test@example.com`). If unsure whether something is safe to include — it is not.
-- **Fail closed on auth/secrets/authorization; degrade carefully elsewhere.** Security-critical paths deny on uncertainty; non-critical reads may fail open only behind explicit resilience controls (*Building Secure and Reliable Systems*).
+- **Least privilege everywhere.** Strong password hashing (Argon2id/bcrypt). Pin and audit dependencies; review lockfile diffs.
+- **Fail closed on auth, secrets, and authorization.** Deny on uncertainty. Fail open only for an explicit availability property. Do not write a STRIDE or four-question threat model as part of shipping. Patient-data rules live outside this file.
 
 ## Article VI — Delivery
 *Deep reference: [`skills/delivery.md`](skills/delivery.md)*
@@ -124,10 +120,10 @@ After a solution is planned and *before* implementation begins:
 
 ---
 
-## Article VII — Numeric Gates (the enforceable floor)
+## Article VII — Numeric Gates (opt-in, and only when written down)
 *Deep reference: [`skills/gates.md`](skills/gates.md) — run via `/mithril gates` or the [pre-commit hook](hooks/)*
 
-Subjective rules above become objective here. These thresholds are the *minimum*, not the target. A change that breaches one is not done until it's fixed or an explicit, recorded exception is taken.
+These thresholds apply only when `/mithril gates` is run and the repo has written them down (`mithril-gates.toml` or the project's own tool config). They are not part of the Definition of Done. With no written threshold, report the measured number. Do not block on a generic default.
 
 | Gate | Threshold | Tooling (examples) |
 |------|-----------|--------------------|
@@ -139,7 +135,7 @@ Subjective rules above become objective here. These thresholds are the *minimum*
 | **Test coverage** | ≥ 80% on changed core logic | native coverage tool |
 | **Mutation score** | ≥ 80% killed on changed critical-path code (≥ 90% for payment/auth/billing) | Stryker, PIT, mutmut, go-mutesting |
 
-> Thresholds are defaults — a project may tighten or relax them in `skills/gates.md`'s project overrides, but a relaxation must be deliberate and written down, never silent.
+> A threshold that is not written down is not a gate. Coverage, CRAP, mutation, and function length report a number until the repo sets them.
 
 ---
 
@@ -148,10 +144,10 @@ Subjective rules above become objective here. These thresholds are the *minimum*
 A task is complete only when **all** of the following hold. This is the checklist swarm-forge calls a Definition of Done; treat it as the gate before you say "done."
 
 - [ ] **Requirements met** — old and new business logic both satisfied; deviations and assumptions documented.
-- [ ] **Tests written and green** — behavior-level, covering the happy path *and* edge cases (empty, null, zero, boundary, concurrent). Prefer property-based tests for pure algebraic cores (codecs, parsers, money) alongside examples.
-- [ ] **Numeric gates pass** (Article VII) — lint clean, complexity/duplication within bounds, coverage and mutation thresholds met on changed code.
-- [ ] **Self-review done** — names reveal intent; functions do one thing; no swallowed exceptions; specific exception types; no N+1; big-O acceptable; USE-visible saturation on new pools/queues.
-- [ ] **Security clear** — threat model for new surfaces; all external input validated; no secrets, PHI, or PII committed; lockfile/deps reviewed.
+- [ ] **Tests written and green** — behavior-level, covering the happy path and the edge cases the change relies on (empty, null, zero, boundary).
+- [ ] **Project lint clean** — the repo's own linter, if it has one. Numeric gates from Article VII block only when the repo has written the threshold down.
+- [ ] **Self-review done** — names match the repo; no swallowed exceptions; no N+1 on a changed query.
+- [ ] **Security clear** — external input validated; auth and tenant checks fail closed; no secrets committed; lockfile/deps reviewed.
 - [ ] **Operability clear** — golden signals / logs / traces for new paths; expand-contract for schema/API breaks; shippable behind flags.
 - [ ] **UI accessibility clear** (when shipping interactive UI) — keyboard operable primary path; controls have accessible names; labels/errors associated; no keyboard trap; WCAG 2.2 AA intent (`/mithril a11y`).
 - [ ] **UI usability clear** (when shipping interactive UI) — important tasks are discoverable; labels and consequences are unambiguous; actions provide feedback and recovery; meaningful uncertainty is checked with realistic user tasks (`/mithril usability`).
@@ -165,7 +161,7 @@ A task is complete only when **all** of the following hold. This is the checklis
 
 ## Article IX — Communication Style
 
-*Personalized by `install.sh --link --name "Your Name"` (it asks if you omit `--name`). The haiku/limerick sign-off is **off by default** — turn it on with `--poem` (and off again with `--no-poem`). An un-personalized clone shows the `__USER_NAME__` placeholder.*
+*Personalize by replacing `__USER_NAME__` below with your name. The haiku/limerick sign-off is **off by default** — add it yourself if you want one. An un-personalized clone shows the `__USER_NAME__` placeholder.*
 
 <!-- BEGIN quality:communication-style -->
 - In **conversational replies**, open with "Hey __USER_NAME__" and close with "Cheers __USER_NAME__!". Skip the greeting for non-prose artifacts — commit messages, code, structured review reports, file edits, and terse tool output — where a salutation would be noise or would fight the surrounding tool's format.

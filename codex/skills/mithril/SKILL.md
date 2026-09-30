@@ -1,6 +1,6 @@
 ---
 name: mithril
-description: Code quality skillset for Codex. Use when asked to review a diff or project for correctness, maintainability, architecture, tests, security, delivery, persistence, concurrency, distributed-systems risks, patterns, refactoring, specification quality, numeric gates, or to tutor/explain the code-quality canon from this repository.
+description: Code quality skillset for Codex. Use when asked to review a diff or project for correctness, maintainability, architecture, tests, security, delivery, persistence, concurrency, distributed-systems risks, refactoring, numeric gates, or to tutor/explain the code-quality canon from this repository.
 ---
 
 # Code Quality
@@ -26,20 +26,17 @@ Read only what the task needs:
 | Need | Reference |
 |------|-----------|
 | Always-on write discipline, conflict precedence, Definition of Done | `<repo>/CONSTITUTION.md` |
-| General code readability, names, functions, complexity, error handling | `<repo>/skills/code-quality.md` |
+| General code readability, names, functions, complexity, error handling, performance, pattern misuse | `<repo>/skills/code-quality.md` |
 | Review process, finding format, confidence scoring | `<repo>/skills/review.md` |
 | Architecture, dependencies, SOLID, resilience, DDD | `<repo>/skills/architecture.md` |
 | Behavior-preserving cleanup or Fowler-style refactor planning | `<repo>/skills/refactor.md` |
-| Test design, test smells, coverage expectations | `<repo>/skills/test-quality.md` |
+| Test design, test smells, coverage expectations, acceptance scenarios | `<repo>/skills/test-quality.md` |
 | Security, secrets, OWASP/CWE/ASVS checks | `<repo>/skills/security-review.md` |
 | Delivery, CI/CD, migrations, feature flags, observability | `<repo>/skills/delivery.md` |
 | Distributed boundaries, latency, idempotency, partial failure | `<repo>/skills/distributed.md` |
 | Threads, async, races, visibility, deadlocks | `<repo>/skills/concurrency.md` |
-| Design pattern fit and anti-patterns | `<repo>/skills/patterns.md` |
 | ORM, repositories, transactions, N+1, migrations | `<repo>/skills/persistence.md` |
 | Objective numeric gates and tool thresholds | `<repo>/skills/gates.md` |
-| Acceptance criteria, Gherkin, Specification by Example | `<repo>/skills/specification.md` |
-| Planning/process discipline | `<repo>/skills/process.md` |
 | Teaching concepts from the canon | `<repo>/skills/tutor.md` |
 
 For source-backed explanation or deeper nuance, follow links from the selected skill file into `<repo>/Resources/Themes/` or `<repo>/THEMES.md`.

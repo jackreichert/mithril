@@ -1,6 +1,6 @@
 # 10 — Specification by Example
 
-> **Tier 4 · Verification.** The layer upstream of test quality: getting the *right* behavior specified before any code exists, as concrete examples that are simultaneously the requirement, the acceptance test, and documentation that cannot go stale. **Skill:** [`skills/specification.md`](../../skills/specification.md) · agent `mithril-specification`.
+> **Tier 4 · Verification.** The layer upstream of test quality: getting the *right* behavior specified before any code exists, as concrete examples that are simultaneously the requirement, the acceptance test, and documentation that cannot go stale. **Skill:** acceptance-scenario quality is checked by [`skills/test-quality.md`](../../skills/test-quality.md) · agent `mithril-test-quality`; the review contract lives in the `/mithril` router and [`skills/review.md`](../../skills/review.md).
 
 ## The idea in one paragraph
 

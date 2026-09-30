@@ -8,7 +8,7 @@
 #                          ${CLAUDE_PLUGIN_ROOT} skill references point at real files
 #   2. ROUTING           — every subagent_type the orchestrator routes to has a
 #                          matching runtime skill (and no skill is orphaned)
-#   3. COUNT CLAIMS      — "N agent" figures in README.md / install.sh match reality
+#   3. COUNT CLAIMS      — "N agent" figures in README.md match reality
 #   4. SUMMARY DEPTH     — every chapter summary has at least three sentences
 #   5. DEPLOYED SYNC     — ~/.claude and ~/.grok agents match canonical skills
 #   6. DOC LINKS         — relative .md links AND plain-text ../ paths resolve
@@ -114,27 +114,26 @@ require_in_agent() {
 }
 require_in_agent mithril-security-review 'STRIDE' 'STRIDE threat enum'
 require_in_agent mithril-security-review 'Shostack|four questions' 'Shostack four questions'
-require_in_agent mithril-delivery 'golden signals|error budget' 'SRE golden signals / error budget'
-require_in_agent mithril-delivery 'saturation' 'saturation (4th golden signal)'
-require_in_agent mithril-code-quality 'USE method|Utilization.*Saturation' 'USE method'
-require_in_agent mithril-code-quality 'actions|calculations' 'actions/calculations FP frame'
-require_in_agent mithril-code-quality 'Class Composition.*Decomposition|independent reasons to change' 'class decomposition decision test'
-require_in_agent mithril-architecture 'Vernon|one transaction|illegal states' 'Vernon aggregates / illegal states'
-require_in_agent mithril-architecture 'Hyrum|expand-contract|additive' 'API contract evolution'
+require_in_agent mithril-delivery 'expand-contract' 'expand-contract deploy/rollback safety'
+require_in_agent mithril-code-quality 'Size is a prompt, not a finding' 'anti-dogma size calibration'
+require_in_agent mithril-code-quality 'independent reasons to change' 'class decomposition decision test'
+require_in_agent mithril-code-quality 'load X → outcome Y' 'performance failure-scenario format'
+require_in_agent mithril-architecture 'illegal states|one transaction = one aggregate' 'domain integrity / aggregates'
+require_in_agent mithril-architecture 'Hyrum|expand-contract' 'API contract evolution'
 require_in_agent mithril-architecture 'Class decomposition test|disjoint method/field clusters' 'class decomposition counterweight'
-require_in_agent mithril-test-quality 'Property-Based|property-based|PBT' 'property-based testing'
+require_in_agent mithril-test-quality 'Property-based|property-based|PBT' 'property-based testing'
 require_in_agent mithril-test-quality 'shrink|Hypothesis|fast-check' 'PBT tooling / shrinking'
-require_in_agent mithril-test-quality 'Two Test Layers|Customer acceptance tests.*Programmer tests' 'customer/programmer test layers'
-require_in_agent mithril-specification 'Requirements gate before code review|Never reverse-engineer intended behavior' 'requirements-first specification gate'
-require_in_agent mithril-specification 'story or feature is complete|story acceptance criteria' 'acceptance tests define story completion'
+require_in_agent mithril-test-quality 'Two test layers|acceptance-level evidence' 'customer/programmer test layers'
+require_in_agent mithril-test-quality 'Confidence and Severity' 'confidence threshold'
+require_in_agent mithril-persistence 'sargable' 'sargable predicates'
 require_in_agent mithril-review 'Review Contract Precondition|Never infer intended behavior' 'requirements-first review contract'
+require_in_agent mithril-review 'Look Here First' 'human PR inspection brief'
+require_in_agent mithril-observability 'USE method' 'USE method on pools/queues'
 require_in_agent mithril-concurrency 'atomic|visibility|liveness' 'three concurrency hazards'
-require_in_agent mithril-performance 'USE method|Utilization' 'USE method (performance skill)'
 require_in_agent mithril-observability 'golden signals|saturation' 'golden signals (observability skill)'
 require_in_agent mithril-accessibility 'WCAG|keyboard|accessible name' 'WCAG / keyboard a11y'
 require_in_agent mithril-usability 'Observed.*Heuristic|Heuristic.*Observed' 'observed vs heuristic usability evidence'
 require_in_agent mithril-usability 'hierarchy|information scent|error recovery' 'task-centered usability checks'
-require_in_agent mithril-process 'Forecasts are not promises|measured delivery' 'measured replanning and forecast discipline'
 if grep -qE 'UI usability clear.*discoverable.*feedback and recovery' "$SCRIPT_DIR/CONSTITUTION.md"; then
   ok "Constitution carries the UI usability gate"
 else
@@ -153,19 +152,36 @@ else
   bad "quality orchestrator missing requirements-first review gate"
   parity_ok=0
 fi
+if grep -qE 'Look Here First' "$CMD_SRC"; then
+  ok "quality orchestrator includes Look Here First human inspection brief"
+else
+  bad "quality orchestrator missing Look Here First section"
+  parity_ok=0
+fi
+vocab_ok=1
+for f in "$AGENTS_SRC"/*.md; do
+  [[ "$(basename "$f")" == "tutor.md" ]] && continue
+  name="mithril-$(basename "$f" .md)"
+  grep -qE '^Verdict: \[SHIP IT / (NEEDS WORK / )?SIGNIFICANT ISSUES\]' "$f" \
+    || { bad "$name — verdict line is not the shared SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES vocabulary"; vocab_ok=0; parity_ok=0; }
+  if grep -qE '\[(SUGGESTION|HIGH|MEDIUM|LOW)\]|NEEDS TESTING|PARTIAL\]' "$f"; then
+    bad "$name — uses an off-vocabulary severity or verdict word"; vocab_ok=0; parity_ok=0
+  fi
+done
+(( vocab_ok )) && ok "all agents use the shared severity and verdict vocabulary"
 (( parity_ok )) && ok "all required skill checklists present in agents"
 
 # ---- 3. count claims -----------------------------------------------------------
 hdr "Count claims"
 claims_ok=1
-for doc in README.md install.sh; do
+for doc in README.md; do
   while IFS= read -r n; do
     [[ -z "$n" ]] && continue
     [[ "$n" -eq "$n_agents" ]] \
       || { bad "$doc claims $n agents; $n_agents canonical runtime skills exist (stale count)"; claims_ok=0; }
   done < <(grep -ohE '[0-9]+ agent' "$SCRIPT_DIR/$doc" 2>/dev/null | grep -oE '^[0-9]+' | sort -u)
 done
-(( claims_ok )) && ok "README/install agent counts match reality ($n_agents)"
+(( claims_ok )) && ok "README agent counts match reality ($n_agents)"
 # Theme count: Themes/README claims N guides
 n_themes=$(find "$SCRIPT_DIR/Resources/Themes" -maxdepth 1 -name '[0-9]*.md' | wc -l | tr -d ' ')
 if grep -qE "${n_themes} cross-source|${n_themes} concept|\\*\\*${n_themes}\\*\\* per-theme|${n_themes} per-theme" \
@@ -231,7 +247,7 @@ check_deployed_sync() {
       if diff -q "$f" "$dst" >/dev/null 2>&1; then
         ok "$label: mithril-$name deployed & in sync"
       else
-        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (edit skills/, then re-run install.sh for copy installs)"
+        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (edit skills/ and reinstall)"
       fi
     fi
   done
@@ -247,7 +263,7 @@ check_deployed_sync() {
     fi
     rm -f "$expected_command"
   fi
-  (( deployed_any )) || warn "nothing deployed to $home — run install.sh (repository checks passed)"
+  (( deployed_any )) || warn "nothing deployed to $home (repository checks passed)"
 }
 check_deployed_sync "$CLAUDE_HOME" "Claude"
 check_deployed_sync "$GROK_HOME"   "Grok"

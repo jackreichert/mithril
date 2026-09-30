@@ -6,7 +6,7 @@
 case: singleton-global
 defects:
   - id: singleton-hidden-global-state
-    agent: mithril-patterns
+    agent: mithril-code-quality
     file: src/pricing/taxRuleRegistry.ts
     severity_min: Important
     match: "(Singleton|global state|hidden dependency|test isolation|mutable|shared state)"

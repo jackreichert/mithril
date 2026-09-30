@@ -6,7 +6,7 @@
 case: ui-scripted-gherkin
 defects:
   - id: imperative-ui-scripted-spec
-    agent: mithril-specification
+    agent: mithril-test-quality
     file: features/refund.feature
     severity_min: Important
     match: "(imperative|UI|selector|click|wait|declarative|business language|implementation detail)"

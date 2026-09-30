@@ -1,6 +1,6 @@
 # 18 — Performance & Operability
 
-> **Tier 5 · Systems in production.** Measure before you change: USE-method resource hygiene, latency percentiles, query cost models, SLOs/error budgets, and the telemetry that makes failure visible. **Primary skills:** [`skills/performance.md`](../../skills/performance.md) · [`skills/observability.md`](../../skills/observability.md) · agents `mithril-performance`, `mithril-observability`. Supporting: [`skills/persistence.md`](../../skills/persistence.md), [`skills/delivery.md`](../../skills/delivery.md), [`skills/code-quality.md`](../../skills/code-quality.md). Flow tracing (source→sink cost) is owned by `mithril-flow`.
+> **Tier 5 · Systems in production.** Measure before you change: USE-method resource hygiene, latency percentiles, query cost models, SLOs/error budgets, and the telemetry that makes failure visible. **Primary skills:** [`skills/code-quality.md`](../../skills/code-quality.md) (performance) · [`skills/observability.md`](../../skills/observability.md) · agents `mithril-code-quality`, `mithril-observability`. Supporting: [`skills/persistence.md`](../../skills/persistence.md), [`skills/delivery.md`](../../skills/delivery.md), [`skills/code-quality.md`](../../skills/code-quality.md). Flow tracing (source→sink cost) is owned by `mithril-flow`.
 
 ## The idea in one paragraph
 

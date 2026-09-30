@@ -39,18 +39,16 @@ mithril/
 │   │   ├── mithril-simplify.prompt.md
 │   │   ├── mithril-review.prompt.md
 │   │   ├── mithril-security.prompt.md
-│   │   ├── mithril-process.prompt.md
 │   │   ├── mithril-delivery.prompt.md
 │   │   ├── mithril-distributed.prompt.md
-│   │   ├── mithril-patterns.prompt.md
 │   │   └── mithril-persistence.prompt.md
-│   │   # TODO: mithril-performance / observability / accessibility / concurrency prompts
+│   │   # TODO: mithril-observability / accessibility / concurrency prompts
 │   ├── global-instructions.md         # Paste-ready ~2.5K char snippet
 │   └── AGENTS.md                      # Repo-drop-in cross-tool template
 └── Copilot-Integration.md             # This file
 ```
 
-**Skill inventory (canonical):** `code-quality`, `architecture`, `refactor`, `review`, `security-review`, `test-quality`, `delivery`, `distributed`, `concurrency`, `patterns`, `persistence`, `gates`, `specification`, `process`, `performance`, `observability`, `accessibility`, `flow`, plus `tutor` (inline teaching, not a subagent).
+**Skill inventory (canonical):** `code-quality`, `architecture`, `refactor`, `review`, `security-review`, `test-quality`, `delivery`, `distributed`, `concurrency`, `persistence`, `gates`, `observability`, `accessibility`, `usability`, `flow`, plus `tutor` (inline teaching, not a subagent).
 
 ## Setup — three layers
 
@@ -90,10 +88,8 @@ Then in any VS Code workspace, in Copilot Chat, type:
 - `/mithril-simplify` — light behavior-preserving cleanup
 - `/mithril-review` — confidence-scored review (Google priority order)
 - `/mithril-security` — OWASP Top 10:2021 systematic
-- `/mithril-process` — pre-flight + post-validation discipline
 - `/mithril-delivery` — CD pipeline + 12-Factor + DORA
 - `/mithril-distributed` — Waldo's four differences + microservices
-- `/mithril-patterns` — GoF + anti-patterns + modern alternatives
 - `/mithril-persistence` — PEAA + N+1 + transactions + migrations
 
 ### Layer 3 — Per-repo AGENTS.md (cross-tool consistency)
@@ -110,9 +106,8 @@ A symlink works if the repo allows.
 
 **Claude Code:**
 ```bash
-ls ~/.claude/agents/mithril-*.md         # 19 agents
-ls ~/.claude/commands/mithril.md         # orchestrator
-# In a repo: /mithril
+/plugin
+# confirm mithril is installed and enabled, then in a repo: /mithril
 ```
 
 **Copilot (VS Code):**
@@ -153,7 +148,7 @@ These are inherent to Copilot's architecture, not gaps in this framework.
 ## Maintenance
 
 When canonical skills (`skills/code-quality.md`, `skills/architecture.md`, etc.) are updated:
-1. Linked Claude/Grok installs update immediately; rerun `install.sh` for copy installs.
+1. The Claude/Grok plugin installs load `skills/` directly, so the edit is live on next invocation.
 2. Mirror relevant changes to the corresponding Copilot prompt file (`copilot/prompts/mithril-*.prompt.md`).
 3. If the change affects high-level priorities or stance, update `copilot/global-instructions.md` and `copilot/AGENTS.md`.
 

@@ -1,6 +1,6 @@
 # 02 — The Professional's Discipline
 
-> **Tier 1 · Foundations.** Before construction technique: how a professional plans, commits, estimates, and validates — the checks that happen *around* the code. **Skill:** [`skills/process.md`](../../skills/process.md) · agent `mithril-process`.
+> **Tier 1 · Foundations.** Before construction technique: how a professional plans, commits, estimates, and validates — the checks that happen *around* the code. **Skill:** none at review time (the process agent was retired: a diff carries little evidence of planning). Failure-edge coverage lives in [`skills/test-quality.md`](../../skills/test-quality.md).
 
 ## The idea in one paragraph
 
