@@ -104,6 +104,8 @@ A reviewer cannot call code correct without knowing the behavior it must impleme
 - `gates` → mithril-gates
 - `tutor`/`learn` → Tutor Mode (inline; no agent)
 
+**Baseline (every run).** Whenever source files are in scope, mithril-code-quality and mithril-smells run in addition to any explicit aspect (`/mithril security`, `fix`, `project src/ code`). Explicit aspects and the signals below only add agents.
+
 **Auto-selection (no aspects).** Diff mode reads signals from `git diff --name-only` and the diff; project mode from the file list.
 
 | Signal | Agent |
