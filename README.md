@@ -63,6 +63,8 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | File | Focus | Subagent type |
 |------|-------|---------------|
 | `skills/code-quality.md` | Size-as-prompt calibration, reuse and placement, names, errors, contracts, performance (load X → outcome Y), pattern misuse | `mithril-code-quality` |
+| `skills/smells.md` | Runs on every source diff and project scan. Refactoring ch. 3 smell vocabulary, each with its catalog move; flagged only with a concrete maintenance consequence, never as proof of a defect | `mithril-smells` |
+| `skills/lint-fix.md` | Opt-in (`/mithril fix`, diff mode). The only specialist with `Edit`: project linter autofix then hand-fix on changed files, never suppressing, committed separately | `mithril-lint-fix` |
 | `skills/architecture.md` | Sonnet. New modules and layer-crossing imports only. Dependency direction, cycles, public-contract evolution, timeouts at integration points | `mithril-architecture` |
 | `skills/refactor.md` | Opt-in. Mode 1 simplify (light) + Mode 2 named, test-first refactor plan with the WELC seam ranking, Branch by Abstraction & Strangler Fig | `mithril-refactor` |
 | `skills/review.md` | Confidence-scored review (quick / full-PR / follow-up), per-commit review of sliced PRs, and the Look Here First human inspection brief | `mithril-review` |
@@ -153,6 +155,15 @@ Check the tool's current docs for the exact filename — these conventions move 
 ## Sources by Skill
 
 Below: the books, articles, and chapters that drove each skill's content. Section names refer to the fuller pre-2026-09 prompts; the canon still informs the rules, but the runtime prompts no longer restate it (see [Prompts carry rules, not the canon](#what-this-is)).
+
+### `skills/smells.md`
+
+**Books**
+- **Refactoring: Improving the Design of Existing Code 2nd ed.** — Fowler, with Kent Beck on ch. 3 (2018)
+  - ch.3 Bad Smells in Code → the 24-smell catalog and its smell → move map ([`Resources/Books/Canon/05-Refactoring.md`](Resources/Books/Canon/05-Refactoring.md))
+
+**Articles**
+- Fowler, *Code Smell* (bliki) and the refactoring.com catalog → definition ("a surface indication that usually corresponds to a deeper problem") and move names ([`Resources/Articles/Martin-Fowler/02-Code-Smells.md`](Resources/Articles/Martin-Fowler/02-Code-Smells.md))
 
 ### `skills/code-quality.md`
 
@@ -603,7 +614,7 @@ The orchestrator:
   - If those outcomes are absent or contradictory, labels the contract ASSUMED, reviews against it, and lists the open questions at the top of the report
 4. Shares that contract with every agent it spawns.
 5. Auto-selects the remaining agents based on detectable signals:
-   - `mithril-code-quality` (always, source files changed)
+   - `mithril-code-quality` and `mithril-smells` (always, source files changed)
    - `mithril-architecture` (new function/endpoint adds structural surface)
    - `mithril-test-quality` (test file in diff)
    - `mithril-security-review` (file in `routes/` path)
