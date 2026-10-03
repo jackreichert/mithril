@@ -1,6 +1,6 @@
 ---
 description: "Code quality framework — runs targeted quality agents against your current git diff or full project. Usage: /mithril [aspects] | /mithril project [path] [aspects] | /mithril deep [path] (file→method→flow pass) | /mithril tutor [topic]"
-argument-hint: "[project [path]] [deep] [code] [smells] [fix] [arch] [refactor] [simplify] [tests] [security] [review] [flow] [delivery] [distributed] [concurrency] [persistence] [perf] [observability] [a11y] [usability] [gates] [tutor [topic]] — or omit for auto-selection"
+argument-hint: "[project [path]] [deep] [code] [smells] [nofix] [arch] [refactor] [simplify] [tests] [security] [review] [flow] [delivery] [distributed] [concurrency] [persistence] [perf] [observability] [a11y] [usability] [gates] [tutor [topic]] — or omit for auto-selection"
 allowed-tools: ["Bash", "Glob", "Grep", "Read", "Write", "Task"]
 ---
 
@@ -87,7 +87,7 @@ A reviewer cannot call code correct without knowing the behavior it must impleme
 
 **Aspect keywords:**
 - `code` → mithril-code-quality · `perf`/`performance`/`latency` → mithril-code-quality (+ mithril-persistence when queries are involved) · `patterns` → mithril-code-quality
-- `smells`/`smell`/`lint` → mithril-smells (report-only) · `fix` → mithril-lint-fix (Step 6)
+- `smells`/`smell`/`lint` → mithril-smells (report-only) · `nofix` → skip mithril-lint-fix (it runs by default in diff mode, Step 6)
 - `arch`/`architecture` → mithril-architecture
 - `refactor` → mithril-refactor (Mode 2: plan) · `simplify` → mithril-refactor (Mode 1: light)
 - `tests`/`test`/`spec`/`specification` → mithril-test-quality
@@ -104,7 +104,7 @@ A reviewer cannot call code correct without knowing the behavior it must impleme
 - `gates` → mithril-gates
 - `tutor`/`learn` → Tutor Mode (inline; no agent)
 
-**Baseline (every run).** Whenever source files are in scope, mithril-code-quality and mithril-smells run in addition to any explicit aspect (`/mithril security`, `fix`, `project src/ code`). Explicit aspects and the signals below only add agents.
+**Baseline (every run).** Whenever source files are in scope, mithril-code-quality and mithril-smells run in addition to any explicit aspect (`/mithril security`, `project src/ code`). Explicit aspects and the signals below only add agents.
 
 **Auto-selection (no aspects).** Diff mode reads signals from `git diff --name-only` and the diff; project mode from the file list.
 
@@ -212,9 +212,9 @@ Suggest follow-ups only when earned: smells needing a step-by-step plan → `/mi
 
 ---
 
-## Step 6 — Lint Fix (opt-in: the `fix` keyword only)
+## Step 6 — Lint Fix (default in diff mode; `nofix` opts out)
 
-Everything above is read-only; this is the only step that edits files, and only `mithril-lint-fix` has the `Edit` tool. Run it only when `fix` is in `$ARGUMENTS` and the scope is diff mode (Cases A/B). With `deep` or `project`, print `fix skipped: diff mode only` and run nothing. After Step 5 completes (one writer, nothing else running), spawn `mithril-lint-fix` alone with the diff's changed-file list. Print what it fixed and left, and remind the caller to commit it separately from behavior changes (`style(lint): ... (no behaviour change)`). Without `fix`, the `[LINT]` findings from `mithril-smells` are reported and nothing is changed.
+Everything above is read-only; this is the only step that edits files, and only `mithril-lint-fix` has the `Edit` tool. Run it by default in diff mode (Cases A/B) unless `nofix` is in `$ARGUMENTS`. `project` and `deep` stay report-only: run nothing there. After Step 5 completes (one writer, nothing else running), spawn `mithril-lint-fix` alone with the diff's changed-file list. Print what it fixed and left, and remind the caller to commit it separately from behavior changes (`style(lint): ... (no behaviour change)`). With `nofix`, or in `project`/`deep`, the `[LINT]` findings from `mithril-smells` are reported and nothing is changed. No linter found: `SKIPPED`, never PASS, nothing installed.
 
 ---
 
@@ -242,14 +242,14 @@ Teaching, not review: runs **inline in the main thread** (no agent, no findings,
 ## Usage
 
 ```
-/mithril                         # auto-selected agents on the diff / branch
+/mithril                         # auto-selected agents on the diff / branch, then lint fix on changed files (edits files)
 /mithril code arch               # specific aspects (code-quality and smells run on every source diff anyway)
 /mithril security flow           # auth or input-handling change: exploitability + entry→sink paths
 /mithril persistence delivery    # schema change: queries + migration safety
 /mithril review                  # PR-style confidence-scored review with Look Here First
 /mithril simplify                # light behavior-preserving cleanup (opt-in)
 /mithril refactor                # named, test-first refactor plan (opt-in)
-/mithril fix                     # review, then fix lint findings on the changed files (opt-in, edits files)
+/mithril nofix                   # review only; skip the default lint fix of the changed files
 /mithril gates                   # tool-measured lint/complexity/duplication/coverage/mutation
 /mithril project src/ code       # project scan of a subtree
 /mithril deep src/services       # flow on that path, plus the specialists the files would select
