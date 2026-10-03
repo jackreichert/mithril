@@ -1,6 +1,6 @@
 ---
 description: "Code quality framework — runs targeted quality agents against your current git diff or full project. Usage: /mithril [aspects] | /mithril project [path] [aspects] | /mithril deep [path] (file→method→flow pass) | /mithril tutor [topic]"
-argument-hint: "[project [path]] [deep] [code] [arch] [refactor] [simplify] [tests] [security] [review] [flow] [delivery] [distributed] [concurrency] [persistence] [perf] [observability] [a11y] [usability] [gates] [tutor [topic]] — or omit for auto-selection"
+argument-hint: "[project [path]] [deep] [code] [smells] [fix] [arch] [refactor] [simplify] [tests] [security] [review] [flow] [delivery] [distributed] [concurrency] [persistence] [perf] [observability] [a11y] [usability] [gates] [tutor [topic]] — or omit for auto-selection"
 allowed-tools: ["Bash", "Glob", "Grep", "Read", "Write", "Task"]
 ---
 
@@ -87,6 +87,7 @@ A reviewer cannot call code correct without knowing the behavior it must impleme
 
 **Aspect keywords:**
 - `code` → mithril-code-quality · `perf`/`performance`/`latency` → mithril-code-quality (+ mithril-persistence when queries are involved) · `patterns` → mithril-code-quality
+- `smells`/`smell`/`lint` → mithril-smells (report-only) · `fix` → mithril-lint-fix (Step 6)
 - `arch`/`architecture` → mithril-architecture
 - `refactor` → mithril-refactor (Mode 2: plan) · `simplify` → mithril-refactor (Mode 1: light)
 - `tests`/`test`/`spec`/`specification` → mithril-test-quality
@@ -103,11 +104,13 @@ A reviewer cannot call code correct without knowing the behavior it must impleme
 - `gates` → mithril-gates
 - `tutor`/`learn` → Tutor Mode (inline; no agent)
 
+**Baseline (every run).** Whenever source files are in scope, mithril-code-quality and mithril-smells run in addition to any explicit aspect (`/mithril security`, `fix`, `project src/ code`). Explicit aspects and the signals below only add agents.
+
 **Auto-selection (no aspects).** Diff mode reads signals from `git diff --name-only` and the diff; project mode from the file list.
 
 | Signal | Agent |
 |---|---|
-| Any source files | mithril-code-quality (always) |
+| Any source files | mithril-code-quality + mithril-smells (always, in diff, project and deep runs) |
 | A new module, or a new import that crosses a layer (domain importing DB, HTTP, or a framework). Not a class, constructor, field, or public-method edit inside an existing module | mithril-architecture |
 | Test files (`*.test.*`, `*.spec.*`, `*_test.*`, `test_*.py`) or executable specs (`*.feature`, Given/When/Then) | mithril-test-quality |
 | Auth/payment/api paths, input handling, sessions, secrets, tenant/agency scoping, logging of request or patient data | mithril-security-review |
@@ -123,7 +126,7 @@ The table is an exact match, not a keyword search. A weak or partial signal does
 
 **Opt-in only:** mithril-refactor (both modes — `/mithril simplify` or `/mithril refactor`), mithril-review (overlaps the auto-selected set; use for a PR-style pass), mithril-gates (executes tools that may not be installed; also runs from `hooks/pre-commit` and CI). Explicit keywords always force an agent even when signals are weak.
 
-When in doubt: mithril-code-quality only. That line wins over a weak row in the table.
+When in doubt: mithril-code-quality + mithril-smells only. That line wins over a weak row in the table.
 
 ---
 
@@ -156,7 +159,7 @@ Task(
 )
 ```
 
-Spawn all selected agents at once. On diffs over ~500 changed lines, give each specialist only the hunks matching its Step-2 signal plus the full file list; code-quality and architecture always get the full diff.
+Spawn all selected agents at once. On diffs over ~500 changed lines, give each specialist only the hunks matching its Step-2 signal plus the full file list; code-quality, smells and architecture always get the full diff.
 
 ---
 
@@ -168,7 +171,7 @@ Spawn all selected agents at once. On diffs over ~500 changed lines, give each s
   - **Absence claim — keep unless disproved.** The agent says a control is missing: an uncalled validator, a missing tenant or entity predicate, or a helper that returns a different id than the caller asked for. Not seeing the bug in the hunk is what a correct absence finding looks like. Drop it only when the re-read finds that control on the path. Confirm a helper-return mismatch by reading the helper, not by looking for the bad value at the call site.
   Report `Adjudicated: N findings dropped on re-read`, and count only invented or implausible findings. Do not count an absence the re-read could not disprove. This rule is not satisfied by deleting every finding that is not a visible bad line.
 - **Failure scenario required at Critical/Important.** Each must state *given what inputs/state → what wrong outcome*. A principle alone ("violates SRP", "not thread-safe") is not a scenario. If neither the agent nor your re-read can articulate one, **demote to Minor**.
-- **Deduplicate:** same file within ±3 lines and a similar description is one finding; keep the clearest wording, credit both agents, keep the higher severity.
+- **Deduplicate:** `mithril-smells` and `mithril-code-quality` overlap on Mysterious Name, Duplicated Code, Long Function and Large Class; treat those as one finding. Same file within ±3 lines and a similar description is one finding; keep the clearest wording, credit both agents, keep the higher severity.
 - **Shared vocabulary:** every agent tags findings `[CRITICAL]`/`[IMPORTANT]`/`[MINOR]` and ends with `Verdict: SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES`; no normalization is needed. Treat any other word as a defect in that agent.
 - **Conflict precedence** when two findings pull opposite ways, earlier wins: **(1) correctness → (2) security & data safety → (3) consistency with the repository's established conventions → (4) readability for the next maintainer → (5) simplicity → (6) performance.** Say which finding you overrode and why.
 - **mithril-gates:** a gate `FAIL` is a Critical finding. A number reported against a generic default, with no project threshold, is a note, not a FAIL and not a block. Skipped gates are a note, not a block.
@@ -205,7 +208,13 @@ Agents run: [list] | Adjudicated: N dropped | Issues: X critical, Y important, Z
 Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```
 
-Suggest follow-ups only when earned: smells needing named moves → `/mithril refactor`; a new pool/queue/cache without saturation signals → `/mithril observability`; shared mutable state or async hazards flagged by another agent → `/mithril concurrency`; a bug that spans files → `/mithril flow`.
+Suggest follow-ups only when earned: smells needing a step-by-step plan → `/mithril refactor`; a new pool/queue/cache without saturation signals → `/mithril observability`; shared mutable state or async hazards flagged by another agent → `/mithril concurrency`; a bug that spans files → `/mithril flow`.
+
+---
+
+## Step 6 — Lint Fix (opt-in: the `fix` keyword only)
+
+Everything above is read-only; this is the only step that edits files, and only `mithril-lint-fix` has the `Edit` tool. Run it only when `fix` is in `$ARGUMENTS` and the scope is diff mode (Cases A/B). With `deep` or `project`, print `fix skipped: diff mode only` and run nothing. After Step 5 completes (one writer, nothing else running), spawn `mithril-lint-fix` alone with the diff's changed-file list. Print what it fixed and left, and remind the caller to commit it separately from behavior changes (`style(lint): ... (no behaviour change)`). Without `fix`, the `[LINT]` findings from `mithril-smells` are reported and nothing is changed.
 
 ---
 
@@ -213,7 +222,7 @@ Suggest follow-ups only when earned: smells needing named moves → `/mithril re
 
 A flow pass on a critical path, plus the specialists Step 2 would select for those files. Expensive: if the in-scope list (after the Case C exclusions) exceeds **40 files**, require a narrower path or explicit confirmation. Do not walk every method for inputs and outputs. Flow greps its own entry points.
 
-Spawn in parallel: `mithril-flow` on the in-scope entry points, and the Step 2 specialists whose signals match (security on auth, tenant scope, or secrets; persistence on SQL; concurrency on a lock or a mutation across `await`). Not a method-by-method code-quality dump, and not architecture unless the diff adds a module or a layer-crossing import.
+Spawn in parallel: `mithril-flow` on the in-scope entry points, and the Step 2 specialists whose signals match (mithril-smells on any source file; security on auth, tenant scope, or secrets; persistence on SQL; concurrency on a lock or a mutation across `await`). Not a method-by-method code-quality dump, and not architecture unless the diff adds a module or a layer-crossing import.
 
 **Summary (do not delegate).** Flow map (entry → key paths → sinks), findings by severity tagged `file:method:line` under Step 5's rules, verdict. Structural notes from flow are suggestions, not findings.
 
@@ -234,12 +243,13 @@ Teaching, not review: runs **inline in the main thread** (no agent, no findings,
 
 ```
 /mithril                         # auto-selected agents on the diff / branch
-/mithril code arch               # specific aspects
+/mithril code arch               # specific aspects (code-quality and smells run on every source diff anyway)
 /mithril security flow           # auth or input-handling change: exploitability + entry→sink paths
 /mithril persistence delivery    # schema change: queries + migration safety
 /mithril review                  # PR-style confidence-scored review with Look Here First
 /mithril simplify                # light behavior-preserving cleanup (opt-in)
 /mithril refactor                # named, test-first refactor plan (opt-in)
+/mithril fix                     # review, then fix lint findings on the changed files (opt-in, edits files)
 /mithril gates                   # tool-measured lint/complexity/duplication/coverage/mutation
 /mithril project src/ code       # project scan of a subtree
 /mithril deep src/services       # flow on that path, plus the specialists the files would select

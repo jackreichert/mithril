@@ -57,6 +57,9 @@ Code with too much coupling between modules.
 - **Data Clumps** (variables that always travel together)
 - **Primitive Obsession** (using ints/strings where types should be)
 
+## Source check (2026-10-02)
+Definition and attribution verified at <https://martinfowler.com/bliki/CodeSmell.html>: "a surface indication that usually corresponds to a deeper problem in the system", coined by Kent Beck while helping with *Refactoring*; Fowler stresses that smells are warning signs to investigate, not proof (some long methods are fine). The 24-entry 2nd-edition list and the per-smell move pairings are in [`../../Books/Canon/05-Refactoring.md`](../../Books/Canon/05-Refactoring.md), Ch 3. Switch Statements and Parallel Inheritance Hierarchies above are 1st-edition entries.
+
 ## Practical use
 - In code review: flag the smell, propose a refactoring from the catalogue.
 - In refactoring: if a smell triggers but no refactoring fits cleanly, the smell may be acceptable in this context — judgment, not dogma.
