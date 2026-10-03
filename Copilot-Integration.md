@@ -48,7 +48,7 @@ mithril/
 └── Copilot-Integration.md             # This file
 ```
 
-**Skill inventory (canonical):** `code-quality`, `architecture`, `refactor`, `review`, `security-review`, `test-quality`, `delivery`, `distributed`, `concurrency`, `persistence`, `gates`, `observability`, `accessibility`, `usability`, `flow`, plus `tutor` (inline teaching, not a subagent).
+**Skill inventory (canonical):** `code-quality`, `smells`, `lint-fix`, `architecture`, `refactor`, `review`, `security-review`, `test-quality`, `delivery`, `distributed`, `concurrency`, `persistence`, `gates`, `observability`, `accessibility`, `usability`, `flow`, plus `tutor` (inline teaching, not a subagent).
 
 ## Setup — three layers
 
