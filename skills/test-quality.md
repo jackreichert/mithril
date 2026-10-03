@@ -22,26 +22,13 @@ Coverage and mutation numbers belong to `mithril-gates`. They block only when th
 
 ## Authoring gate
 
-Adapted from OpenClaw's test-audit skill: https://github.com/openclaw/openclaw/blob/main/.agents/skills/test-audit/SKILL.md
+For every NEW or CHANGED test, ask: (1) what behavior or contract does it protect, (2) what credible regression fails it, (3) why existing coverage doesn't already catch that (one owner per contract, at the strongest boundary; extend a table-driven case before adding a near-duplicate), (4) does it need a production seam (export, flag, wrapper) no production caller needs. A failed answer is a finding: Critical if false confidence, Important if duplicate or brittle weight.
 
-Apply to every NEW or CHANGED test in the diff. A test that fails the gate is a finding; severity follows consequence (Critical if it gives false confidence, Important if it is duplicate or brittle weight, Minor otherwise).
+**A bug-regression test must have failed on the pre-fix code, for the intended reason.** No evidence in the diff: ask for it (revert the fix, run the test).
 
-1. What observable behavior or contract does it protect?
-2. What credible regression makes it fail?
-3. Why doesn't existing coverage already catch that? One primary owner per contract, at the strongest boundary; another layer needs a distinct risk. Prefer extending a table-driven case to a near-duplicate.
-4. Does it need a production seam (export, flag, wrapper, hook) no production caller needs? Then test at the real boundary instead.
+Junk beyond rule 1: self-comparisons; expected values computed by the code under test; copied fixtures, inventories, or export lists; exact source greps; private call-shape tests duplicating a real boundary; negative controls that pass because a different guard rejects; names promising more than the input exercises.
 
-**Bug-regression tests must have failed on the pre-fix code, for the intended reason.** One that never demonstrably failed proves the mock, not the fix. If the diff shows no evidence, ask for it (revert the fix, run the test).
-
-Junk patterns, each a gate failure:
-- assertion-free probes; self-comparisons; expected values produced by the code under test
-- copied fixtures, inventories, or export lists; exact source or string greps
-- private call-shape tests duplicated at a real boundary; duplicate invocations of one contract
-- mocks that implement the asserted behavior; fixtures supplying what the owner should produce
-- negative controls that pass for an unrelated reason (a different guard rejects)
-- names promising more than the input exercises
-
-Retention bar: keep, and never recommend deleting, a test that independently guards a public API, protocol, config, migration, storage, security, or release contract. Source inspection is acceptable when it is the cheapest independent guard and survives an identifier-only refactor. Static or slow is not a deletion reason.
+**Retention bar:** never recommend deleting a test that independently guards a public API, protocol, config, migration, storage, security, or release contract. Static or slow is not a deletion reason.
 
 ## Confidence and Severity
 
