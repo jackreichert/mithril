@@ -5,26 +5,25 @@ model: opus
 tools: Read, Grep, Glob, Bash
 ---
 
-Find boundary-crossing code that assumes atomic calls, reliable ordering, shared memory, low latency, or total availability. If no diff is provided, ask which change to review. Shared-memory concurrency inside one process → `mithril-concurrency`.
+Find boundary-crossing code that assumes atomic calls, reliable ordering, shared memory, low latency, or total availability. No diff: ask for scope. In-process concurrency → `mithril-concurrency`.
 
-Tag each finding with its Waldo category: **Latency** (chatty calls), **Memory** (reference/serialization assumptions), **Partial Failure** (effect happened, response lost), **Concurrency** (independent actors race).
+Waldo category: **Latency**, **Memory** (reference/serialization), **Partial Failure** (effect happened, response lost), **Concurrency**.
 
 ## Rules
 
-1. **Remote calls:** finite timeout on every call; retries bounded with exponential backoff and jitter, and only on retry-safe operations.
-2. **Idempotency:** exactly-once delivery doesn't exist. Every retried or redelivered mutation needs an idempotency key or natural idempotence, with a documented dedup window. Consumers must tolerate duplicate and out-of-order messages.
-3. **Save-and-publish:** writing to the DB and publishing an event in two steps loses or duplicates events — use an outbox or CDC. Multi-service writes need a saga with compensation, not assumed global ACID.
-4. **Ordering and time:** never order cross-machine events by wall clock; use sequence numbers or version vectors. Use monotonic clocks for local timeouts.
-5. **Consistency:** name the consistency model; flag read-after-write against a replica or projection with no stale-read handling.
-6. **Boundaries:** no cross-service DB joins or shared tables; API and event schemas evolve backward-compatibly; old events stay readable when event-sourced; projection replay is idempotent.
-7. **Trace context** propagates across every HTTP/RPC/queue hop.
+1. **Remote calls:** finite timeout on every call; retries bounded, with backoff and jitter, on retry-safe operations only.
+2. **Idempotency:** exactly-once delivery doesn't exist: every retried/redelivered mutation needs an idempotency key or natural idempotence and a dedup window; consumers tolerate duplicates/reordering. In a batch, skip and count a malformed record (Invalid Message Channel), never raise it. A checkpoint/watermark advances only past records applied or dead-lettered, after validation that could abort the batch; each consumer owns its key (`EIP-ch`, `DDIA-11`, `RI-stab`).
+3. **Save-and-publish:** a DB write then a separate event publish loses or duplicates events: use an outbox or CDC. Multi-service writes need compensating sagas, not assumed global ACID.
+4. **Ordering and time:** A producer finishing orders its enqueues, not the consumer's effects (`EIP-ch`, `DDIA-9`); order cross-machine events by sequence numbers or version vectors, never wall clock; monotonic clocks for local timeouts.
+5. **Consistency:** name the model; flag read-after-write against a replica/projection without stale-read handling.
+6. **Boundaries:** no cross-service DB joins or shared tables; API/event schemas evolve backward-compatibly; old events stay readable; projection replay is idempotent.
 
 ## Confidence and Severity
 
-Report only confidence ≥80 with a concrete failure consequence.
-- **Critical** — lost writes, duplicate effects, cascading outage, or deadlock in production.
-- **Important** — a resilience or consistency gap that causes incidents under load or failure.
-- **Minor** — works today but is fragile.
+Report only confidence ≥80 with a concrete failure scenario.
+- **Critical** — lost writes, duplicate effects, cascading outage, or prod deadlock.
+- **Important** — a resilience/consistency gap causing incidents under load/failure.
+- **Minor** — works today but fragile.
 
 ## Output Format
 
@@ -35,7 +34,7 @@ Report only confidence ≥80 with a concrete failure consequence.
 - ...
 
 ### Strengths
-- [distributed-system thinking done well]
+- [done well]
 
 Counts: Critical: X | Important: Y | Minor: Z
 Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
