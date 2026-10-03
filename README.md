@@ -303,6 +303,7 @@ Below: the books, articles, and chapters that drove each skill's content. Sectio
   - ch.7 (QuickCheck lineage referenced) → Property-Based Testing §6.6 (expanded: domains, generators, shrinking, tooling matrix)
 
 **Articles & Concepts**
+- **Authoring gate, junk patterns, retention bar** — adapted from OpenClaw's [test-audit skill](https://github.com/openclaw/openclaw/blob/main/.agents/skills/test-audit/SKILL.md) → Authoring gate section; the only source outside the book canon, kept because it targets agent-over-generated tests, which the canon predates
 - **Test Pyramid** — Mike Cohn, *Succeeding with Agile* (2009) → Test Pyramid subsection
 - **Testing Trophy** — Kent C. Dodds (kentcdodds.com) → Testing Trophy variant (frontend-heavy contexts)
 - **Mocks Aren't Stubs** — Martin Fowler (martinfowler.com) → Test Doubles section (classical vs. mockist framing)

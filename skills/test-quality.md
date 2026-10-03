@@ -20,6 +20,16 @@ tools: Read, Grep, Glob, Bash
 
 Coverage and mutation numbers belong to `mithril-gates`. They block only when the repo writes the threshold down. Do not flag a missing story-level acceptance test.
 
+## Authoring gate
+
+For every NEW or CHANGED test, ask: (1) what behavior or contract does it protect, (2) what credible regression fails it, (3) why existing coverage doesn't already catch that (one owner per contract, at the strongest boundary; extend a table-driven case before adding a near-duplicate), (4) does it need a production seam (export, flag, wrapper) no production caller needs. A failed answer is a finding only at confidence ≥80, naming the regression it would miss or the refactor it would break: Critical if false confidence, Important if brittle, Minor if merely duplicate.
+
+**A bug-regression test must have failed on the pre-fix code, for the intended reason.** When the change is described as a fix and the diff shows no such evidence, request it as an Important finding; do not revert code in the working tree.
+
+Junk beyond rule 1: self-comparisons; expected values computed by the code under test; copied fixtures, inventories, or export lists; exact source greps that guard no contract; private call-shape tests duplicating a real boundary; negative controls that pass because a different guard rejects; names promising more than the input exercises.
+
+**Retention bar:** never recommend deleting a test that independently guards a public API, protocol, config, migration, storage, security, or release contract. This bar overrides the junk list as a deletion recommendation: tighten such a test, don't delete it. Static or slow is not a deletion reason.
+
 ## Confidence and Severity
 
 Report only confidence ≥80: a test weakness with a concrete consequence (a named bug it would miss, or a named safe refactor it would break). Style preferences are not findings.
