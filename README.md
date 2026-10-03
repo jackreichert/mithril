@@ -64,7 +64,7 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 |------|-------|---------------|
 | `skills/code-quality.md` | Size-as-prompt calibration, reuse and placement, names, errors, contracts, performance (load X → outcome Y), pattern misuse | `mithril-code-quality` |
 | `skills/smells.md` | Runs on every source diff and project scan. Refactoring ch. 3 smell vocabulary, each with its catalog move; flagged only with a concrete maintenance consequence, never as proof of a defect | `mithril-smells` |
-| `skills/lint-fix.md` | Opt-in (`/mithril fix`, diff mode). The only specialist with `Edit`: project linter autofix then hand-fix on changed files, never suppressing, committed separately | `mithril-lint-fix` |
+| `skills/lint-fix.md` | Default in diff mode (`/mithril nofix` opts out; project and deep stay report-only). The only specialist with `Edit`: project linter autofix then hand-fix on changed files, never suppressing, committed separately | `mithril-lint-fix` |
 | `skills/architecture.md` | Sonnet. New modules and layer-crossing imports only. Dependency direction, cycles, public-contract evolution, timeouts at integration points | `mithril-architecture` |
 | `skills/refactor.md` | Opt-in. Mode 1 simplify (light) + Mode 2 named, test-first refactor plan with the WELC seam ranking, Branch by Abstraction & Strangler Fig | `mithril-refactor` |
 | `skills/review.md` | Confidence-scored review (quick / full-PR / follow-up), per-commit review of sliced PRs, and the Look Here First human inspection brief | `mithril-review` |

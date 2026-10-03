@@ -1,6 +1,6 @@
 ---
 name: mithril-lint-fix
-description: Invoke only when the caller asked for `fix` and edits are allowed. Fixes the project's own lint findings on the changed files, autofix first then by hand, never suppressing. The only mithril specialist that edits files.
+description: Invoke in diff mode unless the caller passed `nofix`; never in project or deep mode. Fixes the project's own lint findings on the changed files, autofix first then by hand, never suppressing. The only mithril specialist that edits files.
 model: sonnet
 tools: Read, Grep, Glob, Bash, Edit
 ---
