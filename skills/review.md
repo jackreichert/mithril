@@ -21,7 +21,7 @@ Establish intended behavior from the request, ticket, confirmed examples, reprod
 
 Treat any PR or branch-vs-base review request as **full-pr**. For a sliced PR, also review per commit: one reason to change each, tree working.
 
-**Lenses (full-pr):** code (bugs, null, races, leaks, N+1) · tests (new, edge, and failure behavior) · errors (empty catches, swallowed async failures, success-shaped errors) · types (narrow public contracts) · comments and docs (accurate, explain why; when the diff changes a count, name, list, or load path, grep docs for the old value; `GEP-LF`, `APOSD-12/13`) · scope (every hunk traces to the stated intent in the PR body or commit messages; flag hunks from another change (including commits a stale branch base pulled in) and descriptions claiming what the diff doesn't do; `GEP-CL`). Adversarial security → `mithril-security-review`.
+**Lenses (full-pr):** code (bugs, null, races, leaks, N+1) · tests (new, edge, and failure behavior) · errors (empty catches, swallowed async failures, success-shaped errors) · types (narrow public contracts) · comments and docs (accurate, explain why; when the diff changes a count, name, list, or load path, grep docs for the old value; `GEP-LF`, `APOSD-12/13`) · scope (every hunk traces to the stated intent in the PR body or commit messages; flag hunks from another change (including commits a stale branch base pulled in) and descriptions claiming what the diff doesn't do; `GEP-CL`) · blast radius (mandatory when the diff changes a default or fallback, or newly gates previously unconditional code: grep for other callers, orgs, and tenants on the path and state what each gets when the key or value is absent; a new default that silently no-ops an out-of-diff caller is Critical if traced, `[ESCALATE]` if the caller can't be traced; Pragmatic Programmer, decoupling, Themes/02) · comment order (when a comment claims an ordering such as "before X" or "never after Y", trace the diff's actual statement order and flag a mismatch). Adversarial security → `mithril-security-review`.
 
 **Priority:** design fit → functionality (intent, edges, concurrency, data safety) → complexity → tests block when significant; naming, comments, style, and docs are flag-only. Style defers to the repo's formatter and linter.
 
@@ -35,7 +35,7 @@ Treat any PR or branch-vs-base review request as **full-pr**. For a sliced PR, a
 | 76–90 | Important |
 | 91–100 | Critical / explicit violation |
 
-**Report only confidence ≥80.** Skip pre-existing issues, linter/typechecker findings, ignored issues, and intentional behavior. Downgrade anything without a concrete fix.
+**Report only confidence ≥80**, except blast-radius and comment-order findings scoring 50–79: report those tagged `[ESCALATE]` and state the uncertainty; never inflate the score to clear the gate. Skip pre-existing issues, linter/typechecker findings, ignored issues, and intentional behavior. Downgrade anything without a concrete fix.
 
 ## Look Here First (required for full-pr / PR review)
 
@@ -67,11 +67,12 @@ Deeper pass: [remaining targets, or none]
   Fix: …
 - [IMPORTANT] …
 - [MINOR] …
+- [ESCALATE] Confidence: XX/100 — Lens: [blast radius/comment order] — file:line (below the gate; who is affected, what is uncertain) → fix or question
 
 ### Strengths (full-pr only)
 - …
 
-Counts: Critical: X | Important: Y | Minor: Z
+Counts: Critical: X | Important: Y | Minor: Z | Escalate: W (excluded from Verdict)
 Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```
 
