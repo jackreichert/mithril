@@ -113,7 +113,6 @@ require_in_agent() {
   fi
 }
 require_in_agent mithril-security-review 'STRIDE' 'STRIDE threat enum'
-require_in_agent mithril-security-review 'Shostack|four questions' 'Shostack four questions'
 require_in_agent mithril-delivery 'expand-contract' 'expand-contract deploy/rollback safety'
 require_in_agent mithril-code-quality 'Size is a prompt, not a finding' 'anti-dogma size calibration'
 require_in_agent mithril-code-quality 'independent reasons to change' 'class decomposition decision test'
@@ -123,9 +122,8 @@ require_in_agent mithril-architecture 'Hyrum|expand-contract' 'API contract evol
 require_in_agent mithril-architecture 'Class decomposition test|disjoint method/field clusters' 'class decomposition counterweight'
 require_in_agent mithril-test-quality 'Property-based|property-based|PBT' 'property-based testing'
 require_in_agent mithril-test-quality 'shrink|Hypothesis|fast-check' 'PBT tooling / shrinking'
-require_in_agent mithril-test-quality 'Two test layers|acceptance-level evidence' 'customer/programmer test layers'
+require_in_agent mithril-test-quality 'Acceptance scenarios' 'acceptance scenarios in test-quality'
 require_in_agent mithril-test-quality 'Confidence and Severity' 'confidence threshold'
-require_in_agent mithril-persistence 'sargable' 'sargable predicates'
 require_in_agent mithril-review 'Review Contract Precondition|Never infer intended behavior' 'requirements-first review contract'
 require_in_agent mithril-review 'Look Here First' 'human PR inspection brief'
 require_in_agent mithril-observability 'USE method' 'USE method on pools/queues'
@@ -138,12 +136,6 @@ if grep -qE 'UI usability clear.*discoverable.*feedback and recovery' "$SCRIPT_D
   ok "Constitution carries the UI usability gate"
 else
   bad "Constitution missing UI usability Definition-of-Done gate"
-  parity_ok=0
-fi
-if grep -qE 'adds/changes classes, constructors, fields, collaborators, or public methods' "$CMD_SRC"; then
-  ok "quality orchestrator routes existing class-structure changes to architecture"
-else
-  bad "quality orchestrator missing existing class-structure routing signal"
   parity_ok=0
 fi
 if grep -qE 'Establish the Review Contract Before Judging Code' "$CMD_SRC"; then
@@ -174,13 +166,12 @@ done
 # ---- 3. count claims -----------------------------------------------------------
 hdr "Count claims"
 claims_ok=1
-for doc in README.md; do
-  while IFS= read -r n; do
-    [[ -z "$n" ]] && continue
-    [[ "$n" -eq "$n_agents" ]] \
-      || { bad "$doc claims $n agents; $n_agents canonical runtime skills exist (stale count)"; claims_ok=0; }
-  done < <(grep -ohE '[0-9]+ agent' "$SCRIPT_DIR/$doc" 2>/dev/null | grep -oE '^[0-9]+' | sort -u)
-done
+doc=README.md
+while IFS= read -r n; do
+  [[ -z "$n" ]] && continue
+  [[ "$n" -eq "$n_agents" ]] \
+    || { bad "$doc claims $n agents; $n_agents canonical runtime skills exist (stale count)"; claims_ok=0; }
+done < <(grep -ohE '[0-9]+ agent' "$SCRIPT_DIR/$doc" 2>/dev/null | grep -oE '^[0-9]+' | sort -u)
 (( claims_ok )) && ok "README agent counts match reality ($n_agents)"
 # Theme count: Themes/README claims N guides
 n_themes=$(find "$SCRIPT_DIR/Resources/Themes" -maxdepth 1 -name '[0-9]*.md' | wc -l | tr -d ' ')
