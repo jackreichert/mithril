@@ -166,13 +166,12 @@ done
 # ---- 3. count claims -----------------------------------------------------------
 hdr "Count claims"
 claims_ok=1
-for doc in README.md; do
-  while IFS= read -r n; do
-    [[ -z "$n" ]] && continue
-    [[ "$n" -eq "$n_agents" ]] \
-      || { bad "$doc claims $n agents; $n_agents canonical runtime skills exist (stale count)"; claims_ok=0; }
-  done < <(grep -ohE '[0-9]+ agent' "$SCRIPT_DIR/$doc" 2>/dev/null | grep -oE '^[0-9]+' | sort -u)
-done
+doc=README.md
+while IFS= read -r n; do
+  [[ -z "$n" ]] && continue
+  [[ "$n" -eq "$n_agents" ]] \
+    || { bad "$doc claims $n agents; $n_agents canonical runtime skills exist (stale count)"; claims_ok=0; }
+done < <(grep -ohE '[0-9]+ agent' "$SCRIPT_DIR/$doc" 2>/dev/null | grep -oE '^[0-9]+' | sort -u)
 (( claims_ok )) && ok "README agent counts match reality ($n_agents)"
 # Theme count: Themes/README claims N guides
 n_themes=$(find "$SCRIPT_DIR/Resources/Themes" -maxdepth 1 -name '[0-9]*.md' | wc -l | tr -d ' ')
