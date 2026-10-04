@@ -9,7 +9,9 @@
 set -u
 
 repo="${MITHRIL_REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-git -C "$repo" rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
+# Only act when $repo is itself a checkout root, never a copy nested in another repo.
+top="$(git -C "$repo" rev-parse --show-toplevel 2>/dev/null)" || exit 0
+[ "$(cd "$top" && pwd -P)" = "$(cd "$repo" && pwd -P)" ] || exit 0
 
 auto_pull_enabled() {
   local v="${MITHRIL_AUTO_PULL:-}"
@@ -21,11 +23,15 @@ auto_pull_enabled() {
 }
 
 upstream="$(git -C "$repo" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null)" || exit 0
-remote="${upstream%%/*}"
+branch="$(git -C "$repo" rev-parse --abbrev-ref HEAD)"
+remote="$(git -C "$repo" config "branch.$branch.remote")" || exit 0
 
-fetch=(git -C "$repo" fetch --quiet "$remote")
-if command -v timeout >/dev/null 2>&1; then fetch=(timeout 20 "${fetch[@]}"); fi
-GIT_TERMINAL_PROMPT=0 "${fetch[@]}" >/dev/null 2>&1 || exit 0
+# Bound the fetch: a hard timeout when available, plus transport-level limits.
+fetch=(git -C "$repo" -c http.lowSpeedLimit=1 -c http.lowSpeedTime=20 fetch --quiet "$remote")
+for t in timeout gtimeout; do
+  if command -v "$t" >/dev/null 2>&1; then fetch=("$t" 20 "${fetch[@]}"); break; fi
+done
+GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=10" "${fetch[@]}" >/dev/null 2>&1 || exit 0
 
 counts="$(git -C "$repo" rev-list --left-right --count "HEAD...$upstream" 2>/dev/null)" || exit 0
 read -r ahead behind <<<"$counts"
@@ -49,4 +55,6 @@ state=()
 [ "$dirty" -gt 0 ] && state+=("dirty ($dirty file(s))")
 hint=""
 [ "$behind" -gt 0 ] && ! auto_pull_enabled && hint="; auto_pull is off"
-(IFS=,; echo "mithril: ${state[*]}$hint")
+line="${state[0]}"
+for part in "${state[@]:1}"; do line="$line, $part"; done
+echo "mithril: $line$hint"

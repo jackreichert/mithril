@@ -20,7 +20,7 @@ Agent names (`mithril-code-quality`, …) are identical on both hosts.
 
 ## Step 0 — Update check
 
-Run `bash "${CLAUDE_PLUGIN_ROOT:-<mithril repo>}/scripts/update-check.sh"` once, first. Print its output (at most one line) verbatim above the plan; no output means current, say nothing. `tutor` mode skips it. It never blocks the review; ignore a failure.
+Run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-check.sh"` once, first (skip it if `CLAUDE_PLUGIN_ROOT` is unset). Print its output (at most one line) verbatim above the plan; no output means current, say nothing. `tutor` mode skips it. It never blocks the review; ignore a failure.
 
 ## Step 1 — Scope
 

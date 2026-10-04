@@ -34,9 +34,16 @@ setup 2; echo x > "$tmp/work/f"; git -C "$tmp/work" add f; git -C "$tmp/work" co
 out="$(MITHRIL_AUTO_PULL=on run)"; check "diverged reported, not pulled" "diverged: 1 ahead, 2 behind" "$out"
 check "diverged leaves HEAD" "local" "$(git -C "$tmp/work" log -1 --format=%s)"
 setup 1; echo z > "$tmp/work/g"; git -C "$tmp/work" add g
-out="$(MITHRIL_AUTO_PULL=on run)"; check "dirty and behind is reported, not pulled" "1 behind origin/main,dirty (1 file(s))" "$out"
+out="$(MITHRIL_AUTO_PULL=on run)"; check "dirty and behind is reported, not pulled" "1 behind origin/main, dirty (1 file(s))" "$out"
 setup 1; mkdir -p "$XDG_CONFIG_HOME/mithril"; echo 'auto_pull=on' > "$XDG_CONFIG_HOME/mithril/config"
 check "config file turns it on" "fast-forwarded 1" "$(run)"
 rm -rf "$XDG_CONFIG_HOME"
+setup 0; echo x > "$tmp/work/f"; git -C "$tmp/work" add f; git -C "$tmp/work" commit -q -m local
+check "ahead only, auto_pull on, reported" "1 ahead of origin/main" "$(MITHRIL_AUTO_PULL=on run)"
+setup 1; git -C "$tmp/work" remote set-url origin "$tmp/nonexistent"
+check "failed fetch is silent" "" "$(MITHRIL_AUTO_PULL=on run)"
+setup 1; mkdir -p "$tmp/work/sub"
+check "nested subdir of a repo is silent" "" "$(MITHRIL_AUTO_PULL=on MITHRIL_REPO="$tmp/work/sub" bash "$script")"
+check "nested subdir left HEAD alone" "base" "$(git -C "$tmp/work" log -1 --format=%s)"
 mkdir -p "$tmp/plain"; check "non-git dir is silent" "" "$(MITHRIL_REPO="$tmp/plain" bash "$script")"
 exit $((fails > 0))
