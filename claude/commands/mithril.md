@@ -18,6 +18,10 @@ Agent names (`mithril-code-quality`, …) are identical on both hosts.
 
 ---
 
+## Step 0 — Update check
+
+Run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-check.sh"` once, first (skip it if `CLAUDE_PLUGIN_ROOT` is unset). Print its output (at most one line) verbatim above the plan; no output means current, say nothing. `tutor` mode skips it. It never blocks the review; ignore a failure.
+
 ## Step 1 — Scope
 
 `project` anywhere in `$ARGUMENTS` → **Case C**. `deep` (alias `trace`) → resolve scope with Cases A–C, then follow **Deep Mode** instead of Steps 2–5 (`deep` and `project` combine). `tutor`/`learn` → **Tutor Mode**.
