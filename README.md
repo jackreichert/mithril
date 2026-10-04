@@ -50,6 +50,12 @@ Then run `/mithril` from either tool in any git repo.
 
 **GitHub Copilot, Codex, and other tools** don't have an equivalent plugin/subagent mechanism for the review agents, but the write-time [Constitution](CONSTITUTION.md) is plain markdown — point that tool's project-instructions file at `CONSTITUTION.md` (see [Multi-tool reach](#multi-tool-reach)). For Copilot specifically, see [`Copilot-Integration.md`](Copilot-Integration.md).
 
+### Update check
+
+On each `/mithril` run (except `tutor`) the router calls `scripts/update-check.sh`, which fetches the checkout's own upstream and prints one line only when something is off: behind, ahead, diverged, or dirty (tracked files). Current, not a git checkout (a plugin cache copy), or an offline fetch: silent.
+
+Config key `auto_pull`, default **off**. Turn it on with `MITHRIL_AUTO_PULL=on` or the line `auto_pull=on` in `${XDG_CONFIG_HOME:-~/.config}/mithril/config`. When on, a clean checkout that is purely behind is fast-forwarded with `git merge --ff-only`; anything else (dirty, ahead, diverged) is only reported. It never merges, rebases or resets. Tests: `bash tests/update-check.sh`.
+
 ### Contributing
 
 The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUTING.md`](CONTRIBUTING.md).

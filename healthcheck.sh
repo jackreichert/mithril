@@ -171,6 +171,13 @@ done
 (( vocab_ok )) && ok "all agents use the shared severity and verdict vocabulary"
 (( parity_ok )) && ok "all required skill checklists present in agents"
 
+# ---- 2d. update check wired in -------------------------------------------------
+if [[ -x "$SCRIPT_DIR/scripts/update-check.sh" ]] && grep -q 'scripts/update-check.sh' "$CMD_SRC"; then
+  ok "update-check script exists, is executable, and the router calls it"
+else
+  bad "scripts/update-check.sh missing, not executable, or not called from the router"
+fi
+
 # ---- 3. count claims -----------------------------------------------------------
 hdr "Count claims"
 claims_ok=1
