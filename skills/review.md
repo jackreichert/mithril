@@ -18,12 +18,25 @@ Establish intended behavior from the request, ticket, confirmed examples, reprod
 | **quick** | Coding checkpoint | code |
 | **full-pr** | Before a PR or PR update, or when asked to review a PR | all lenses |
 | **targeted-follow-up** | After review feedback | code + relevant lenses |
+| **execute** | Opt-in (`/mithril review execute`); logic or data changes; full-pr lenses plus the run below | full-pr, executing |
 
 Treat any PR or branch-vs-base review request as **full-pr**. For a sliced PR, also review per commit: one reason to change each, tree working.
 
 **Lenses (full-pr):** code (bugs, null, races, leaks, N+1) · tests (new, edge, and failure behavior) · errors (empty catches, swallowed async failures, success-shaped errors) · types (narrow public contracts) · comments and docs (accurate, explain why; when the diff changes a count, name, list, or load path, grep docs for the old value; `GEP-LF`, `APOSD-12/13`) · scope (every hunk traces to the stated intent in the PR body or commit messages; flag hunks from another change (including commits a stale branch base pulled in) and descriptions claiming what the diff doesn't do; `GEP-CL`) · blast radius (mandatory when the diff changes a default or fallback, or newly gates previously unconditional code: grep for other callers, orgs, and tenants on the path and state what each gets when the key or value is absent; a new default that silently no-ops an out-of-diff caller is Critical if traced, `[ESCALATE]` if the caller can't be traced; Pragmatic Programmer, decoupling, Themes/02) · comment order (when a comment claims an ordering such as "before X" or "never after Y", trace the diff's actual statement order and flag a mismatch). Adversarial security → `mithril-security-review`.
 
 **Priority:** design fit → functionality (intent, edges, concurrency, data safety) → complexity → tests block when significant; naming, comments, style, and docs are flag-only. Style defers to the repo's formatter and linter.
+
+## Execute mode (opt-in)
+
+Reading a diff finds fewer defects than reviewers expect and understanding is the bottleneck (`BB-MCR`); running the code with inputs you chose is how you learn it (`BB-ET3`). Run in order, and **stop at step 2 if the contract is missing** (state it as ASSUMED):
+
+1. **Cases first.** From the Review Contract only (PR body, ticket, examples), write 5-10 cases before opening the diff: typical, boundary (0, 1, N, N±1, empty, null), failure, and one repeat-the-operation case. Include inputs the author's tests do not use.
+2. **Run the tests before reading the code.** Record pass/fail and what they fail to cover.
+3. **Read the diff**, then add cases for what you found.
+4. **Build a throwaway fixture** (temp dir or scratch DB, never a shared or real environment; delete it after) and call the changed code with your cases. Prefer the public entry point. Never touch production data or secrets.
+5. Report only what you ran: input, expected (from the contract), actual. A mismatch is a finding at confidence ≥90. A case you could not run is listed under `Not executed`, never implied clean.
+
+Run only as a fresh agent that did not write the change; if you did, say so and do not use this mode. End with the usual verdict; any contract mismatch you reproduced means `NEEDS WORK` at minimum.
 
 ## Confidence
 
@@ -68,6 +81,10 @@ Deeper pass: [remaining targets, or none]
 - [IMPORTANT] …
 - [MINOR] …
 - [ESCALATE] Confidence: XX/100 — Lens: [blast radius/comment order] — file:line (below the gate; who is affected, what is uncertain) → fix or question
+
+### Executed (execute mode only)
+- case — input → expected / actual — PASS | FAIL
+Not executed: [cases skipped and why]
 
 ### Strengths (full-pr only)
 - …
