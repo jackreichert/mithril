@@ -49,3 +49,10 @@ Many of these papers exist as university course PDFs. Linking them is fine — t
 - **IEEE Xplore** — Brooks, embedded/aerospace papers.
 - **Author homepages** — Kleppmann, Fowler, several others post their own PDFs.
 - **Citeseer / Semantic Scholar** — search by DOI; many open versions surface.
+
+## Expectations, Outcomes, and Challenges of Modern Code Review
+
+- **Authors**: Alberto Bacchelli, Christian Bird
+- **Year**: 2013
+- **Venue**: 35th International Conference on Software Engineering (ICSE)
+- **Publication page**: <https://www.microsoft.com/en-us/research/publication/expectations-outcomes-and-challenges-of-modern-code-review/>
