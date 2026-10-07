@@ -65,7 +65,7 @@ Joel's articles are a relevant exception worth noting: his older posts have been
 
 | Article | URL |
 |---------|-----|
-| Exploratory Testing 3.0 (2025) | <https://www.satisfice.com/blog/archives/1509> |
+| Exploratory Testing 3.0 (2015) | <https://www.satisfice.com/blog/archives/1509> |
 
 ## Software Metrics
 
