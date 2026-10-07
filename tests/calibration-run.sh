@@ -24,4 +24,13 @@ out="$(bash "$script" idor-orders 2>&1)"
 check "default case runs plain /mithril" "'/mithril'" "$out"
 check_absent "default case is not execute mode" "review execute" "$out"
 
+# A contract with an apostrophe must still print a command the shell can parse.
+mkdir -p "$tmp/cal/cases/quoted/base" "$tmp/cal/cases/quoted/changed"
+cp "$script" "$tmp/cal/run.sh"
+printf 'mode: execute\n' > "$tmp/cal/cases/quoted/expected.yaml"
+printf "The author's rule holds.\n" > "$tmp/cal/cases/quoted/contract.md"
+echo x > "$tmp/cal/cases/quoted/base/f"; echo y > "$tmp/cal/cases/quoted/changed/f"
+line="$(bash "$tmp/cal/run.sh" quoted 2>&1 | grep 'claude -p')"
+check "apostrophe in contract survives quoting" "The author's rule holds." "$(eval "printf '%s' ${line#*claude -p }")"
+
 [ "$fails" -eq 0 ] || { echo "$fails failure(s)"; exit 1; }

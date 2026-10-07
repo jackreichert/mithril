@@ -42,6 +42,7 @@ if grep -q '^mode: execute' "$CASE_DIR/expected.yaml"; then
 fi
 command -v claude >/dev/null 2>&1 || echo "▸ claude CLI not found — run this from a Claude Code session instead."
 echo "▸ run the review with:"
-echo "    cd $work && claude -p '$prompt'"
+q="'\\''"   # close quote, escaped apostrophe, reopen
+echo "    cd $work && claude -p '${prompt//\'/$q}'"
 echo "  then score against expected.yaml (see calibration/README.md protocol)."
 [[ "$KEEP" == "--keep" ]] || echo "▸ (temp repo left in place; rm -rf $work when done)"
