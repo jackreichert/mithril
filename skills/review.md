@@ -28,15 +28,15 @@ Treat any PR or branch-vs-base review request as **full-pr**. For a sliced PR, a
 
 ## Execute mode (opt-in)
 
-Reading a diff finds fewer defects than reviewers expect and understanding is the bottleneck (`BB-MCR`); running the code with inputs you chose is how you learn it (`BB-ET3`). Run in order, and **stop at step 2 if the contract is missing** (state it as ASSUMED):
+Reading a diff finds fewer defects than reviewers expect; understanding is the bottleneck (`BB-MCR`). Running the code with inputs you chose is how you learn it (`BB-ET3`). In order:
 
-1. **Cases first.** From the Review Contract only (PR body, ticket, examples), write 5-10 cases before opening the diff: typical, boundary (0, 1, N, N±1, empty, null), failure, and one repeat-the-operation case. Include inputs the author's tests do not use.
-2. **Run the tests before reading the code.** Record pass/fail and what they fail to cover.
-3. **Read the diff**, then add cases for what you found.
-4. **Build a throwaway fixture** (temp dir or scratch DB, never a shared or real environment; delete it after) and call the changed code with your cases. Prefer the public entry point. Never touch production data or secrets.
-5. Report only what you ran: input, expected (from the contract), actual. A mismatch is a finding at confidence ≥90. A case you could not run is listed under `Not executed`, never implied clean.
+1. **Cases first.** From the Review Contract only (PR body, ticket, examples), write 5-10 cases with expected results before opening the diff: typical, boundary (0, 1, N, N±1, empty, null), failure, one repeat. Include inputs the author's tests skip. With an ASSUMED contract, tag expectations ASSUMED and go on.
+2. **Run the tests before reading the code.** Record pass/fail and the gaps.
+3. **Read the diff**; add cases for what you found.
+4. **Throwaway fixture** (temp dir or scratch DB, never shared or real data or secrets; delete after): call the changed code, preferring the public entry point.
+5. Report only what you ran. A mismatch with the contract is a finding at confidence ≥90. A case not run goes under `Not executed`, never implied clean.
 
-Run only as a fresh agent that did not write the change; if you did, say so and do not use this mode. End with the usual verdict; any contract mismatch you reproduced means `NEEDS WORK` at minimum.
+Only a fresh agent that did not write the change runs this mode; otherwise say so and stop. A reproduced mismatch means at least `NEEDS WORK`.
 
 ## Confidence
 
@@ -83,6 +83,7 @@ Deeper pass: [remaining targets, or none]
 - [ESCALATE] Confidence: XX/100 — Lens: [blast radius/comment order] — file:line (below the gate; who is affected, what is uncertain) → fix or question
 
 ### Executed (execute mode only)
+Cases written before the diff: [list, in order]
 - case — input → expected / actual — PASS | FAIL
 Not executed: [cases skipped and why]
 

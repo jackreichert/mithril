@@ -155,7 +155,7 @@ Every prompt carries: the Project Context block, the Review Contract, the change
 
 > The diff is your FOCUS, not your SCOPE. Read each changed file in full and Grep the repo (start from the reuse surface) before judging. Every Critical/Important finding must state a concrete failure: given what input/state → what wrong outcome.
 
-**Execute mode** (`review execute`): spawn one fresh `mithril-review` agent with `mode: execute`, the Review Contract, the base ref, and the changed-file list, but **not** the diff text, so it writes its cases before reading the change. Run it alongside the other selected agents; it never reuses an agent that wrote the code.
+**Execute mode** (`review execute`): this replaces the plain `mithril-review` agent, never adds a second one. Spawn it fresh (never reuse an agent that wrote the code) with `mode: execute`, the Review Contract, the base ref, and the changed-file list. Unlike every other prompt it gets **no** diff text, so it writes its cases before reading the change.
 
 ```
 Task(
