@@ -33,11 +33,15 @@ git -C "$work" --no-pager diff --cached --stat
 echo
 echo "▸ expected findings: $CASE_DIR/expected.yaml"
 echo
-if command -v claude >/dev/null 2>&1; then
-  echo "▸ run the review with:"
-  echo "    cd $work && claude -p '/mithril'"
-  echo "  then score against expected.yaml (see calibration/README.md protocol)."
-else
-  echo "▸ claude CLI not found — cd $work and run /mithril from a Claude Code session."
+# Execute-mode cases carry a contract.md (the PR description), kept out of the diff
+# so the reviewer writes its cases from the contract before reading the code.
+prompt="/mithril"
+if grep -q '^mode: execute' "$CASE_DIR/expected.yaml"; then
+  prompt="/mithril review execute"
+  [[ -f "$CASE_DIR/contract.md" ]] && prompt="$prompt — PR description: $(tr '\n' ' ' < "$CASE_DIR/contract.md")"
 fi
+command -v claude >/dev/null 2>&1 || echo "▸ claude CLI not found — run this from a Claude Code session instead."
+echo "▸ run the review with:"
+echo "    cd $work && claude -p '$prompt'"
+echo "  then score against expected.yaml (see calibration/README.md protocol)."
 [[ "$KEEP" == "--keep" ]] || echo "▸ (temp repo left in place; rm -rf $work when done)"
