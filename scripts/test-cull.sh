@@ -41,6 +41,7 @@ done
 repo="$(cd "$repo" && pwd -P)"
 git -C "$repo" rev-parse --show-toplevel >/dev/null 2>&1 || die "$repo is not a git repository"
 [ "$(git -C "$repo" rev-parse --show-toplevel)" = "$repo" ] || die "$repo is not a repository root"
+[ -z "$prev" ] || [ -r "$prev" ] || die "cannot read --compare file $prev"
 resolve_path() { # absolute, symlink-resolved form of a path that may not exist yet
   local p="$1" rest=""
   while [ ! -e "$p" ]; do rest="/$(basename "$p")$rest"; p="$(dirname "$p")"; done
@@ -228,7 +229,6 @@ fi
 num_of() { sed -n "s/.*\"$2\": *\([0-9.]*\).*/\1/p" "$1" | head -1; }
 compare_lines=""
 if [ -n "$prev" ]; then
-  [ -r "$prev" ] || die "cannot read --compare file $prev"
   for pair in "coverage_pct:$coverage" "mutation_score_pct:$mutation_score"; do
     k="${pair%%:*}"; now="${pair#*:}"; was="$(num_of "$prev" "$k")"
     if [ -z "$was" ]; then v="CANNOT PROVE (not measured in the earlier report)"

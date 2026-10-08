@@ -76,6 +76,12 @@ else
   echo "skip mutation tests: jq not installed"
 fi
 
+# A missing --compare file must fail before the suite runs, not after.
+cmp_out="$("$script" "$repo" --out "$tmp/o11" --test-cmd "touch $tmp/ran-marker" --compare "$tmp/nope.json" 2>&1)"; cmp_rc=$?
+check "missing compare file is refused" "cannot read --compare file" "$cmp_out"
+check "missing compare file exits 2" "2" "$cmp_rc"
+absent "missing compare file refused before any run" "x" "$([ -e "$tmp/ran-marker" ] && echo x)"
+
 # Coverage via command, and guards.
 "$script" "$repo" --out "$tmp/o7" --coverage-cmd 'echo noise; echo 91.5%' >/dev/null
 check "coverage-cmd last line parsed" '"coverage_pct": 91.5' "$(cat "$tmp/o7/report.json")"
