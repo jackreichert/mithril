@@ -73,7 +73,7 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `skills/lint-fix.md` | Default in diff mode (`/mithril nofix` opts out; project and deep stay report-only). The only specialist with `Edit`: project linter autofix then hand-fix on changed files, never suppressing, committed separately | `mithril-lint-fix` |
 | `skills/architecture.md` | Sonnet. New modules and layer-crossing imports only. Dependency direction, cycles, public-contract evolution, timeouts at integration points | `mithril-architecture` |
 | `skills/refactor.md` | Opt-in. Mode 1 simplify (light) + Mode 2 named, test-first refactor plan with the WELC seam ranking, Branch by Abstraction & Strangler Fig | `mithril-refactor` |
-| `skills/review.md` | Confidence-scored review (quick / full-PR / follow-up), per-commit review of sliced PRs, and the Look Here First human inspection brief | `mithril-review` |
+| `skills/review.md` | Confidence-scored review (quick / full-PR / follow-up), per-commit review of sliced PRs, the Look Here First human inspection brief, and an opt-in execute mode that runs the changed code in a throwaway fixture | `mithril-review` |
 | `skills/security-review.md` | Scanners, then a manual read. Tenant scoping, exact-match allowlists, fail-closed, exploit-or-downgrade. No empty-category report and no PHI policy | `mithril-security-review` |
 | `skills/test-quality.md` | False confidence, behavior-vs-internals, determinism, failure edges. Acceptance scenarios only when the repo has them | `mithril-test-quality` |
 | `skills/delivery.md` | Deploy/rollback safety: expand-contract, build-once, config and secrets, process hygiene, feature flags, lockfiles | `mithril-delivery` |

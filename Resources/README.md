@@ -18,9 +18,10 @@ Resources/
 │   ├── Robert-Martin/                 # blog.cleancoder.com
 │   ├── Joel-Spolsky/                  # joelonsoftware.com
 │   ├── Jon-Skeet/                     # codeblog.jonskeet.uk
-│   └── Google-Engineering/            # google.github.io/eng-practices
+│   ├── Google-Engineering/            # google.github.io/eng-practices
+│   └── Bach-Bolton/                   # satisfice.com (exploratory testing)
 ├── Standards/                         # OWASP, 12-Factor, NASA Power of 10, style guides
-├── Papers/                            # Parnas, Waldo, Moseley/Marks, Brooks
+├── Papers/                            # Parnas, Waldo, Moseley/Marks, Brooks, Bacchelli/Bird
 ├── Themes/                            # 20 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer
 └── Originals/
     ├── README.md                      # Canonical URLs for open-licensed sources
@@ -59,3 +60,5 @@ Skill text cites sources by these ids so long citations stay out of the prompts.
 | `SQLPE-5` | SQL Performance Explained, Ch 5 Clustering Data (covering indexes) | `Books/Performance-Reliability/30-SQL-Performance-Explained.md` |
 | `SQLPE-7` | SQL Performance Explained, Ch 7 Partial Results (paging) | `Books/Performance-Reliability/30-SQL-Performance-Explained.md` |
 | `SKEET-UTC` | Jon Skeet, Storing UTC is not a silver bullet | `Articles/Jon-Skeet/01-Storing-UTC-Is-Not-a-Silver-Bullet.md` |
+| `BB-MCR` | Bacchelli and Bird, Expectations, Outcomes, and Challenges of Modern Code Review (ICSE 2013) | `Papers/05-Expectations-Outcomes-and-Challenges-of-Modern-Code-Review.md` |
+| `BB-ET3` | Bach and Bolton, Exploratory Testing 3.0 | `Articles/Bach-Bolton/01-Exploratory-Testing-3.0.md` |

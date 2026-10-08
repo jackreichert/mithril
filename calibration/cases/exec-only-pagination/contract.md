@@ -1,0 +1,1 @@
+Add pageCount(total, size): the number of pages needed to show `total` items at `size` per page. A partial last page counts as a page, so it rounds up (10 items at 3 per page is 4 pages). Zero items is zero pages.
