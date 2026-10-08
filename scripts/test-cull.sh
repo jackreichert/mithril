@@ -88,7 +88,7 @@ coupling() {
       NF == 0 { next }
       { if ($0 ~ re) seen[$0] = 1; else nontest++ }
       END { flush()
-        if (total < minr) { print "SKIP\t" total; exit }
+        if (total < minr) { print "SKIP\t" (total + 0); exit }
         for (f in hit) if (hit[f] / total >= ratio) printf "%s\t%d\t%d\n", f, hit[f], total
         print "TOTAL\t" total }' > "$work/coupling.out"
   if grep -q '^SKIP' "$work/coupling.out"; then
