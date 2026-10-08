@@ -97,6 +97,8 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `Resources/Themes/` | 20 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer between the per-source summaries and the skills; each theme names its tensions and the checklist its skill encodes | — |
 | `CONSTITUTION.md` | Write-time prevention layer — the skills distilled into always-on imperative rules, a conflict-precedence order, numeric gate thresholds, and a Definition of Done. Loaded via a `CLAUDE.md` `@`-import. | — |
 | `hooks/pre-commit` | Opt-in git hook that runs the fast gates (lint + complexity) on staged files and blocks the commit on a breach. See `hooks/README.md`. | — |
+| `scripts/test-cull.sh` | Report-only periodic test cull: ranks tests to cull or rewrite from mutation (Stryker report), refactor change-coupling, duplicate assertions, flaky and slow runs. Read-only on the target repo; records coverage and mutation baselines and `--compare`s a later run. Tests: `bash tests/test-cull.sh`. | — |
+| `playbooks/test-cull.md` | Short step list a small model follows to run the script, read the report, and list candidates to the owner. Never deletes. | — |
 
 ### Two modes: review-time and write-time
 

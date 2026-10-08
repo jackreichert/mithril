@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1",
+  "files": {
+    "src/calc.py": {
+      "mutants": [
+        {"id": "m1", "status": "Killed", "killedBy": ["g1"], "coveredBy": ["g1", "n1"]},
+        {"id": "m2", "status": "Killed", "killedBy": ["g1"], "coveredBy": ["g1", "n1"]},
+        {"id": "m3", "status": "Killed", "killedBy": ["g1"], "coveredBy": ["g1", "n1"]},
+        {"id": "m4", "status": "Survived", "coveredBy": ["g1", "n1"]}
+      ]
+    }
+  },
+  "testFiles": {
+    "tests/test_good.py": {"tests": [{"id": "g1", "name": "test_add_returns_sum"}]},
+    "tests/test_never_kills.py": {"tests": [{"id": "n1", "name": "test_smoke"}]}
+  }
+}
