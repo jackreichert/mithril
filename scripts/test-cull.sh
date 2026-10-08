@@ -152,11 +152,24 @@ flaky_slow() {
   if [ "$got" -ge 2 ]; then mark "flaky" "ran" "$got runs compared"
   else mark "flaky" "not run" "only $got run produced JUnit XML (need 2)"; fi
   mark "slow" "ran" "mean seconds per test over $got run(s), threshold ${slow_s}s"
+  # Runners without a file= attribute (pytest xunit2, jest-junit) give a dotted classname or a path:
+  # map it to a test file so one file's evidence lands in one row.
   awk -F'\t' -v slow="$slow_s" -v runsok="$got" '
-    { p = $1; f[p] = $2; t[p] += $3; c[p]++; if ($4 == "F") fail[p]++; else pass[p]++ }
+    function resolve(k,   s, q) {
+      if (k in paths) return k
+      s = k; gsub(/\./, "/", s)
+      while (s != "") {
+        if (s in noext) return noext[s]
+        q = match(s, /\/[^\/]*$/); if (!q) break
+        s = substr(s, 1, q - 1)
+      }
+      return k
+    }
+    FNR == NR { paths[$0] = 1; e = $0; sub(/\.[^.\/]*$/, "", e); noext[e] = $0; next }
+    { p = $1; f[p] = resolve($2); t[p] += $3; c[p]++; if ($4 == "F") fail[p]++; else pass[p]++ }
     END { for (p in c) {
       if (runsok >= 2 && fail[p] > 0 && pass[p] > 0) printf "%s\tflaky\t3\tfailed %d of %d runs, passed the rest (%s)\n", f[p], fail[p], c[p], p
-      if (t[p] / c[p] >= slow) printf "%s\tslow\t1\tmean %.2fs (%s)\n", f[p], t[p] / c[p], p } }' "$work/runs.tsv" >> "$sig"
+      if (t[p] / c[p] >= slow) printf "%s\tslow\t1\tmean %.2fs (%s)\n", f[p], t[p] / c[p], p } }' "$work/testfiles" "$work/runs.tsv" >> "$sig"
 }
 
 # ---- signal: mutation (Stryker-format report) + baseline score ----------------------

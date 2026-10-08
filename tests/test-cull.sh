@@ -43,7 +43,12 @@ check "markdown carries the retention bar" "never delete a test that independent
 check "flaky test flagged" '"signal": "flaky", "evidence": "failed 1 of 3 runs' "$r2"
 check "slow test flagged" '"signal": "slow", "evidence": "mean 2.50s' "$r2"
 check "flaky maps to its file" '"file": "tests/test_flaky.py"' "$r2"
-check "flaky ranks above slow-only" '"rank": 1, "file": "tests/test_flaky.py"' "$r2"
+check "flaky (3) ranks above slow-only (1)" '"rank": 2, "file": "tests/test_flaky.py"' "$r2"
+# pytest-style rows carry no file=: the dotted classname must merge into the coupled file's row.
+check "classname maps into the file's existing row" '"file": "tests/test_coupled.py", "score": 3' "$r2"
+check "merged row carries both signals" '"signal": "slow", "evidence": "mean 3.00s (tests.test_coupled.TestInternals::test_slow_helper)' "$r2"
+absent "no row keyed by a dotted classname" '"file": "tests.' "$r2"
+absent "path-style classname that passes is not a candidate" "test_pathy" "$r2"
 absent "stable fast test is spared" "tests/test_good.py" "$r2"
 "$script" "$repo" --out "$tmp/o2b" --test-cmd "bash tools/fake-runner.sh" --runs 1 >/dev/null
 check "one run cannot show flakiness" '"signal": "flaky", "status": "not run"' "$(cat "$tmp/o2b/report.json")"

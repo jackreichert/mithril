@@ -9,4 +9,6 @@ printf '%s' '<?xml version="1.0"?><testsuites><testsuite name="fx">' \
   '<testcase classname="tests.test_good" file="tests/test_good.py" name="test_add_returns_sum" time="0.01"/>' \
   "<testcase classname=\"tests.test_flaky\" file=\"tests/test_flaky.py\" name=\"test_flaky_timing\" time=\"0.02\">${flaky_body}</testcase>" \
   '<testcase classname="tests.test_slow" file="tests/test_slow.py" name="test_slow_report" time="2.5"/>' \
+  '<testcase classname="tests.test_coupled.TestInternals" name="test_slow_helper" time="3.0"/>' \
+  '<testcase classname="tests/test_dup.py" name="test_pathy_classname" time="0.01"/>' \
   '</testsuite></testsuites>' > "$MITHRIL_JUNIT_OUT"
