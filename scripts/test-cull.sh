@@ -44,6 +44,8 @@ git -C "$repo" rev-parse --show-toplevel >/dev/null 2>&1 || die "$repo is not a 
 resolve_path() { # absolute, symlink-resolved form of a path that may not exist yet
   local p="$1" rest=""
   while [ ! -e "$p" ]; do rest="/$(basename "$p")$rest"; p="$(dirname "$p")"; done
+  # A ".." below a missing directory cannot be resolved without creating it; refuse rather than guess.
+  case "$rest/" in */../*) die "--out may not use .. below a directory that does not exist" ;; esac
   printf '%s%s' "$(cd "$p" && pwd -P)" "$rest"
 }
 out="$(resolve_path "$out")"

@@ -83,6 +83,10 @@ check "out inside repo is refused" "must be outside the target repo" "$("$script
 absent "refused out dir is never created" "x" "$([ -e "$repo/report" ] && echo x)"
 "$script" "$repo" --out "$repo/reports/deep/cull" >/dev/null 2>&1
 absent "nested refused out creates no directories" "x" "$([ -e "$repo/reports" ] && echo x)"
+"$script" "$repo" --out "$tmp/nope/../repo/q" >/dev/null 2>&1; rc=$?
+absent "dotdot through a missing dir creates nothing in the repo" "x" "$([ -e "$repo/q" ] && echo x)"
+absent "dotdot through a missing dir creates no stray dir" "x" "$([ -e "$tmp/nope" ] && echo x)"
+check "dotdot through a missing dir is refused" "2" "$rc"
 ln -s "$repo" "$tmp/link"; "$script" "$repo" --out "$tmp/link/viasym" >/dev/null 2>&1
 absent "symlinked route into the repo creates nothing" "x" "$([ -e "$repo/viasym" ] && echo x)"
 mkdir -p "$tmp/plain"; check "non-git dir is refused" "not a git repository" "$("$script" "$tmp/plain" --out "$tmp/o8" 2>&1)"
