@@ -75,6 +75,11 @@ fi
 "$script" "$repo" --out "$tmp/o7" --coverage-cmd 'echo noise; echo 91.5%' >/dev/null
 check "coverage-cmd last line parsed" '"coverage_pct": 91.5' "$(cat "$tmp/o7/report.json")"
 check "out inside repo is refused" "must be outside the target repo" "$("$script" "$repo" --out "$repo/report" 2>&1)"
+absent "refused out dir is never created" "x" "$([ -e "$repo/report" ] && echo x)"
+"$script" "$repo" --out "$repo/reports/deep/cull" >/dev/null 2>&1
+absent "nested refused out creates no directories" "x" "$([ -e "$repo/reports" ] && echo x)"
+ln -s "$repo" "$tmp/link"; "$script" "$repo" --out "$tmp/link/viasym" >/dev/null 2>&1
+absent "symlinked route into the repo creates nothing" "x" "$([ -e "$repo/viasym" ] && echo x)"
 mkdir -p "$tmp/plain"; check "non-git dir is refused" "not a git repository" "$("$script" "$tmp/plain" --out "$tmp/o8" 2>&1)"
 
 after="$(git -C "$repo" status --porcelain=v1 --untracked-files=all | cksum)$(git -C "$repo" rev-parse HEAD)"

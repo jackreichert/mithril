@@ -41,8 +41,14 @@ done
 repo="$(cd "$repo" && pwd -P)"
 git -C "$repo" rev-parse --show-toplevel >/dev/null 2>&1 || die "$repo is not a git repository"
 [ "$(git -C "$repo" rev-parse --show-toplevel)" = "$repo" ] || die "$repo is not a repository root"
-mkdir -p "$out"; out="$(cd "$out" && pwd -P)"
+resolve_path() { # absolute, symlink-resolved form of a path that may not exist yet
+  local p="$1" rest=""
+  while [ ! -e "$p" ]; do rest="/$(basename "$p")$rest"; p="$(dirname "$p")"; done
+  printf '%s%s' "$(cd "$p" && pwd -P)" "$rest"
+}
+out="$(resolve_path "$out")"
 case "$out/" in "$repo"/*) die "--out must be outside the target repo (read-only guarantee)" ;; esac
+mkdir -p "$out"
 
 work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
 sig="$work/signals.tsv"; : > "$sig"
