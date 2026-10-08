@@ -56,7 +56,10 @@ status_file="$work/status.tsv"; : > "$status_file"
 # Test files: common conventions across Python, JS/TS, Go, Java, Ruby, Rust.
 test_re='(^|/)(tests?|__tests__|spec|specs)/|(^|/)test_[^/]*\.py$|[._-](test|spec)\.[A-Za-z]+$|_test\.go$|Tests?\.java$'
 git -C "$repo" ls-files | grep -E "$test_re" > "$work/testfiles" || true
-before_state="$(git -C "$repo" status --porcelain=v1 --untracked-files=all | cksum)"
+# Read-only proof: nothing outside .git modified after this marker (ignored files such as
+# node_modules included), and HEAD plus status unchanged.
+touch "$work/start-marker"; sleep 1
+before_state="$(git -C "$repo" rev-parse HEAD 2>/dev/null)$(git -C "$repo" status --porcelain=v1 --untracked-files=all | cksum)"
 
 mark() { printf '%s\t%s\t%s\n' "$1" "$2" "$3" >> "$status_file"; }  # signal, ran|not run, detail
 emit() { printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" >> "$sig"; }  # file, signal, weight, evidence
@@ -65,7 +68,8 @@ make_copy() { # tracked + untracked-not-ignored files, working-tree state, into 
   [ -d "$work/copy" ] && return 0
   mkdir -p "$work/copy"
   (cd "$repo" && git ls-files -co --exclude-standard -z | tar --null -T - -cf -) | tar -x -C "$work/copy"
-  [ -d "$repo/node_modules" ] && ln -s "$repo/node_modules" "$work/copy/node_modules"
+  # Dependency dirs are ignored by git, so copy them (a symlink would let the suite write into the repo).
+  if [ -d "$repo/node_modules" ]; then cp -cR "$repo/node_modules" "$work/copy/node_modules" 2>/dev/null || cp -R "$repo/node_modules" "$work/copy/node_modules"; fi
   return 0
 }
 
@@ -198,9 +202,12 @@ baseline_coverage() {
 
 coupling; duplicates; flaky_slow; mutation; baseline_coverage
 
-after_state="$(git -C "$repo" status --porcelain=v1 --untracked-files=all | cksum)"
-repo_clean_note="target repo status unchanged by this run"
-[ "$before_state" = "$after_state" ] || repo_clean_note="WARNING: target repo status changed during the run; investigate"
+after_state="$(git -C "$repo" rev-parse HEAD 2>/dev/null)$(git -C "$repo" status --porcelain=v1 --untracked-files=all | cksum)"
+touched="$(find "$repo" -path "$repo/.git" -prune -o -newer "$work/start-marker" -print 2>/dev/null | head -3 | tr '\n' ' ')"
+repo_clean_note="no file in the target repo (ignored files included, .git excluded) was modified during this run; HEAD and status unchanged"
+if [ "$before_state" != "$after_state" ] || [ -n "$touched" ]; then
+  repo_clean_note="WARNING: the target repo was modified during the run (${touched:-git state changed}); investigate"
+fi
 
 # ---- compare with an earlier report ----------------------------------------------
 num_of() { sed -n "s/.*\"$2\": *\([0-9.]*\).*/\1/p" "$1" | head -1; }

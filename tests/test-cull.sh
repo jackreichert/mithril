@@ -82,6 +82,19 @@ ln -s "$repo" "$tmp/link"; "$script" "$repo" --out "$tmp/link/viasym" >/dev/null
 absent "symlinked route into the repo creates nothing" "x" "$([ -e "$repo/viasym" ] && echo x)"
 mkdir -p "$tmp/plain"; check "non-git dir is refused" "not a git repository" "$("$script" "$tmp/plain" --out "$tmp/o8" 2>&1)"
 
+# Suite writes under an ignored node_modules must stay in the temp copy.
+nm="$tmp/nmrepo"; mkdir -p "$nm"; cp -R "$fx/." "$nm/"; rm -f "$nm/mutation.json"; mkdir -p "$nm/node_modules/pkg"
+echo "node_modules/" > "$nm/.gitignore"; echo x > "$nm/node_modules/pkg/index.js"
+git -C "$nm" init -q -b main; git -C "$nm" add -A; git -C "$nm" commit -q -m "chore: init"
+"$script" "$nm" --out "$tmp/o9" --test-cmd 'echo cache > node_modules/pkg/cache.json; bash tools/fake-runner.sh' --runs 2 >/dev/null
+absent "suite write into node_modules never reaches the repo" "x" "$([ -e "$nm/node_modules/pkg/cache.json" ] && echo x)"
+absent "clean run has no warning" "WARNING" "$(cat "$tmp/o9/report.md")"
+check "clean run states the tree check" "ignored files included" "$(cat "$tmp/o9/report.md")"
+# A command that really writes into the repo (ignored path, invisible to git status) must be caught.
+"$script" "$nm" --out "$tmp/o10" --coverage-cmd "echo hit > $nm/node_modules/pkg/leak.json; echo 50" >/dev/null
+check "ignored-file write into the repo is reported" "WARNING: the target repo was modified" "$(cat "$tmp/o10/report.md")"
+rm -f "$nm/node_modules/pkg/leak.json"
+
 after="$(git -C "$repo" status --porcelain=v1 --untracked-files=all | cksum)$(git -C "$repo" rev-parse HEAD)"
 check "target repo untouched by every run" "$before" "$after"
 absent "report states repo unchanged" "WARNING" "$m1"
