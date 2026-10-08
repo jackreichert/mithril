@@ -104,6 +104,31 @@ absent "nested refused out creates no directories" "x" "$([ -e "$repo/reports" ]
 absent "dotdot through a missing dir creates nothing in the repo" "x" "$([ -e "$repo/q" ] && echo x)"
 absent "dotdot through a missing dir creates no stray dir" "x" "$([ -e "$tmp/nope" ] && echo x)"
 check "dotdot through a missing dir is refused" "2" "$rc"
+# N4: a prefix that cannot be entered must stop the run, never silently drop out of the check.
+echo f > "$tmp/afile"
+r="$("$script" "$repo" --out "$tmp/afile/sub" 2>&1)"; rc=$?
+check "file as a path component is refused" "not a directory" "$r"; check "file as a path component exits 2" "2" "$rc"
+mkdir -p "$tmp/locked/inner"; chmod 000 "$tmp/locked"
+r="$(cd "$repo" && "$script" "$repo" --out "$tmp/locked/inner/q" 2>&1)"; rc=$?
+chmod 755 "$tmp/locked"
+mkdir -p "$repo/lockdir"; chmod 000 "$repo/lockdir"
+r="$(cd "$repo" && "$script" "$repo" --out lockdir/q 2>&1)"; chmod 755 "$repo/lockdir"
+[ "$(id -u)" -eq 0 ] || check "relative route through a mode-000 dir inside the repo is refused" "cannot enter" "$r"
+rmdir "$repo/lockdir"
+if [ "$(id -u)" -ne 0 ]; then check "mode-000 directory in the path is refused" "cannot enter" "$r"; check "mode-000 path exits 2" "2" "$rc"; fi
+absent "mode-000 route creates nothing in the repo" "x" "$([ -e "$repo/inner" ] || [ -e "$repo/q" ] && echo x)"
+ln -s "$tmp/afile" "$tmp/filelink"; r="$("$script" "$repo" --out "$tmp/filelink/sub" 2>&1)"; rc=$?
+check "symlink to a file is refused" "not a directory" "$r"
+ln -s "$repo/ghost/deep" "$tmp/dangling"; r="$("$script" "$repo" --out "$tmp/dangling" 2>&1)"; rc=$?
+check "dangling symlink is refused" "dangling symlink" "$r"; check "dangling symlink exits 2" "2" "$rc"
+absent "dangling symlink into the repo creates nothing" "x" "$([ -e "$repo/ghost" ] && echo x)"
+nlp="$tmp/new
+line"; "$script" "$repo" --out "$nlp" >/dev/null 2>&1; rc=$?
+check "path with a newline works" "0" "$rc"; check "newline path got its report" "x" "$([ -e "$nlp/report.json" ] && echo x)"
+nlr="$repo/in
+side"; r="$("$script" "$repo" --out "$nlr" 2>&1)"
+check "newline path inside the repo is refused" "must be outside" "$r"
+absent "newline path inside the repo creates nothing" "x" "$([ -e "$nlr" ] && echo x)"
 ln -s "$repo" "$tmp/link"; "$script" "$repo" --out "$tmp/link/viasym" >/dev/null 2>&1
 absent "symlinked route into the repo creates nothing" "x" "$([ -e "$repo/viasym" ] && echo x)"
 mkdir -p "$tmp/plain"; check "non-git dir is refused" "not a git repository" "$("$script" "$tmp/plain" --out "$tmp/o8" 2>&1)"

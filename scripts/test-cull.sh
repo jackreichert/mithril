@@ -44,10 +44,16 @@ git -C "$repo" rev-parse --show-toplevel >/dev/null 2>&1 || die "$repo is not a 
 [ -z "$prev" ] || [ -r "$prev" ] || die "cannot read --compare file $prev"
 resolve_path() { # absolute, symlink-resolved form of a path that may not exist yet
   local p="$1" rest=""
-  while [ ! -e "$p" ]; do rest="/$(basename "$p")$rest"; p="$(dirname "$p")"; done
+  while [ ! -e "$p" ]; do
+    [ ! -L "$p" ] || die "--out: $p is a dangling symlink"
+    rest="/$(basename "$p")$rest"; p="$(dirname "$p")"
+  done
   # A ".." below a missing directory cannot be resolved without creating it; refuse rather than guess.
   case "$rest/" in */../*) die "--out may not use .. below a directory that does not exist" ;; esac
-  printf '%s%s' "$(cd "$p" && pwd -P)" "$rest"
+  [ -d "$p" ] || die "--out: $p exists but is not a directory"
+  local prefix
+  prefix="$(cd "$p" 2>/dev/null && pwd -P)" || die "--out: cannot enter $p"
+  printf '%s%s' "$prefix" "$rest"
 }
 out="$(resolve_path "$out")"
 case "$out/" in "$repo"/*) die "--out must be outside the target repo (read-only guarantee)" ;; esac
