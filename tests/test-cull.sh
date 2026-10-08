@@ -76,6 +76,17 @@ else
   echo "skip mutation tests: jq not installed"
 fi
 
+# Playbook structure that the reviews found broken: schedule re-armed before any stop path,
+# baseline taken from a recorded path, coverage measured without counting test files.
+pb="$(cat "$here/playbooks/test-cull.md")"
+rearm_line="$(grep -n 'event-loop.ts add' "$here/playbooks/test-cull.md" | head -1 | cut -d: -f1)"
+stop_line="$(grep -n 'stop and report' "$here/playbooks/test-cull.md" | head -1 | cut -d: -f1)"
+check "playbook re-arms the schedule before the first stop path" "yes" "$([ "$rearm_line" -lt "$stop_line" ] && echo yes)"
+absent "playbook compares against a recorded baseline, not today's OUT" '--compare "$OUT/report.json"' "$pb"
+check "playbook names an explicit baseline variable" 'BASELINE=/absolute/path' "$pb"
+check "playbook coverage omits test files" '--cov-config=' "$pb"
+absent "playbook has no bare --cov coverage command" '--cov --cov-report' "$pb"
+
 # A missing --compare file must fail before the suite runs, not after.
 cmp_out="$("$script" "$repo" --out "$tmp/o11" --test-cmd "touch $tmp/ran-marker" --compare "$tmp/nope.json" 2>&1)"; cmp_rc=$?
 check "missing compare file is refused" "cannot read --compare file" "$cmp_out"
