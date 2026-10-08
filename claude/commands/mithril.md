@@ -1,6 +1,6 @@
 ---
 description: "Code quality framework — runs targeted quality agents against your current git diff or full project. Usage: /mithril [aspects] | /mithril project [path] [aspects] | /mithril deep [path] (file→method→flow pass) | /mithril tutor [topic]"
-argument-hint: "[project [path]] [deep] [code] [smells] [nofix] [arch] [refactor] [simplify] [tests] [security] [review] [flow] [delivery] [distributed] [concurrency] [persistence] [perf] [observability] [a11y] [usability] [gates] [tutor [topic]] — or omit for auto-selection"
+argument-hint: "[project [path]] [deep] [code] [smells] [nofix] [arch] [refactor] [simplify] [tests] [security] [review] [flow] [delivery] [distributed] [concurrency] [persistence] [perf] [observability] [a11y] [usability] [gates] [execute] [tutor [topic]] — or omit for auto-selection"
 allowed-tools: ["Bash", "Glob", "Grep", "Read", "Write", "Task"]
 ---
 
@@ -96,7 +96,7 @@ A reviewer cannot call code correct without knowing the behavior it must impleme
 - `refactor` → mithril-refactor (Mode 2: plan) · `simplify` → mithril-refactor (Mode 1: light)
 - `tests`/`test`/`spec`/`specification` → mithril-test-quality
 - `security` → mithril-security-review
-- `review` → mithril-review (confidence-scored PR review with Look Here First)
+- `review` → mithril-review (confidence-scored PR review with Look Here First) · `review execute`/`exec` → mithril-review in execute mode (runs the changed code in a throwaway fixture; fresh agent only)
 - `flow`/`flows` → mithril-flow
 - `delivery`/`deploy` → mithril-delivery
 - `distributed`/`dist` → mithril-distributed
@@ -154,6 +154,8 @@ Changed files / Files in scope: [list, first 20 then "...and N more"]
 Every prompt carries: the Project Context block, the Review Contract, the changed-file list, and either the diff (diff mode) or `mode: project-wide review — read the listed files in full` plus the file list (project mode). Add this instruction to every prompt:
 
 > The diff is your FOCUS, not your SCOPE. Read each changed file in full and Grep the repo (start from the reuse surface) before judging. Every Critical/Important finding must state a concrete failure: given what input/state → what wrong outcome.
+
+**Execute mode** (`review execute`): this replaces the plain `mithril-review` agent, never adds a second one. Spawn it fresh (never reuse an agent that wrote the code) with `mode: execute`, the Review Contract, the base ref, and the changed-file list. Unlike every other prompt it gets **no** diff text, so it writes its cases before reading the change.
 
 ```
 Task(
@@ -251,6 +253,7 @@ Teaching, not review: runs **inline in the main thread** (no agent, no findings,
 /mithril security flow           # auth or input-handling change: exploitability + entry→sink paths
 /mithril persistence delivery    # schema change: queries + migration safety
 /mithril review                  # PR-style confidence-scored review with Look Here First
+/mithril review execute          # same, but runs tests first and calls the changed code with its own inputs
 /mithril simplify                # light behavior-preserving cleanup (opt-in)
 /mithril refactor                # named, test-first refactor plan (opt-in)
 /mithril nofix                   # review only; skip the default lint fix of the changed files

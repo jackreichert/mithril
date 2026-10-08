@@ -95,6 +95,7 @@ The token value is estimated from bytes and is useful for trend comparison, not 
 | `div-button-trap` | Custom div-"button" without keyboard/name; modal focus trap with no Escape; labeled form is clean bait | mithril-accessibility |
 | `ambiguous-billing-actions` | Generic destructive CTA with hidden consequence; async save has no pending/success/error feedback; semantic native controls are clean bait | mithril-usability |
 | `happy-path-only-codec` | Pure encode/decode algebra covered by one happy-path unit test only; no round-trip property / edge generators | mithril-test-quality |
+| `exec-only-pagination` | Page count floors instead of rounding up; the author's test uses an evenly dividing example. `mode: execute` plus a `contract.md` (the PR description, kept out of the diff), so `run.sh` prints `/mithril review execute` | mithril-review (execute) |
 
 Coverage note: the suite aims for ≥1 seed case per specialist domain (including observability, accessibility, and usability). Add harder variants when a model consistently passes a case with no false positives.
 

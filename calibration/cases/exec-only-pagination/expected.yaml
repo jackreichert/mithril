@@ -1,0 +1,18 @@
+# Golden case: exec-only-pagination
+# One logic defect that reads plausibly and passes the author's test; only calling
+# pageCount with a non-multiple (10, 3 -> 3, should be 4) exposes it.
+# Run with `/mithril review execute`. A read-only review may miss it.
+
+case: exec-only-pagination
+mode: execute
+defects:
+  - id: page-count-floors
+    agent: mithril-review
+    file: src/paginate.js
+    severity_min: Important
+    match: "(pageCount|floor|ceil|remainder|non-multiple|10.*3|last page|partial page)"
+    note: Math.floor drops the partial last page; the author's only example (9, 3) divides evenly
+
+false_positive_budget: 1
+clean_bait:
+  - src/paginate.js::pageSlice
