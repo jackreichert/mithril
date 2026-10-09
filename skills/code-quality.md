@@ -16,7 +16,7 @@ Judge whether the next maintainer can understand, extend, and safely change this
 5. **Contracts:** flag invariants, preconditions, or idempotency held only by caller discipline or a comment, and boolean parameters that switch behavior. A gate and the work it gates read one snapshot: read config once and pass it down (`JCIP-2`).
 6. **Performance** — state "load X → outcome Y": realistic-`n` O(n²) or repeated scans; per-item remote/DB calls when a batch API exists; collections that could stream; caches lacking TTL/max size/invalidation or stampede control. Performance claims need measurements (p95/p99, not averages).
 7. **Pattern misuse:** a mutable global Singleton/registry instead of injection; Observer chains with no unsubscribe or 3+ hops; Visitor/Strategy where pattern matching or first-class functions suffice. A pattern needing a comment to justify it is ceremony.
-8. **Scope creep:** rewrites or abstraction layers larger than the request needs.
+8. **Scope creep:** rewrites or abstraction layers larger than the request needs. **Necessity:** name the nearest existing mechanism (config, flag, helper, framework hook) that could already do this and say why it is not enough; a finding needs that alternative opened and verified to cover the case, not a hunch (`GEP-LF`, `PP-2`).
 
 Route, noting the symptom: remote-call timeouts/retries → `mithril-distributed`; races → `mithril-concurrency`; formatting, file length, coverage → `mithril-gates`.
 

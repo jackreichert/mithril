@@ -52,7 +52,7 @@ Skill text cites sources by these ids so long citations stay out of the prompts.
 | `DDIA-11` | Designing Data-Intensive Applications, Ch 11 Stream Processing | `Books/Domain-Systems-Design/12-Designing-Data-Intensive-Applications.md` |
 | `RI-stab` | Release It!, stability patterns (Bulkheads) | `Books/Domain-Systems-Design/13-Release-It.md` |
 | `GEP-CL` | Google Eng Practices, The CL Author's Guide (small CLs, descriptions) | `Articles/Google-Engineering/03-The-CL-Authors-Guide.md` |
-| `GEP-LF` | Google Eng Practices, What to Look For in a Code Review (Documentation) | `Articles/Google-Engineering/02-What-to-Look-For-in-a-Code-Review.md` |
+| `GEP-LF` | Google Eng Practices, What to Look For in a Code Review (Complexity, Documentation) | `Articles/Google-Engineering/02-What-to-Look-For-in-a-Code-Review.md` |
 | `APOSD-12/13` | A Philosophy of Software Design, Ch 12-13 (comments) | `Books/Canon/06-A-Philosophy-of-Software-Design.md` |
 | `JCIP-2` | Java Concurrency in Practice, Ch 2 Thread Safety (check-then-act, by analogy) | `Books/Concurrency/29-Java-Concurrency-in-Practice.md` |
 | `XUTP` | xUnit Test Patterns, smell catalog and Ch 8 Transient Fresh Fixtures | `Books/Testing/17-xUnit-Test-Patterns.md` |

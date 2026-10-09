@@ -40,6 +40,7 @@ Google's engineering-practices guides — the closest thing the industry has to 
 - [ ] Oversized or multi-concern diffs flagged as review-quality risks in their own right (with the split suggested).
 - [ ] Refactoring mixed with behavior change → finding (unreviewable and unbisectable).
 - [ ] Speculative generality and unneeded configurability flagged as complexity findings now.
+- [ ] Necessity asked of every new mechanism: the nearest existing config, flag, helper, or hook is named and shown not to cover the case; a finding needs a verified alternative.
 - [ ] Tests in the diff reviewed for would-actually-fail, not just presence.
 - [ ] Every finding: principle cited, concrete fix proposed, confidence carried; "Nit:" on the optional.
 - [ ] Comments address the code; explanations teach the why (source-linked when the canon has one).
