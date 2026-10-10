@@ -17,13 +17,26 @@ Establish intended behavior from the request, ticket, confirmed examples, reprod
 |------|------|--------|
 | **quick** | Coding checkpoint | code |
 | **full-pr** | Before a PR or PR update, or when asked to review a PR | all lenses |
+| **execute** | Opt-in (`/mithril review execute`); logic or data changes; full-pr lenses plus the run below | full-pr, executing |
 | **targeted-follow-up** | After review feedback | code + relevant lenses |
 
 Treat any request to review a PR, pull request, GitHub PR, or branch-vs-base as **full-pr**. When the PR is sliced into commits, review per commit as well as the whole: each commit should have one reason to change and leave the tree working.
 
-**Lenses (full-pr):** code (bugs, logic, null, races, leaks, N+1) · tests (new, edge, and failure behavior) · errors (empty catches, swallowed async failures, success-shaped errors) · types (narrow public contracts) · comments (accurate, explain why) · necessity (is the change needed at all? name the nearest existing mechanism (config, flag, helper, framework hook) that could already do it and say why it is not enough; report only when a named alternative was opened and verified to cover the case, never a hunch; `GEP-LF`, `PP-2`). Adversarial security → `mithril-security-review`.
+**Lenses (full-pr):** code (bugs, logic, null, races, leaks, N+1) · tests (new, edge, and failure behavior) · errors (empty catches, swallowed async failures, success-shaped errors) · types (narrow public contracts) · comments (accurate, explain why) · blast radius (mandatory when the diff changes a default or fallback, or newly gates previously unconditional code: grep for other callers, orgs, and tenants on the path and state what each gets when the key or value is absent; a new default that silently no-ops an out-of-diff caller is Critical if traced, `[ESCALATE]` if the caller can't be traced; Pragmatic Programmer, decoupling, Themes/02) · necessity (is the change needed at all? name the nearest existing mechanism (config, flag, helper, framework hook) that could already do it and say why it is not enough; report only when a named alternative was opened and verified to cover the case, never a hunch; `GEP-LF`, `PP-2`). Adversarial security → `mithril-security-review`.
 
 **Priority:** design fit → functionality (intent, edges, concurrency, data safety) → complexity → tests block when significant; naming, comments, style, and docs are flag-only. Style defers to the repo's formatter and linter.
+
+## Execute mode (opt-in)
+
+Reading a diff finds fewer defects than reviewers expect; running the code with inputs you chose is how you learn it (`BB-MCR`, `BB-ET3`). In order:
+
+1. **Cases first.** From the Review Contract only, write 5-10 cases with expected results before opening the diff: typical, boundary (0, 1, N, N±1, empty, null), failure, one repeat, plus inputs the author's tests skip. Tag expectations ASSUMED if the contract is.
+2. **Run the tests before reading the code**; record pass/fail and gaps.
+3. **Read the diff**; add cases for what you found.
+4. **Throwaway fixture** (temp dir or scratch DB, never shared or real data or secrets; delete after): call the changed code via the public entry point.
+5. Report only what you ran. A mismatch with the contract is a finding at confidence ≥90; a case not run goes under `Not executed`, never implied clean.
+
+Only a fresh agent that did not write the change runs this mode; otherwise say so and stop. A reproduced mismatch means at least `NEEDS WORK`.
 
 ## Confidence
 
@@ -35,7 +48,7 @@ Treat any request to review a PR, pull request, GitHub PR, or branch-vs-base as 
 | 76–90 | Important |
 | 91–100 | Critical / explicit violation |
 
-**Report only confidence ≥80.** Don't flag pre-existing issues, linter/typechecker findings, explicitly ignored issues, or intentional behavior. Downgrade anything without a concrete fix.
+**Report only confidence ≥80**, except blast-radius findings scoring 50–79: report those tagged `[ESCALATE]` and state the uncertainty; never inflate the score to clear the gate. Don't flag pre-existing issues, linter/typechecker findings, explicitly ignored issues, or intentional behavior. Downgrade anything without a concrete fix.
 
 ## Look Here First (required for full-pr / PR review)
 
@@ -67,11 +80,17 @@ Deeper pass (if more time): [remaining targets, or none]
   Fix: …
 - [IMPORTANT] …
 - [MINOR] …
+- [ESCALATE] Confidence: XX/100 — Lens: blast radius — file:line (below the gate; who is affected, what is uncertain) → fix or question
+
+### Executed (execute mode only)
+Cases written before the diff: [list, in order]
+- case — input → expected / actual — PASS | FAIL
+Not executed: [cases skipped and why]
 
 ### Strengths (full-pr only)
 - …
 
-Counts: Critical: X | Important: Y | Minor: Z
+Counts: Critical: X | Important: Y | Minor: Z | Escalate: W (excluded from Verdict)
 Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```
 
