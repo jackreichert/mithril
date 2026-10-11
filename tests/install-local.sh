@@ -18,6 +18,18 @@ bash "$here/scripts/install-local.sh" --home "$tmp/h" >/dev/null
 after="$(md5 -q "$tmp/h/commands/mithril.md" 2>/dev/null || md5sum "$tmp/h/commands/mithril.md" | cut -d' ' -f1)"
 check "second run changes nothing" "$before" "$after"
 
+# --- Grok home: installed by default when it exists, never created ---
+fh="$tmp/fh"; mkdir -p "$fh/.grok"
+env -u CLAUDE_HOME -u GROK_HOME HOME="$fh" bash "$here/scripts/install-local.sh" >/dev/null 2>&1
+check "default install also links agents into an existing Grok home" "$here/skills/review.md" "$(readlink "$fh/.grok/agents/mithril-review.md")"
+check "default install also renders the Grok command" "yes" "$([[ -s "$fh/.grok/commands/mithril.md" ]] && echo yes || echo no)"
+nh="$tmp/nh"; mkdir -p "$nh"
+env -u CLAUDE_HOME -u GROK_HOME HOME="$nh" bash "$here/scripts/install-local.sh" >/dev/null 2>&1
+check "a missing Grok home is not created" "no" "$([[ -e "$nh/.grok" ]] && echo yes || echo no)"
+oh="$tmp/oh"; mkdir -p "$oh/.grok"
+env -u CLAUDE_HOME -u GROK_HOME HOME="$oh" bash "$here/scripts/install-local.sh" --home "$tmp/only" >/dev/null 2>&1
+check "explicit --home installs only there" "no" "$([[ -e "$oh/.grok/agents" ]] && echo yes || echo no)"
+
 # --- linked worktree: links must never point into a disposable worktree ---
 main="$tmp/main"; mkdir -p "$main"
 cp -R "$here/scripts" "$here/skills" "$here/claude" "$here/healthcheck.sh" "$main/"
