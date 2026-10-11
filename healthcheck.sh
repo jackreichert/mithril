@@ -22,6 +22,13 @@ set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 GROK_HOME="${GROK_HOME:-$HOME/.grok}"
+# From a linked worktree, links and the rendered command belong to the main checkout.
+INSTALL_ROOT="$SCRIPT_DIR"
+_gd="$(cd "$SCRIPT_DIR" && git rev-parse --git-dir 2>/dev/null || true)"
+_gc="$(cd "$SCRIPT_DIR" && git rev-parse --git-common-dir 2>/dev/null || true)"
+if [[ -n "$_gd" && -n "$_gc" && "$(cd "$SCRIPT_DIR" && cd "$_gd" && pwd -P)" != "$(cd "$SCRIPT_DIR" && cd "$_gc" && pwd -P)" ]]; then
+  INSTALL_ROOT="$(cd "$SCRIPT_DIR" && cd "$_gc" && cd .. && pwd -P)"
+fi
 AGENTS_SRC="$SCRIPT_DIR/skills"
 CMD_SRC="$SCRIPT_DIR/claude/commands/mithril.md"
 QUIET=0
@@ -240,7 +247,10 @@ check_deployed_sync() {
     name="$(basename "$f")"
     [[ "$name" == "tutor.md" ]] && continue
     dst="$home/agents/mithril-$name"
-    if [[ -f "$dst" ]]; then
+    if [[ -L "$dst" && ! -e "$dst" ]]; then
+      deployed_any=1
+      warn "$label: mithril-$name is a dangling link to $(readlink "$dst") (run scripts/install-local.sh from the main checkout)"
+    elif [[ -f "$dst" ]]; then
       deployed_any=1
       if diff -q "$f" "$dst" >/dev/null 2>&1; then
         ok "$label: mithril-$name deployed & in sync"
@@ -253,7 +263,7 @@ check_deployed_sync() {
     deployed_any=1
     local expected_command
     expected_command="$(mktemp "${TMPDIR:-/tmp}/mithril-healthcheck.XXXXXX")"
-    sed "s|\${CLAUDE_PLUGIN_ROOT}|$SCRIPT_DIR|g" "$CMD_SRC" > "$expected_command"
+    sed "s|\${CLAUDE_PLUGIN_ROOT}|$INSTALL_ROOT|g" "$CMD_SRC" > "$expected_command"
     if diff -q "$expected_command" "$home/commands/mithril.md" >/dev/null 2>&1; then
       ok "$label: mithril.md command deployed & in sync"
     else

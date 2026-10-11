@@ -2,7 +2,7 @@
 # Tests for scripts/install-local.sh against a throwaway home.
 set -u
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+tmp="$(cd "$(mktemp -d)" && pwd -P)"; trap 'rm -rf "$tmp"' EXIT
 fails=0
 # The checkout under test may itself be a linked worktree; the guard is exercised separately below.
 export MITHRIL_ALLOW_WORKTREE=1
@@ -17,8 +17,6 @@ before="$(md5 -q "$tmp/h/commands/mithril.md" 2>/dev/null || md5sum "$tmp/h/comm
 bash "$here/scripts/install-local.sh" --home "$tmp/h" >/dev/null
 after="$(md5 -q "$tmp/h/commands/mithril.md" 2>/dev/null || md5sum "$tmp/h/commands/mithril.md" | cut -d' ' -f1)"
 check "second run changes nothing" "$before" "$after"
-CLAUDE_HOME="$tmp/h" GROK_HOME="$tmp/none" bash "$here/healthcheck.sh" 2>&1 | grep -q DRIFTED && d=drift || d=clean
-check "healthcheck sees the installed copy as in sync" "clean" "$d"
 
 # --- linked worktree: links must never point into a disposable worktree ---
 main="$tmp/main"; mkdir -p "$main"
@@ -29,7 +27,15 @@ env -u MITHRIL_ALLOW_WORKTREE bash "$tmp/wt/scripts/install-local.sh" --home "$t
 check "install from a linked worktree is refused" "1" "$rc"
 check "refused install wrote nothing" "no" "$([[ -e "$tmp/hw" ]] && echo yes || echo no)"
 env -u MITHRIL_ALLOW_WORKTREE bash "$main/scripts/install-local.sh" --home "$tmp/hm" >/dev/null 2>&1
+hc() { CLAUDE_HOME="$1" GROK_HOME="$tmp/none" bash "$2/healthcheck.sh" 2>&1; }
+hc "$tmp/hm" "$main" | grep -q DRIFTED && d=drift || d=clean
+check "healthcheck sees the installed copy as in sync" "clean" "$d"
+hc "$tmp/hm" "$tmp/wt" | grep -q DRIFTED && d=drift || d=clean
+check "healthcheck from a worktree compares against the main checkout" "clean" "$d"
 git_t worktree remove --force "$tmp/wt"
+mkdir -p "$tmp/hd/agents"; ln -s "$tmp/gone.md" "$tmp/hd/agents/mithril-review.md"
+hc "$tmp/hd" "$main" | grep -q 'dangling' && d=found || d=missed
+check "healthcheck reports a dangling link" "found" "$d"
 dangling=0; for l in "$tmp"/hm/agents/*; do [[ -e "$l" ]] || dangling=$((dangling+1)); done
 check "install from the main checkout survives worktree removal" "0" "$dangling"
 exit $((fails > 0))
