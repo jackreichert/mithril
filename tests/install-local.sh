@@ -43,7 +43,7 @@ hc "$tmp/ho" "$odd" | grep -q DRIFTED && d=drift || d=clean
 check "healthcheck agrees on that path" "clean" "$d"
 
 echo keep > "$tmp/ho/commands/mithril.md"
-bash "$odd/scripts/install-local.sh" --hoem "$tmp/typo" >/dev/null 2>&1; rc=$?
+env -u CLAUDE_HOME -u GROK_HOME HOME="$tmp/hh" bash "$odd/scripts/install-local.sh" --hoem "$tmp/typo" >/dev/null 2>&1; rc=$?
 check "an unknown argument is rejected" "2" "$rc"
 
 # --- linked worktree: links must never point into a disposable worktree ---
