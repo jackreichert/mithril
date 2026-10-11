@@ -20,7 +20,12 @@ fi
 # Default: Claude home, plus the Grok home when it already exists. --home DIR: only DIR.
 homes=("${CLAUDE_HOME:-$HOME/.claude}")
 [[ -d "${GROK_HOME:-$HOME/.grok}" ]] && homes+=("${GROK_HOME:-$HOME/.grok}")
-[[ "${1:-}" == "--home" ]] && homes=("${2:?--home needs a directory}")
+while (( $# )); do
+  case "$1" in
+    --home) homes=("${2:?--home needs a directory}"); shift 2 ;;
+    *) echo "mithril: unknown argument: $1 (usage: install-local.sh [--home DIR])" >&2; exit 2 ;;
+  esac
+done
 
 # Escape \ & | so the path is a literal sed replacement; render to a temp file so a failure
 # never truncates an existing command.

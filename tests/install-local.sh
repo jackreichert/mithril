@@ -42,6 +42,10 @@ check "command has no unresolved plugin root" "0" "$(grep -c 'CLAUDE_PLUGIN_ROOT
 hc "$tmp/ho" "$odd" | grep -q DRIFTED && d=drift || d=clean
 check "healthcheck agrees on that path" "clean" "$d"
 
+echo keep > "$tmp/ho/commands/mithril.md"
+bash "$odd/scripts/install-local.sh" --hoem "$tmp/typo" >/dev/null 2>&1; rc=$?
+check "an unknown argument is rejected" "2" "$rc"
+
 # --- linked worktree: links must never point into a disposable worktree ---
 main="$tmp/main"; mkdir -p "$main"
 cp -R "$here/scripts" "$here/skills" "$here/claude" "$here/healthcheck.sh" "$main/"
