@@ -15,7 +15,12 @@ if [[ -z "${MITHRIL_ALLOW_WORKTREE:-}" && -n "$gd" && -n "$gc" ]] \
   exit 1
 fi
 home="${CLAUDE_HOME:-$HOME/.claude}"
-[[ "${1:-}" == "--home" ]] && home="${2:?--home needs a directory}"
+while (( $# )); do
+  case "$1" in
+    --home) home="${2:?--home needs a directory}"; shift 2 ;;
+    *) echo "mithril: unknown argument: $1 (usage: install-lite.sh [--home DIR])" >&2; exit 2 ;;
+  esac
+done
 
 mkdir -p "$home/agents"
 n=0

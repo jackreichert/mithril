@@ -18,6 +18,10 @@ check "second run keeps the link" "$here/skills/lite/review.md" "$(readlink "$tm
 CLAUDE_HOME="$tmp/h" GROK_HOME="$tmp/none" bash "$here/healthcheck.sh" 2>&1 | grep -q 'lite.*DRIFTED' && d=drift || d=clean
 check "healthcheck sees the links as in sync" "clean" "$d"
 
+env -u CLAUDE_HOME HOME="$tmp/hh" bash "$here/scripts/install-lite.sh" --hoem "$tmp/typo" >/dev/null 2>&1; rc=$?
+check "an unknown argument is rejected" "2" "$rc"
+check "the rejected run wrote nothing" "no" "$([[ -e "$tmp/hh" ]] && echo yes || echo no)"
+
 # --- linked worktree: links must never point into a disposable worktree ---
 main="$tmp/main"; mkdir -p "$main"
 cp -R "$here/scripts" "$here/skills" "$main/"
