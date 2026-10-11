@@ -283,7 +283,7 @@ check_deployed_sync() {
       if diff -q "$f" "$dst" >/dev/null 2>&1; then
         ok "$label: mithril-lite-$name deployed & in sync"
       else
-        warn "$label: mithril-lite-$name deployed but DRIFTED from skills/lite/ (link or copy it from there)"
+        warn "$label: mithril-lite-$name deployed but DRIFTED from skills/lite/ (run scripts/install-lite.sh)"
       fi
     fi
   done

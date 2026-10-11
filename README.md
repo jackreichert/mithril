@@ -128,7 +128,7 @@ This mirrors the lesson of [unclebob/swarm-forge](https://github.com/unclebob/sw
 |------|---------|
 | `claude/commands/mithril.md` | The `/mithril [aspects]` command — routes to agents, aggregates findings. Loaded directly by the Claude Code and Grok plugins. |
 | `skills/*.md` | Canonical agent content, loaded directly by the plugin manifests. |
-| `skills/lite/*.md` | `mithril-lite-*` twins for personal-repo use (no patient-data policy lines). Not in the plugin manifests: install by linking each into `~/.claude/agents/mithril-lite-<name>.md`. `healthcheck.sh` checks they keep each full twin's execute, blast-radius and authoring-gate behavior and warns when an installed copy drifts. |
+| `skills/lite/*.md` | `mithril-lite-*` twins for personal-repo use (no patient-data policy lines). Not in the plugin manifests: install with `bash scripts/install-lite.sh`, which symlinks each into `~/.claude/agents/mithril-lite-<name>.md` (replacing plain copies). Tests: `bash tests/install-lite.sh`. `healthcheck.sh` checks they keep each full twin's execute, blast-radius and authoring-gate behavior and warns when an installed copy drifts. |
 
 ### Multi-tool reach
 
