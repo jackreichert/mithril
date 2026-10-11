@@ -22,6 +22,10 @@ homes=("${CLAUDE_HOME:-$HOME/.claude}")
 [[ -d "${GROK_HOME:-$HOME/.grok}" ]] && homes+=("${GROK_HOME:-$HOME/.grok}")
 [[ "${1:-}" == "--home" ]] && homes=("${2:?--home needs a directory}")
 
+# Escape \ & | so the path is a literal sed replacement; render to a temp file so a failure
+# never truncates an existing command.
+esc_root="$(printf '%s' "$root" | sed 's/[\\&|]/\\&/g')"
+
 for home in "${homes[@]}"; do
   mkdir -p "$home/agents" "$home/commands"
   for f in "$root"/skills/*.md; do
@@ -29,6 +33,9 @@ for home in "${homes[@]}"; do
     [[ "$base" == "tutor.md" ]] && continue
     ln -sfn "$f" "$home/agents/mithril-$base"
   done
-  sed "s|\${CLAUDE_PLUGIN_ROOT}|$root|g" "$root/claude/commands/mithril.md" > "$home/commands/mithril.md"
+  tmpcmd="$(mktemp "$home/commands/.mithril.XXXXXX")"
+  sed "s|\${CLAUDE_PLUGIN_ROOT}|$esc_root|g" "$root/claude/commands/mithril.md" > "$tmpcmd"
+  chmod 644 "$tmpcmd"
+  mv -f "$tmpcmd" "$home/commands/mithril.md"
   echo "mithril: linked agents and rendered command into $home from $root"
 done

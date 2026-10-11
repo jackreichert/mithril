@@ -18,6 +18,8 @@ bash "$here/scripts/install-local.sh" --home "$tmp/h" >/dev/null
 after="$(md5 -q "$tmp/h/commands/mithril.md" 2>/dev/null || md5sum "$tmp/h/commands/mithril.md" | cut -d' ' -f1)"
 check "second run changes nothing" "$before" "$after"
 
+hc() { CLAUDE_HOME="$1" GROK_HOME="$tmp/none" bash "$2/healthcheck.sh" 2>&1; }
+
 # --- Grok home: installed by default when it exists, never created ---
 fh="$tmp/fh"; mkdir -p "$fh/.grok"
 env -u CLAUDE_HOME -u GROK_HOME HOME="$fh" bash "$here/scripts/install-local.sh" >/dev/null 2>&1
@@ -30,6 +32,16 @@ oh="$tmp/oh"; mkdir -p "$oh/.grok"
 env -u CLAUDE_HOME -u GROK_HOME HOME="$oh" bash "$here/scripts/install-local.sh" --home "$tmp/only" >/dev/null 2>&1
 check "explicit --home installs only there" "no" "$([[ -e "$oh/.grok/agents" ]] && echo yes || echo no)"
 
+# --- paths with sed metacharacters ---
+odd="$tmp/we|ir&d\\x/repo"; mkdir -p "$odd"
+cp -R "$here/scripts" "$here/skills" "$here/claude" "$here/healthcheck.sh" "$odd/"
+bash "$odd/scripts/install-local.sh" --home "$tmp/ho" >/dev/null 2>&1; rc=$?
+check "install from a path with | & and backslash succeeds" "0" "$rc"
+check "command carries that path literally" "yes" "$(grep -qF "$odd/skills/tutor.md" "$tmp/ho/commands/mithril.md" && echo yes || echo no)"
+check "command has no unresolved plugin root" "0" "$(grep -c 'CLAUDE_PLUGIN_ROOT}/' "$tmp/ho/commands/mithril.md" | tr -d ' ')"
+hc "$tmp/ho" "$odd" | grep -q DRIFTED && d=drift || d=clean
+check "healthcheck agrees on that path" "clean" "$d"
+
 # --- linked worktree: links must never point into a disposable worktree ---
 main="$tmp/main"; mkdir -p "$main"
 cp -R "$here/scripts" "$here/skills" "$here/claude" "$here/healthcheck.sh" "$main/"
@@ -39,7 +51,6 @@ env -u MITHRIL_ALLOW_WORKTREE bash "$tmp/wt/scripts/install-local.sh" --home "$t
 check "install from a linked worktree is refused" "1" "$rc"
 check "refused install wrote nothing" "no" "$([[ -e "$tmp/hw" ]] && echo yes || echo no)"
 env -u MITHRIL_ALLOW_WORKTREE bash "$main/scripts/install-local.sh" --home "$tmp/hm" >/dev/null 2>&1
-hc() { CLAUDE_HOME="$1" GROK_HOME="$tmp/none" bash "$2/healthcheck.sh" 2>&1; }
 hc "$tmp/hm" "$main" | grep -q DRIFTED && d=drift || d=clean
 check "healthcheck sees the installed copy as in sync" "clean" "$d"
 hc "$tmp/hm" "$tmp/wt" | grep -q DRIFTED && d=drift || d=clean

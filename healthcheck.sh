@@ -263,7 +263,7 @@ check_deployed_sync() {
     deployed_any=1
     local expected_command
     expected_command="$(mktemp "${TMPDIR:-/tmp}/mithril-healthcheck.XXXXXX")"
-    sed "s|\${CLAUDE_PLUGIN_ROOT}|$INSTALL_ROOT|g" "$CMD_SRC" > "$expected_command"
+    sed "s|\${CLAUDE_PLUGIN_ROOT}|$(printf '%s' "$INSTALL_ROOT" | sed 's/[\\&|]/\\&/g')|g" "$CMD_SRC" > "$expected_command"
     if diff -q "$expected_command" "$home/commands/mithril.md" >/dev/null 2>&1; then
       ok "$label: mithril.md command deployed & in sync"
     else
