@@ -245,7 +245,7 @@ check_deployed_sync() {
       if diff -q "$f" "$dst" >/dev/null 2>&1; then
         ok "$label: mithril-$name deployed & in sync"
       else
-        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (edit skills/ and reinstall)"
+        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (run scripts/install-local.sh)"
       fi
     fi
   done
@@ -257,7 +257,7 @@ check_deployed_sync() {
     if diff -q "$expected_command" "$home/commands/mithril.md" >/dev/null 2>&1; then
       ok "$label: mithril.md command deployed & in sync"
     else
-      warn "$label: mithril.md command deployed but DRIFTED from canonical command"
+      warn "$label: mithril.md command deployed but DRIFTED from canonical command (run scripts/install-local.sh)"
     fi
     rm -f "$expected_command"
   fi
