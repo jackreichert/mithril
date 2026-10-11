@@ -278,7 +278,10 @@ check_deployed_sync() {
     [[ -f "$f" ]] || continue
     name="$(basename "$f")"
     dst="$home/agents/mithril-lite-$name"
-    if [[ -f "$dst" ]]; then
+    if [[ -L "$dst" && ! -e "$dst" ]]; then
+      deployed_any=1
+      warn "$label: mithril-lite-$name is a dangling link to $(readlink "$dst") (run scripts/install-lite.sh from the main checkout)"
+    elif [[ -f "$dst" ]]; then
       deployed_any=1
       if diff -q "$f" "$dst" >/dev/null 2>&1; then
         ok "$label: mithril-lite-$name deployed & in sync"

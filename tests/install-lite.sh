@@ -28,6 +28,9 @@ check "install from a linked worktree is refused" "1" "$rc"
 check "refused install wrote nothing" "no" "$([[ -e "$tmp/hw" ]] && echo yes || echo no)"
 env -u MITHRIL_ALLOW_WORKTREE bash "$main/scripts/install-lite.sh" --home "$tmp/hm" >/dev/null 2>&1
 git_t worktree remove --force "$tmp/wt"
+mkdir -p "$tmp/hd/agents"; ln -s "$tmp/gone.md" "$tmp/hd/agents/mithril-lite-review.md"
+CLAUDE_HOME="$tmp/hd" GROK_HOME="$tmp/none" bash "$here/healthcheck.sh" 2>&1 | grep -q 'lite-review.*dangling' && d=found || d=missed
+check "healthcheck reports a dangling lite link" "found" "$d"
 dangling=0; for l in "$tmp"/hm/agents/*; do [[ -e "$l" ]] || dangling=$((dangling+1)); done
 check "install from the main checkout survives worktree removal" "0" "$dangling"
 exit $((fails > 0))
