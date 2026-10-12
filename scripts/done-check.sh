@@ -16,19 +16,42 @@ TAB="$(printf '\t')"
 
 usage() { echo "usage: done-check.sh extract [ticket] | verdict <table> [ticket]" >&2; exit 2; }
 
-# Leaf bullets under the "What done looks like" heading. A bullet with sub-bullets is a
-# lead-in: its children are the lines, each prefixed "lead-in: child".
+# The lines under the "What done looks like" heading (any # level, any case, or a bold or
+# "What done looks like:" lead line). Items are bullets (-, *, +), numbered lines, or a prose
+# paragraph (one line). A bullet with sub-bullets is a lead-in: its children are the lines, each
+# prefixed "lead-in: child". Fenced code is ignored; the section ends at the next heading.
 extract_lines() {
   awk '
-    function flush() { if (pend != "") { print pend; pend = "" } }
-    /^#+[ \t]+[Ww]hat done looks like[ \t]*$/ { in_sec = 1; next }
-    in_sec && /^#+[ \t]/ { exit }
-    !in_sec { next }
-    /^-[ \t]+/ { flush(); sub(/^-[ \t]+/, ""); pend = $0; lead = ""; haskids = 0; next }
-    /^[ \t]+[-*][ \t]+/ {
-      line = $0; sub(/^[ \t]+[-*][ \t]+/, "", line)
-      if (!haskids) { lead = pend; sub(/:[ \t]*$/, "", lead); haskids = 1 }
-      pend = ""; print lead ": " line; next
+    function flush() { if (pend != "") { print pend; pend = "" } kind = "" }
+    function trim(t) { sub(/^[ \t]+/, "", t); sub(/[ \t]+$/, "", t); return t }
+    { gsub(/\r/, "") }
+    /^[ \t]*(```|~~~)/ { fence = !fence; next }
+    fence { next }
+    !in_sec {
+      low = tolower($0)
+      if (low ~ /^#+[ \t]+what done looks like[ \t]*:?[ \t]*$/) { in_sec = 1; next }
+      if (low ~ /^(\*\*|__)?what done looks like(\*\*|__)?:(\*\*|__)?/) {
+        in_sec = 1; rest = $0
+        sub(/^[^:]*:(\*\*|__)?[ \t]*/, "", rest)
+        if (trim(rest) != "") { pend = trim(rest); kind = "prose" }
+      }
+      next
+    }
+    /^#+[ \t]/ { exit }
+    /^[ \t]*$/ { if (kind == "prose") flush(); next }
+    /^[-*+][ \t]+|^[0-9]+[.)][ \t]+/ {
+      flush(); t = $0; sub(/^([-*+]|[0-9]+[.)])[ \t]+/, "", t)
+      pend = t; kind = "bullet"; lead = t; haskids = 0; next
+    }
+    /^[ \t]+([-*+]|[0-9]+[.)])[ \t]+/ {
+      t = $0; sub(/^[ \t]+([-*+]|[0-9]+[.)])[ \t]+/, "", t)
+      if (!haskids) { sub(/:[ \t]*$/, "", lead); haskids = 1; pend = ""; kind = "" }
+      flush(); print lead ": " t; next
+    }
+    { # continuation of the open item, or the start of a prose paragraph
+      t = trim($0)
+      if (pend != "") pend = pend " " t
+      else { pend = t; kind = "prose" }
     }
     END { flush() }
   ' "$1"
