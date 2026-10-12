@@ -65,4 +65,9 @@ hc "$tmp/hd" "$main" | grep -q 'dangling' && d=found || d=missed
 check "healthcheck reports a dangling link" "found" "$d"
 dangling=0; for l in "$tmp"/hm/agents/*; do [[ -e "$l" ]] || dangling=$((dangling+1)); done
 check "install from the main checkout survives worktree removal" "0" "$dangling"
+
+# --- --strict: with the repo healthy, drift is only a warning unless --strict is given ---
+echo drift > "$tmp/hm/commands/mithril.md"
+CLAUDE_HOME="$tmp/hm" GROK_HOME="$tmp/none" bash "$here/healthcheck.sh" >/dev/null 2>&1; check "drift alone exits 0 by default" "0" "$?"
+CLAUDE_HOME="$tmp/hm" GROK_HOME="$tmp/none" bash "$here/healthcheck.sh" --strict >/dev/null 2>&1; check "--strict exits 1 on drift" "1" "$?"
 exit $((fails > 0))

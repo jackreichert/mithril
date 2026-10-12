@@ -17,6 +17,7 @@
 #
 #   bash healthcheck.sh            # full check
 #   bash healthcheck.sh --quiet    # only failures + verdict
+#   bash healthcheck.sh --strict   # warnings (deployed-copy drift, dangling links) also exit 1
 
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -32,7 +33,13 @@ fi
 AGENTS_SRC="$SCRIPT_DIR/skills"
 CMD_SRC="$SCRIPT_DIR/claude/commands/mithril.md"
 QUIET=0
-[[ "${1:-}" == "--quiet" ]] && QUIET=1
+STRICT=0
+for _arg in "$@"; do
+  case "$_arg" in
+    --quiet) QUIET=1 ;;
+    --strict) STRICT=1 ;;
+  esac
+done
 
 if [[ -t 1 ]]; then GRN=$'\033[32m'; YLW=$'\033[33m'; RED=$'\033[31m'; BOLD=$'\033[1m'; RST=$'\033[0m'
 else GRN=""; YLW=""; RED=""; BOLD=""; RST=""; fi
@@ -297,7 +304,9 @@ done < <(find "$SCRIPT_DIR" -name '*.md' \
 # ---- verdict -------------------------------------------------------------------
 hdr "Verdict"
 if [[ "$FAILS" -eq 0 ]]; then
-  printf '%s✓ healthy%s (%d warning(s))\n' "$GRN" "$RST" "$WARNS"; exit 0
+  printf '%s✓ healthy%s (%d warning(s))\n' "$GRN" "$RST" "$WARNS"
+  if (( STRICT && WARNS > 0 )); then exit 1; fi
+  exit 0
 else
   printf '%s✗ %d problem(s)%s, %d warning(s)\n' "$RED" "$FAILS" "$RST" "$WARNS"; exit 1
 fi
