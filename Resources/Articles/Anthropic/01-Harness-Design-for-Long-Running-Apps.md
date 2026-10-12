@@ -12,4 +12,4 @@ The post describes a generator and a separate evaluator. Before each sprint they
 
 ## Why Mithril cites it
 
-The done check in `skills/review.md` copies three moves: write the check for each line before running it (the contract), fail on any single unmet line (the hard threshold), and use a fresh agent that did not write the change (the leniency finding). Cited as `ANT-HARNESS`. The post is one team's experience on one kind of app and reports no measured miss rates; the calibration fixtures here are how Mithril checks its own verifier.
+The done check in `skills/review.md` copies three moves: write the check for each line before running it (the contract), fail on any single unmet line (the hard threshold), and use a fresh agent that did not write the change (the leniency finding). Cited as `ANT-HARNESS`. The post is one team's experience on one kind of app and reports no measured miss rates; Mithril has no calibration fixture for its done check yet, so the model-judged half is unmeasured.

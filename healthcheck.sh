@@ -208,6 +208,8 @@ for pair in 'review|Execute mode' 'review|blast radius' 'review|ESCALATE' 'revie
   grep -q "$phrase" "$LITE_SRC/$base.md" 2>/dev/null \
     || { bad "mithril-lite-$base missing '$phrase' (lite lags its full twin)"; lite_ok=0; }
 done
+grep -q 'done-check.sh" verdict' "$SCRIPT_DIR/claude/commands/mithril.md" \
+  || { bad "mithril.md does not run done-check.sh verdict (the done verdict would be the model's say-so)"; lite_ok=0; }
 (( lite_ok )) && ok "$n_lite lite agents have full twins, valid names, and the required execute/blast-radius/authoring behavior"
 
 # ---- 3. count claims -----------------------------------------------------------
