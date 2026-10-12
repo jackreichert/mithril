@@ -18,15 +18,30 @@
 #
 #   bash healthcheck.sh            # full check
 #   bash healthcheck.sh --quiet    # only failures + verdict
+#   bash healthcheck.sh --strict   # warnings (deployed-copy drift, dangling links) also exit 1
 
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 GROK_HOME="${GROK_HOME:-$HOME/.grok}"
+# From a linked worktree, links and the rendered command belong to the main checkout.
+INSTALL_ROOT="$SCRIPT_DIR"
+_gd="$(cd "$SCRIPT_DIR" && git rev-parse --git-dir 2>/dev/null || true)"
+_gc="$(cd "$SCRIPT_DIR" && git rev-parse --git-common-dir 2>/dev/null || true)"
+if [[ -n "$_gd" && -n "$_gc" && "$(cd "$SCRIPT_DIR" && cd "$_gd" && pwd -P)" != "$(cd "$SCRIPT_DIR" && cd "$_gc" && pwd -P)" ]]; then
+  INSTALL_ROOT="$(cd "$SCRIPT_DIR" && cd "$_gc" && cd .. && pwd -P)"
+fi
 AGENTS_SRC="$SCRIPT_DIR/skills"
 CMD_SRC="$SCRIPT_DIR/claude/commands/mithril.md"
 QUIET=0
-[[ "${1:-}" == "--quiet" ]] && QUIET=1
+STRICT=0
+for _arg in "$@"; do
+  case "$_arg" in
+    --quiet) QUIET=1 ;;
+    --strict) STRICT=1 ;;
+    *) echo "healthcheck: unknown argument: $_arg (usage: healthcheck.sh [--quiet] [--strict])" >&2; exit 2 ;;
+  esac
+done
 
 if [[ -t 1 ]]; then GRN=$'\033[32m'; YLW=$'\033[33m'; RED=$'\033[31m'; BOLD=$'\033[1m'; RST=$'\033[0m'
 else GRN=""; YLW=""; RED=""; BOLD=""; RST=""; fi
@@ -256,21 +271,68 @@ else
 fi
 
 # ---- 5. deployed sync ----------------------------------------------------------
+# Links named mithril-* in $1 that no longer map to a skill here: dangling, or ours and stale.
+# $2 is "agent" or "skill". Mirrors scripts/install-local.sh (owned_link / current_name).
+check_stale_links() {
+  local dir="$1" kind="$2" label="$3" l stem t x n owned current
+  for l in "$dir"/mithril-*; do
+    [[ -L "$l" ]] || continue
+    stem="$(basename "$l" .md)"; t="$(readlink "$l")"; x="$(basename "$t" .md)"
+    owned=0; current=0; layout=0
+    case "$t" in
+      */skills/lite/*.md) [[ "$stem" == "mithril-lite-$x" ]] && layout=1 ;;
+      */skills/*.md) [[ "$stem" == "mithril-$x" ]] && layout=1 ;;
+    esac
+    # Ours only when it points into this checkout, matching scripts/install-local.sh.
+    if (( layout )); then
+      case "$t" in "$INSTALL_ROOT"/skills/*.md|"$(cd "$INSTALL_ROOT" && pwd -P)"/skills/*.md) owned=1 ;; esac
+    fi
+    if [[ "$stem" == mithril-lite-* ]]; then
+      [[ "$kind" == agent && -f "$SCRIPT_DIR/skills/lite/${stem#mithril-lite-}.md" ]] && current=1
+      # No lite agents in this checkout: the link may belong to a newer one, so only dangling counts.
+      [[ ! -d "$SCRIPT_DIR/skills/lite" ]] && current=1
+    else
+      n="${stem#mithril-}"
+      [[ -f "$SCRIPT_DIR/skills/$n.md" ]] && { [[ "$kind" == skill || "$n" != tutor ]] && current=1; }
+    fi
+    if [[ ! -e "$l" ]]; then
+      (( current )) && continue   # current names get the dangling warning in the sync pass
+      if (( owned )); then
+        warn "$label: $(basename "$l") is a dangling link to $t for a skill that no longer exists (run scripts/install-local.sh)"
+      else
+        warn "$label: $(basename "$l") is a dangling link to $t that the installer does not manage; remove it by hand"
+      fi
+    elif (( ! current && owned )); then
+      warn "$label: $(basename "$l") is a stale link to $t; no such skill in this checkout (run scripts/install-local.sh)"
+    elif (( ! current && layout )); then
+      warn "$label: $(basename "$l") points into another checkout ($t) and no such skill exists here; the installer leaves it, remove it by hand"
+    fi
+  done
+}
 check_deployed_sync() {
-  local home="$1" label="$2"
+  local home="$1" label="$2" skills_too="${3:-0}"
   hdr "Deployed sync ($home — $label)"
   local deployed_any=0
   local f name dst
+  # Managed = the installer has been here (a rendered command or any mithril-* agent entry).
+  # Only a managed home owes a link per skill; an unmanaged one gets "nothing deployed" below.
+  local managed=0
+  if [[ -e "$home/commands/mithril.md" ]] || compgen -G "$home/agents/mithril-*" >/dev/null; then managed=1; fi
   for f in "$AGENTS_SRC"/*.md; do
     name="$(basename "$f")"
     [[ "$name" == "tutor.md" ]] && continue
     dst="$home/agents/mithril-$name"
-    if [[ -f "$dst" ]]; then
+    if [[ ! -e "$dst" && ! -L "$dst" ]]; then
+      (( managed )) && warn "$label: mithril-$name link is missing (run scripts/install-local.sh)"
+    elif [[ -L "$dst" && ! -e "$dst" ]]; then
+      deployed_any=1
+      warn "$label: mithril-$name is a dangling link to $(readlink "$dst") (run scripts/install-local.sh from the main checkout)"
+    elif [[ -f "$dst" ]]; then
       deployed_any=1
       if diff -q "$f" "$dst" >/dev/null 2>&1; then
         ok "$label: mithril-$name deployed & in sync"
       else
-        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (edit skills/ and reinstall)"
+        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (run scripts/install-local.sh)"
       fi
     fi
   done
@@ -294,18 +356,31 @@ check_deployed_sync() {
     deployed_any=1
     local expected_command
     expected_command="$(mktemp "${TMPDIR:-/tmp}/mithril-healthcheck.XXXXXX")"
-    sed "s|\${CLAUDE_PLUGIN_ROOT}|$SCRIPT_DIR|g" "$CMD_SRC" > "$expected_command"
+    sed "s|\${CLAUDE_PLUGIN_ROOT}|$(printf '%s' "$INSTALL_ROOT" | sed 's/[\\&|]/\\&/g')|g" "$CMD_SRC" > "$expected_command"
     if diff -q "$expected_command" "$home/commands/mithril.md" >/dev/null 2>&1; then
       ok "$label: mithril.md command deployed & in sync"
     else
-      warn "$label: mithril.md command deployed but DRIFTED from canonical command"
+      warn "$label: mithril.md command deployed but DRIFTED from canonical command (run scripts/install-local.sh)"
     fi
     rm -f "$expected_command"
   fi
+  check_stale_links "$home/agents" agent "$label"
+  if (( skills_too )); then
+    check_stale_links "$home/skills" skill "$label"
+    for f in "$AGENTS_SRC"/*.md; do
+      dst="$home/skills/mithril-$(basename "$f" .md)"
+      if [[ ! -e "$dst" && ! -L "$dst" ]]; then
+        (( managed )) && warn "$label: skills/$(basename "$dst") link is missing (run scripts/install-local.sh)"
+        continue
+      fi
+      [[ -L "$dst" && ! -e "$dst" ]] && warn "$label: skills/$(basename "$dst") is a dangling link to $(readlink "$dst") (run scripts/install-local.sh from the main checkout)"
+    done
+  fi
   (( deployed_any )) || warn "nothing deployed to $home (repository checks passed)"
 }
-check_deployed_sync "$CLAUDE_HOME" "Claude"
-check_deployed_sync "$GROK_HOME"   "Grok"
+check_deployed_sync "$CLAUDE_HOME" "Claude" 1
+# The installer never creates ~/.grok, so a machine without Grok is a correct install.
+[[ -d "$GROK_HOME" ]] && check_deployed_sync "$GROK_HOME" "Grok"
 
 # ---- 6. doc links --------------------------------------------------------------
 hdr "Doc links"
@@ -328,7 +403,9 @@ done < <(find "$SCRIPT_DIR" -name '*.md' \
 # ---- verdict -------------------------------------------------------------------
 hdr "Verdict"
 if [[ "$FAILS" -eq 0 ]]; then
-  printf '%s✓ healthy%s (%d warning(s))\n' "$GRN" "$RST" "$WARNS"; exit 0
+  printf '%s✓ healthy%s (%d warning(s))\n' "$GRN" "$RST" "$WARNS"
+  if (( STRICT && WARNS > 0 )); then exit 1; fi
+  exit 0
 else
   printf '%s✗ %d problem(s)%s, %d warning(s)\n' "$RED" "$FAILS" "$RST" "$WARNS"; exit 1
 fi
