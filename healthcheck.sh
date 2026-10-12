@@ -272,7 +272,11 @@ check_stale_links() {
     fi
     if [[ ! -e "$l" ]]; then
       (( current )) && continue   # current names get the dangling warning in the sync pass
-      warn "$label: $(basename "$l") is a dangling link to $t for a skill that no longer exists (run scripts/install-local.sh)"
+      if (( owned )); then
+        warn "$label: $(basename "$l") is a dangling link to $t for a skill that no longer exists (run scripts/install-local.sh)"
+      else
+        warn "$label: $(basename "$l") is a dangling link to $t that the installer does not manage; remove it by hand"
+      fi
     elif (( ! current && owned )); then
       warn "$label: $(basename "$l") is a stale link to $t; no such skill in this checkout (run scripts/install-local.sh)"
     elif (( ! current && layout )); then
