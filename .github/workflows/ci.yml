@@ -28,3 +28,9 @@ jobs:
 
       - name: Calibration runner tests
         run: bash tests/calibration-run.sh
+
+      - name: Install-lite shellcheck
+        run: shellcheck scripts/install-lite.sh tests/install-lite.sh
+
+      - name: Install-lite tests
+        run: bash tests/install-lite.sh

@@ -11,6 +11,7 @@
 #   3. COUNT CLAIMS      — "N agent" figures in README.md match reality
 #   4. SUMMARY DEPTH     — every chapter summary has at least three sentences
 #   5. DEPLOYED SYNC     — ~/.claude and ~/.grok agents match canonical skills
+#                          (including skills/lite/ twins)
 #   6. DOC LINKS         — relative .md links AND plain-text ../ paths resolve
 #
 # Exit 0 = healthy, 1 = problems found.
@@ -170,6 +171,30 @@ else
   bad "scripts/update-check.sh missing, not executable, or not called from the router"
 fi
 
+# ---- 2e. lite agents -----------------------------------------------------------
+hdr "Lite agents"
+LITE_SRC="$SCRIPT_DIR/skills/lite"
+lite_ok=1; n_lite=0
+for f in "$LITE_SRC"/*.md; do
+  [[ -f "$f" ]] || continue
+  base="$(basename "$f" .md)"; n_lite=$((n_lite+1))
+  [[ -f "$AGENTS_SRC/$base.md" ]] || { bad "mithril-lite-$base has no full twin skills/$base.md"; lite_ok=0; }
+  grep -qE "^name:[[:space:]]*mithril-lite-$base([[:space:]]|$)" "$f" \
+    || { bad "mithril-lite-$base — frontmatter name does not match filename"; lite_ok=0; }
+done
+for f in "$AGENTS_SRC"/*.md; do
+  base="$(basename "$f" .md)"
+  case "$base" in tutor|smells|lint-fix) continue ;; esac
+  [[ -f "$LITE_SRC/$base.md" ]] || { warn "mithril-$base has no lite twin in skills/lite/"; }
+done
+# Behavior the full twin's contract requires must survive in the lite copy.
+for pair in 'review|Execute mode' 'review|blast radius' 'review|ESCALATE' 'test-quality|Authoring gate' 'test-quality|Retention bar'; do
+  base="${pair%%|*}"; phrase="${pair#*|}"
+  grep -q "$phrase" "$LITE_SRC/$base.md" 2>/dev/null \
+    || { bad "mithril-lite-$base missing '$phrase' (lite lags its full twin)"; lite_ok=0; }
+done
+(( lite_ok )) && ok "$n_lite lite agents have full twins, valid names, and the required execute/blast-radius/authoring behavior"
+
 # ---- 3. count claims -----------------------------------------------------------
 hdr "Count claims"
 claims_ok=1
@@ -246,6 +271,22 @@ check_deployed_sync() {
         ok "$label: mithril-$name deployed & in sync"
       else
         warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (edit skills/ and reinstall)"
+      fi
+    fi
+  done
+  for f in "$LITE_SRC"/*.md; do
+    [[ -f "$f" ]] || continue
+    name="$(basename "$f")"
+    dst="$home/agents/mithril-lite-$name"
+    if [[ -L "$dst" && ! -e "$dst" ]]; then
+      deployed_any=1
+      warn "$label: mithril-lite-$name is a dangling link to $(readlink "$dst") (run scripts/install-lite.sh from the main checkout)"
+    elif [[ -f "$dst" ]]; then
+      deployed_any=1
+      if diff -q "$f" "$dst" >/dev/null 2>&1; then
+        ok "$label: mithril-lite-$name deployed & in sync"
+      else
+        warn "$label: mithril-lite-$name deployed but DRIFTED from skills/lite/ (run scripts/install-lite.sh)"
       fi
     fi
   done
