@@ -5,16 +5,17 @@
 # skipped/flagged wording, and the verdict rule over the reviewer's per-line table.
 #
 #   done-check.sh extract [ticket]   print one "N<TAB>line" per done line
-#   done-check.sh verdict <table> [ticket]
+#   done-check.sh verdict <table> <ticket>
 #       table rows: N<TAB>STATUS<TAB>check<TAB>evidence   (STATUS: DONE|NOT DONE|N/A|UNCHECKABLE)
+#       ids must be exactly 1..N for the ticket's N lines; a flagged ticket exits 1
 #
 # Exit: 0 done lines printed / verdict SHIP IT / skipped, 1 verdict NEEDS WORK,
 #       2 flagged (no done section, ticket unreadable) or usage error.
 set -euo pipefail
 
-TAB="$(printf '\t')"
+US="$(printf '\037')" # tab is whitespace to read, which would collapse empty fields
 
-usage() { echo "usage: done-check.sh extract [ticket] | verdict <table> [ticket]" >&2; exit 2; }
+usage() { echo "usage: done-check.sh extract [ticket] | verdict <table> <ticket>" >&2; exit 2; }
 
 # The lines under the "What done looks like" heading (any # level, any case, or a bold or
 # "What done looks like:" lead line). Items are bullets (-, *, +), numbered lines, or a prose
@@ -66,38 +67,48 @@ cmd_extract() {
   printf '%s\n' "$lines" | awk '{ printf "%d\t%s\n", NR, $0 }'
 }
 
+trim() { local t="$1"; t="${t#"${t%%[![:space:]]*}"}"; printf '%s' "${t%"${t##*[![:space:]]}"}"; }
+
+# One row per done line, matched by id: ids must be exactly 1..N for the N lines extract finds.
+# The ticket is required, and a ticket that yields no lines is flagged and fails: the model's
+# table can never be the source of how many lines there are.
 cmd_verdict() {
   local table="${1:-}" ticket="${2:-}"
-  [[ -n "$table" && -r "$table" ]] || usage
-  local expected=0
-  if [[ -n "$ticket" ]]; then
-    expected="$(extract_lines "$ticket" | wc -l | tr -d ' ')"
-  fi
-  local rows=0 bad=0 id status check evidence eff
+  [[ -n "$table" && -r "$table" && -n "$ticket" ]] || usage
+  local ext rc=0
+  ext="$(cmd_extract "$ticket")" || rc=$?
+  if (( rc != 0 )); then echo "$ext"; echo "Done verdict: NEEDS WORK"; return 1; fi
+  local expected; expected="$(printf '%s\n' "$ext" | wc -l | tr -d ' ')"
+  local seen=" " bad=0 rows=0 id status check evidence eff
   echo "| # | Status | Check | Evidence |"; echo "|---|--------|-------|----------|"
-  while IFS="$TAB" read -r id status check evidence || [[ -n "${id:-}" ]]; do
-    [[ -z "${id:-}" ]] && continue
+  while IFS="$US" read -r id status check evidence || [[ -n "${id:-}" ]]; do
+    id="$(trim "${id:-}")"; status="$(trim "${status:-}")"; check="$(trim "${check:-}")"; evidence="$(trim "${evidence:-}")"
+    [[ -z "$id$status$check$evidence" ]] && continue
     rows=$((rows+1)); eff="$status"
-    case "$status" in
-      DONE) # DONE only with the check and its evidence on record
-        if [[ -z "${check:-}" || -z "${evidence:-}" ]]; then eff="NOT DONE (no evidence)"; fi ;;
-      "N/A") # N/A only with a reason
-        if [[ -z "${evidence:-}" ]]; then eff="NOT DONE (N/A without reason)"; fi ;;
-      "NOT DONE"|UNCHECKABLE) ;;
-      *) eff="NOT DONE (unknown status '$status')" ;;
-    esac
+    if [[ ! "$id" =~ ^[0-9]+$ ]] || (( 10#$id < 1 || 10#$id > expected )); then
+      eff="NOT DONE (unknown id)"
+    elif [[ "$seen" == *" $((10#$id)) "* ]]; then
+      eff="NOT DONE (duplicate id)"
+    else
+      seen="$seen$((10#$id)) "
+      case "$status" in
+        DONE) [[ -z "$check" || -z "$evidence" ]] && eff="NOT DONE (no evidence)" ;;
+        "N/A") [[ -z "$evidence" ]] && eff="NOT DONE (N/A without reason)" ;;
+        "NOT DONE"|UNCHECKABLE) ;;
+        *) eff="NOT DONE (unknown status '$status')" ;;
+      esac
+    fi
     case "$eff" in DONE|"N/A") ;; *) bad=$((bad+1)) ;; esac
-    echo "| $id | $eff | ${check:-} | ${evidence:-} |"
-  done < "$table"
-  if (( expected > rows )); then
-    bad=$((bad + expected - rows))
-    echo "| - | NOT DONE (missing rows) | $((expected - rows)) of $expected done lines have no row | |"
-  fi
-  if (( rows == 0 && expected == 0 )); then bad=1; echo "| - | NOT DONE (empty table) | | |"; fi
+    echo "| $id | $eff | $check | $evidence |"
+  done < <(tr '\t' '\037' < "$table")
+  local n
+  for ((n = 1; n <= expected; n++)); do
+    [[ "$seen" == *" $n "* ]] || { bad=$((bad+1)); echo "| $n | NOT DONE (missing row) | | |"; }
+  done
   if (( bad > 0 )); then
-    echo "Done check: $bad line(s) not met"; echo "Done verdict: NEEDS WORK"; return 1
+    echo "Done check: $bad problem(s) across $expected line(s)"; echo "Done verdict: NEEDS WORK"; return 1
   fi
-  echo "Done check: all $rows line(s) met"; echo "Done verdict: SHIP IT"
+  echo "Done check: all $expected line(s) met"; echo "Done verdict: SHIP IT"
 }
 
 case "${1:-}" in

@@ -77,7 +77,7 @@ check "failing row is shown" "| 2 | NOT DONE |" "$out"
 check "met rows are still reported met" "| 1 | DONE |" "$out"
 
 # verdict rules that stop a quiet pass.
-out="$("$script" verdict "$fx/table-weak.tsv")"; rc=$?
+out="$("$script" verdict "$fx/table-weak.tsv" "$fx/ticket-pass.md")"; rc=$?
 code "weak table exits 1" 1 "$rc"
 check "DONE without evidence is NOT DONE" "| 1 | NOT DONE (no evidence) |" "$out"
 check "N/A without reason is NOT DONE" "| 2 | NOT DONE (N/A without reason) |" "$out"
@@ -85,12 +85,45 @@ check "UNCHECKABLE blocks" "| 3 | UNCHECKABLE |" "$out"
 check "weak table verdict" "Done verdict: NEEDS WORK" "$out"
 out="$("$script" verdict "$fx/table-short.tsv" "$fx/ticket-pass.md")"; rc=$?
 code "dropped lines exit 1" 1 "$rc"
-check "dropped lines are NOT DONE" "NOT DONE (missing rows)" "$out"
-check "dropped lines count" "2 of 3 done lines have no row" "$out"
+check "dropped line 2 is NOT DONE" "| 2 | NOT DONE (missing row) |" "$out"
+check "dropped line 3 is NOT DONE" "| 3 | NOT DONE (missing row) |" "$out"
 printf '' > "${TMPDIR:-/tmp}/done-check-empty.$$"
-out="$("$script" verdict "${TMPDIR:-/tmp}/done-check-empty.$$")"; rc=$?; rm -f "${TMPDIR:-/tmp}/done-check-empty.$$"
+out="$("$script" verdict "${TMPDIR:-/tmp}/done-check-empty.$$" "$fx/ticket-pass.md")"; rc=$?; rm -f "${TMPDIR:-/tmp}/done-check-empty.$$"
 code "empty table exits 1" 1 "$rc"
-check "empty table never passes" "NOT DONE (empty table)" "$out"
+check "empty table never passes: every line is missing" "| 1 | NOT DONE (missing row) |" "$out"
+
+# The ids are matched, not counted: the table cannot satisfy the ticket by length alone.
+out="$("$script" verdict "$fx/table-dup.tsv" "$fx/ticket-pass.md")"; rc=$?
+code "three rows all id 1 exit 1" 1 "$rc"
+check "duplicate id is NOT DONE" "| 1 | NOT DONE (duplicate id) |" "$out"
+check "lines 2 and 3 are missing" "| 3 | NOT DONE (missing row) |" "$out"
+check "duplicate-id verdict" "Done verdict: NEEDS WORK" "$out"
+out="$("$script" verdict "$fx/table-unknown.tsv" "$fx/ticket-pass.md")"; rc=$?
+code "ids 9/8/7 exit 1" 1 "$rc"
+check "unknown id is NOT DONE" "| 9 | NOT DONE (unknown id) |" "$out"
+check "line 1 is missing" "| 1 | NOT DONE (missing row) |" "$out"
+check "unknown-id verdict" "Done verdict: NEEDS WORK" "$out"
+out="$("$script" verdict "$fx/table-extra.tsv" "$fx/ticket-pass.md")"; rc=$?
+code "a row beyond N exits 1" 1 "$rc"
+check "extra row is an unknown id" "| 4 | NOT DONE (unknown id) |" "$out"
+
+# Whitespace is not evidence or a reason, and an empty check cannot be DONE.
+out="$("$script" verdict "$fx/table-blank.tsv" "$fx/ticket-pass.md")"; rc=$?
+code "blank evidence exits 1" 1 "$rc"
+check "space evidence is no evidence" "| 1 | NOT DONE (no evidence) |" "$out"
+check "space reason is no reason" "| 2 | NOT DONE (N/A without reason) |" "$out"
+check "empty check keeps its column (not shifted)" "| 3 | NOT DONE (no evidence) |" "$out"
+
+# A ticket is required, and one with nothing to check fails rather than passing on zero lines.
+"$script" verdict "$fx/table-pass.tsv" >/dev/null 2>&1; rc=$?
+code "verdict without a ticket is a usage error" 2 "$rc"
+out="$("$script" verdict "$fx/table-pass.tsv" "$fx/ticket-nosection.md")"; rc=$?
+code "verdict on a no-section ticket exits 1" 1 "$rc"
+check "no-section ticket is flagged in the verdict" "Done check: flagged, ticket has no done section" "$out"
+check "flagged forces NEEDS WORK" "Done verdict: NEEDS WORK" "$out"
+out="$("$script" verdict "$fx/table-pass.tsv" "$fx/missing.md")"; rc=$?
+code "verdict on an unreadable ticket exits 1" 1 "$rc"
+absent "an unreadable ticket never says SHIP IT" "SHIP IT" "$out"
 
 echo
 if (( fails )); then echo "$fails failure(s)"; exit 1; fi
