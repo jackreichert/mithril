@@ -253,11 +253,15 @@ check_stale_links() {
   for l in "$dir"/mithril-*; do
     [[ -L "$l" ]] || continue
     stem="$(basename "$l" .md)"; t="$(readlink "$l")"; x="$(basename "$t" .md)"
-    owned=0; current=0
+    owned=0; current=0; layout=0
     case "$t" in
-      */skills/lite/*.md) [[ "$stem" == "mithril-lite-$x" ]] && owned=1 ;;
-      */skills/*.md) [[ "$stem" == "mithril-$x" ]] && owned=1 ;;
+      */skills/lite/*.md) [[ "$stem" == "mithril-lite-$x" ]] && layout=1 ;;
+      */skills/*.md) [[ "$stem" == "mithril-$x" ]] && layout=1 ;;
     esac
+    # Ours only when it points into this checkout, matching scripts/install-local.sh.
+    if (( layout )); then
+      case "$t" in "$INSTALL_ROOT"/skills/*.md|"$(cd "$INSTALL_ROOT" && pwd -P)"/skills/*.md) owned=1 ;; esac
+    fi
     if [[ "$stem" == mithril-lite-* ]]; then
       [[ "$kind" == agent && -f "$SCRIPT_DIR/skills/lite/${stem#mithril-lite-}.md" ]] && current=1
       # No lite agents in this checkout: the link may belong to a newer one, so only dangling counts.
@@ -271,6 +275,8 @@ check_stale_links() {
       warn "$label: $(basename "$l") is a dangling link to $t for a skill that no longer exists (run scripts/install-local.sh)"
     elif (( ! current && owned )); then
       warn "$label: $(basename "$l") is a stale link to $t; no such skill in this checkout (run scripts/install-local.sh)"
+    elif (( ! current && layout )); then
+      warn "$label: $(basename "$l") points into another checkout ($t) and no such skill exists here; the installer leaves it, remove it by hand"
     fi
   done
 }

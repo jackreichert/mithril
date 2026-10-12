@@ -31,15 +31,25 @@ done
 # never truncates an existing command.
 esc_root="$(printf '%s' "$root" | sed 's/[\\&|]/\\&/g')"
 
-# A link is ours when it points at <checkout>/skills[/lite]/X.md and is named for X
-# (mithril-X[.md] / mithril-lite-X[.md]). Retired or renamed agents leave such links behind.
-owned_link() {
+# A link is ours when it points into THIS checkout (skills/X.md or skills/lite/X.md) and is
+# named for X (mithril-X[.md] / mithril-lite-X[.md]). A link into another checkout is not ours.
+root_phys="$(cd "$root" && pwd -P)"
+layout_link() {
   local l="$1" t x stem
   [[ -L "$l" ]] || return 1
   t="$(readlink "$l")"; x="$(basename "$t" .md)"; stem="$(basename "$l" .md)"
   case "$t" in
     */skills/lite/*.md) [[ "$stem" == "mithril-lite-$x" ]] ;;
     */skills/*.md) [[ "$stem" == "mithril-$x" ]] ;;
+    *) return 1 ;;
+  esac
+}
+owned_link() {
+  local t
+  layout_link "$1" || return 1
+  t="$(readlink "$1")"
+  case "$t" in
+    "$root"/skills/*.md|"$root_phys"/skills/*.md) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -62,7 +72,9 @@ prune_stale() {
     stem="$(basename "$l" .md)"
     [[ "$stem" == mithril-lite-* && ( "$kind" == skill || ! -d "$root/skills/lite" ) ]] && continue
     current_name "$stem" "$kind" && continue
-    if owned_link "$l"; then rm -f "$l"; echo "mithril: removed stale link $l"; fi
+    if owned_link "$l"; then rm -f "$l"; echo "mithril: removed stale link $l"
+    elif layout_link "$l"; then echo "mithril: leaving $l, it points outside this checkout ($(readlink "$l")); remove it by hand if it is retired" >&2
+    fi
   done
 }
 
