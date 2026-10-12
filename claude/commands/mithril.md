@@ -1,6 +1,6 @@
 ---
 description: "Code quality framework — runs targeted quality agents against your current git diff or full project. Usage: /mithril [aspects] | /mithril project [path] [aspects] | /mithril deep [path] (file→method→flow pass) | /mithril tutor [topic]"
-argument-hint: "[project [path]] [deep] [code] [smells] [nofix] [arch] [refactor] [simplify] [tests] [security] [review] [flow] [delivery] [distributed] [concurrency] [persistence] [perf] [observability] [a11y] [usability] [gates] [execute] [tutor [topic]] — or omit for auto-selection"
+argument-hint: "[project [path]] [deep] [code] [smells] [nofix] [arch] [refactor] [simplify] [tests] [security] [review] [flow] [delivery] [distributed] [concurrency] [persistence] [perf] [observability] [a11y] [usability] [gates] [execute] [done <ticket-path>] [tutor [topic]] — or omit for auto-selection"
 allowed-tools: ["Bash", "Glob", "Grep", "Read", "Write", "Task"]
 ---
 
@@ -157,6 +157,11 @@ Every prompt carries: the Project Context block, the Review Contract, the change
 
 **Execute mode** (`review execute`): this replaces the plain `mithril-review` agent, never adds a second one. Spawn it fresh (never reuse an agent that wrote the code) with `mode: execute`, the Review Contract, the base ref, and the changed-file list. Unlike every other prompt it gets **no** diff text, so it writes its cases before reading the change.
 
+**Done check** (`done <ticket-path>` in `$ARGUMENTS`; it forces `mithril-review`, like `review`). The script is `${CLAUDE_PLUGIN_ROOT}/scripts/done-check.sh` (an absolute path: agents run in the user's repo, not this checkout). Path only: a branch key is not resolved to a ticket. You run it in the main thread, not the agent, so the verdict is not the model's say-so:
+
+1. `bash "${CLAUDE_PLUGIN_ROOT}/scripts/done-check.sh" extract <ticket>`. Exit 0 → pass the numbered lines to the fresh `mithril-review` agent (never one that wrote the code), which returns one TAB row per line. Exit 2 (no done section, unreadable) → print its line and set `Done verdict: NEEDS WORK`; spawn no done agent. No path given → print `Done check: skipped (no ticket)`.
+2. Write the agent's rows verbatim to a scratch file and run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/done-check.sh" verdict <rows-file> <ticket>`. Print its table; its exit code and `Done verdict` line are the done verdict. Do not edit the rows or override the result.
+
 ```
 Task(
   subagent_type="mithril-code-quality",
@@ -182,6 +187,7 @@ Spawn all selected agents at once. On diffs over ~500 changed lines, give each s
 - **Conflict precedence** when two findings pull opposite ways, earlier wins: **(1) correctness → (2) security & data safety → (3) consistency with the repository's established conventions → (4) readability for the next maintainer → (5) simplicity → (6) performance.** Say which finding you overrode and why.
 - **mithril-gates:** a gate `FAIL` is a Critical finding. A number reported against a generic default, with no project threshold, is a note, not a FAIL and not a block. Skipped gates are a note, not a block.
 - **Look Here First (required on feature-branch / PR-scope reviews).** After aggregating, write a human inspection brief — where residual risk and judgment live, not a second findings list. Rank 3–7 concrete `path:line` (or hunk) targets, each with a risk class and the question the human should answer there. Prefer behavior/contract/auth/money/PII/persistence, concurrency/retries/idempotency, migrations/public API/flags, dense logic that looks right, and new behavior whose tests don't prove it. Skip generated, lock, format-only, and mechanical files. Tiny and obvious change → `Look Here: none — mechanical / fully covered`. The first 3 items are the 10-minute pass. Don't repeat Critical/Important issues unless a judgment call remains that the agents cannot close. When mithril-review ran, prefer its list and add only targets other agents uniquely justified.
+- **Done check:** print the `done-check.sh verdict` table under the report as `## Done check`. If its exit code is 1 (any `NOT DONE`, `UNCHECKABLE`, duplicate, unknown or missing id, or a flagged ticket) the final verdict is at least `NEEDS WORK`; adjudication does not drop done lines. Skipped is stated as-is, never a pass.
 - **Verdict** (post-adjudication): any Critical → `SIGNIFICANT ISSUES`; no Critical but ≥2 Important, or 1 Important that is security- or correctness-sourced → `NEEDS WORK`; otherwise `SHIP IT` (the bar is net improvement, not perfection).
 
 **Output:**
@@ -254,6 +260,7 @@ Teaching, not review: runs **inline in the main thread** (no agent, no findings,
 /mithril persistence delivery    # schema change: queries + migration safety
 /mithril review                  # PR-style confidence-scored review with Look Here First
 /mithril review execute          # same, but runs tests first and calls the changed code with its own inputs
+/mithril review done <ticket>   # also verify each "What done looks like" line of that ticket file, with evidence
 /mithril simplify                # light behavior-preserving cleanup (opt-in)
 /mithril refactor                # named, test-first refactor plan (opt-in)
 /mithril nofix                   # review only; skip the default lint fix of the changed files

@@ -331,6 +331,7 @@ Every source cited above by short name (e.g. "APOSD," "DDIA," "Waldo"), with its
 | **Google Style Guides** | Google. *Google Style Guides*. CC BY 3.0. <https://google.github.io/styleguide/> | [05](Resources/Standards/05-Google-Style-Guides.md) |
 | **Airbnb JS** | Airbnb. *JavaScript Style Guide*. MIT. <https://github.com/airbnb/javascript> | [06](Resources/Standards/06-Airbnb-JavaScript-Style-Guide.md) |
 | **PEP 8** | van Rossum, Warsaw, Coghlan. *PEP 8 — Style Guide for Python Code*. Public domain. <https://peps.python.org/pep-0008/> | [07](Resources/Standards/07-PEP-8.md) |
+| **Scrum Guide DoD** | Schwaber and Sutherland (2020). *The Scrum Guide*, Commitment: Definition of Done. <https://scrumguides.org/scrum-guide.html> | [10](Resources/Standards/10-Scrum-Guide-Definition-of-Done.md) |
 
 ### Articles
 
@@ -341,6 +342,7 @@ Every source cited above by short name (e.g. "APOSD," "DDIA," "Waldo"), with its
 | **Uncle Bob — articles** | Robert C. Martin, blog.cleancoder.com / butunclebob.com (© all rights reserved). Principles of OOD/SOLID (<http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod>), Clean Code series, TDD series, [Three Laws of TDD](http://butunclebob.com/ArticleS.UncleBob.TheThreeRulesOfTdd), FP Basics | [Robert-Martin/](Resources/Articles/Robert-Martin/) |
 | **Joel Spolsky** | Joel Spolsky, joelonsoftware.com (© all rights reserved). [The Joel Test](https://www.joelonsoftware.com/2000/08/09/the-joel-test-12-steps-to-better-code/), [Things You Should Never Do](https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/), [Painless Software Schedules](https://www.joelonsoftware.com/2000/03/29/painless-software-schedules/), [Law of Leaky Abstractions](https://www.joelonsoftware.com/2002/11/11/the-law-of-leaky-abstractions/) | [Joel-Spolsky/](Resources/Articles/Joel-Spolsky/) |
 | **Google Eng Practices** | Google. *Engineering Practices — Code Review Developer Guide*. CC BY 3.0. <https://google.github.io/eng-practices/> | [Google-Engineering/](Resources/Articles/Google-Engineering/) |
+| **Anthropic Engineering** | Anthropic. [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps), [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) | [Anthropic/](Resources/Articles/Anthropic/) |
 | **CRAP metric** | Alberto Savoia & Bob Evans (2007). *crap4j*. <https://www.artima.com/weblogs/viewpost.jsp?thread=210575> |  |
 
 ---

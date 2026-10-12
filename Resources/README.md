@@ -19,7 +19,8 @@ Resources/
 │   ├── Joel-Spolsky/                  # joelonsoftware.com
 │   ├── Jon-Skeet/                     # codeblog.jonskeet.uk
 │   ├── Google-Engineering/            # google.github.io/eng-practices
-│   └── Bach-Bolton/                   # satisfice.com (exploratory testing)
+│   ├── Bach-Bolton/                   # satisfice.com (exploratory testing)
+│   └── Anthropic/                     # anthropic.com/engineering (agent and evaluator design)
 ├── Standards/                         # OWASP, 12-Factor, NASA Power of 10, style guides
 ├── Papers/                            # Parnas, Waldo, Moseley/Marks, Brooks, Bacchelli/Bird
 ├── Themes/                            # 20 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer
@@ -62,3 +63,6 @@ Skill text cites sources by these ids so long citations stay out of the prompts.
 | `SKEET-UTC` | Jon Skeet, Storing UTC is not a silver bullet | `Articles/Jon-Skeet/01-Storing-UTC-Is-Not-a-Silver-Bullet.md` |
 | `BB-MCR` | Bacchelli and Bird, Expectations, Outcomes, and Challenges of Modern Code Review (ICSE 2013) | `Papers/05-Expectations-Outcomes-and-Challenges-of-Modern-Code-Review.md` |
 | `BB-ET3` | Bach and Bolton, Exploratory Testing 3.0 | `Articles/Bach-Bolton/01-Exploratory-Testing-3.0.md` |
+| `SCRUM-DoD` | Scrum Guide, Commitment: Definition of Done | `Standards/10-Scrum-Guide-Definition-of-Done.md` |
+| `ANT-HARNESS` | Anthropic, Harness design for long-running application development | `Articles/Anthropic/01-Harness-Design-for-Long-Running-Apps.md` |
+| `ANT-BEA` | Anthropic, Building effective agents | `Articles/Anthropic/02-Building-Effective-Agents.md` |

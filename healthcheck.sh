@@ -203,11 +203,13 @@ for f in "$AGENTS_SRC"/*.md; do
   [[ -f "$LITE_SRC/$base.md" ]] || { warn "mithril-$base has no lite twin in skills/lite/"; }
 done
 # Behavior the full twin's contract requires must survive in the lite copy.
-for pair in 'review|Execute mode' 'review|blast radius' 'review|ESCALATE' 'test-quality|Authoring gate' 'test-quality|Retention bar'; do
+for pair in 'review|Execute mode' 'review|blast radius' 'review|ESCALATE' 'review|Done check' 'test-quality|Authoring gate' 'test-quality|Retention bar'; do
   base="${pair%%|*}"; phrase="${pair#*|}"
   grep -q "$phrase" "$LITE_SRC/$base.md" 2>/dev/null \
     || { bad "mithril-lite-$base missing '$phrase' (lite lags its full twin)"; lite_ok=0; }
 done
+grep -q 'done-check.sh" verdict' "$SCRIPT_DIR/claude/commands/mithril.md" \
+  || { bad "mithril.md does not run done-check.sh verdict (the done verdict would be the model's say-so)"; lite_ok=0; }
 (( lite_ok )) && ok "$n_lite lite agents have full twins, valid names, and the required execute/blast-radius/authoring behavior"
 
 # ---- 3. count claims -----------------------------------------------------------
