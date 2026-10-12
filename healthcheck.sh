@@ -279,11 +279,17 @@ check_deployed_sync() {
   hdr "Deployed sync ($home — $label)"
   local deployed_any=0
   local f name dst
+  # Managed = the installer has been here (a rendered command or any mithril-* agent entry).
+  # Only a managed home owes a link per skill; an unmanaged one gets "nothing deployed" below.
+  local managed=0
+  if [[ -e "$home/commands/mithril.md" ]] || compgen -G "$home/agents/mithril-*" >/dev/null; then managed=1; fi
   for f in "$AGENTS_SRC"/*.md; do
     name="$(basename "$f")"
     [[ "$name" == "tutor.md" ]] && continue
     dst="$home/agents/mithril-$name"
-    if [[ -L "$dst" && ! -e "$dst" ]]; then
+    if [[ ! -e "$dst" && ! -L "$dst" ]]; then
+      (( managed )) && warn "$label: mithril-$name link is missing (run scripts/install-local.sh)"
+    elif [[ -L "$dst" && ! -e "$dst" ]]; then
       deployed_any=1
       warn "$label: mithril-$name is a dangling link to $(readlink "$dst") (run scripts/install-local.sh from the main checkout)"
     elif [[ -f "$dst" ]]; then
@@ -313,8 +319,7 @@ check_deployed_sync() {
     for f in "$AGENTS_SRC"/*.md; do
       dst="$home/skills/mithril-$(basename "$f" .md)"
       if [[ ! -e "$dst" && ! -L "$dst" ]]; then
-        # Only a home the installer manages (something deployed) owes a link per skill.
-        (( deployed_any )) && warn "$label: skills/$(basename "$dst") link is missing (run scripts/install-local.sh)"
+        (( managed )) && warn "$label: skills/$(basename "$dst") link is missing (run scripts/install-local.sh)"
         continue
       fi
       [[ -L "$dst" && ! -e "$dst" ]] && warn "$label: skills/$(basename "$dst") is a dangling link to $(readlink "$dst") (run scripts/install-local.sh from the main checkout)"

@@ -137,4 +137,17 @@ fhc "$ml/.claude" "$ml/.grok" --strict >/dev/null 2>&1; check "--strict exits 1 
 check "healthcheck names the missing link" "yes" "$(fhc "$ml/.claude" "$ml/.grok" 2>&1 | grep -q 'mithril-smells link is missing' && echo yes || echo no)"
 fhc "$tmp/noclaude/.claude" "$tmp/noclaude/.grok" --strict >/dev/null 2>&1
 check "a machine with no Claude home gets no missing-link warnings" "0" "$(fhc "$tmp/noclaude/.claude" "$tmp/noclaude/.grok" 2>&1 | grep -c 'link is missing')"
+# --- a missing agent link in a managed home is drift, in Claude and in Grok ---
+ag="$tmp/agentlink"; mkdir -p "$ag/.grok"
+bash "$full/scripts/install-local.sh" --home "$ag/.claude" >/dev/null 2>&1
+bash "$full/scripts/install-local.sh" --home "$ag/.grok" >/dev/null 2>&1
+fhc "$ag/.claude" "$ag/.grok" --strict >/dev/null 2>&1; check "--strict exits 0 on a clean Claude+Grok install" "0" "$?"
+rm "$ag/.claude/agents/mithril-smells.md"
+fhc "$ag/.claude" "$ag/.grok" --strict >/dev/null 2>&1; check "--strict exits 1 when a Claude agent link is missing" "1" "$?"
+check "healthcheck names the missing Claude agent link" "yes" "$(fhc "$ag/.claude" "$ag/.grok" 2>&1 | grep -q 'Claude: mithril-smells.md link is missing' && echo yes || echo no)"
+bash "$full/scripts/install-local.sh" --home "$ag/.claude" >/dev/null 2>&1
+fhc "$ag/.claude" "$ag/.grok" --strict >/dev/null 2>&1; check "re-install restores --strict 0" "0" "$?"
+rm "$ag/.grok/agents/mithril-smells.md"
+fhc "$ag/.claude" "$ag/.grok" --strict >/dev/null 2>&1; check "--strict exits 1 when a Grok agent link is missing" "1" "$?"
+check "healthcheck names the missing Grok agent link" "yes" "$(fhc "$ag/.claude" "$ag/.grok" 2>&1 | grep -q 'Grok: mithril-smells.md link is missing' && echo yes || echo no)"
 exit $((fails > 0))
