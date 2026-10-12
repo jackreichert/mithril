@@ -46,4 +46,45 @@ setup 1; mkdir -p "$tmp/work/sub"
 check "nested subdir of a repo is silent" "" "$(MITHRIL_AUTO_PULL=on MITHRIL_REPO="$tmp/work/sub" bash "$script")"
 check "nested subdir left HEAD alone" "base" "$(git -C "$tmp/work" log -1 --format=%s)"
 mkdir -p "$tmp/plain"; check "non-git dir is silent" "" "$(MITHRIL_REPO="$tmp/plain" bash "$script")"
+# --- auto-pull reinstalls the command copy and links (MITHRIL-022) ---
+# Fixture: a clone of this repo's tree, installed into a temp HOME, then fast-forwarded.
+reinstall_setup() { # $1 = shell snippet run in the pusher clone before it commits
+  rm -rf "$tmp/origin" "$tmp/work" "$tmp/pusher" "$tmp/rhome"; mkdir -p "$tmp/rhome"
+  git init -q --bare -b main "$tmp/origin"
+  git clone -q "$tmp/origin" "$tmp/work" 2>/dev/null
+  git -C "$here" archive HEAD | tar -x -C "$tmp/work"
+  git -C "$tmp/work" add -A; git -C "$tmp/work" commit -q -m base
+  git -C "$tmp/work" push -q origin main 2>/dev/null
+  git -C "$tmp/work" branch -q --set-upstream-to=origin/main main
+  git clone -q "$tmp/origin" "$tmp/pusher" 2>/dev/null
+  (cd "$tmp/pusher" && eval "$1" && git add -A && git commit -q -m up && git push -q origin main 2>/dev/null)
+  HOME="$tmp/rhome" bash "$tmp/work/scripts/install-local.sh" >/dev/null 2>&1
+}
+pull() { HOME="$tmp/rhome" MITHRIL_AUTO_PULL=on MITHRIL_REPO="$tmp/work" bash "$script" 2>&1; }
+strict() { HOME="$tmp/rhome" bash "$tmp/work/healthcheck.sh" --strict 2>&1; }
+
+reinstall_setup 'echo "<!-- v2 -->" >> claude/commands/mithril.md'
+out="$(pull)"; rc=$?
+check "reinstall: pull succeeds" "0" "$rc"
+check "reinstall: command copy re-rendered" "yes" "$(grep -q 'v2 -->' "$tmp/rhome/.claude/commands/mithril.md" && echo yes || echo no)"
+strict >/dev/null; check "reinstall: strict healthcheck exits 0 after update" "0" "$?"
+
+reinstall_setup 'sed "s/mithril-review/mithril-zzextra/" skills/review.md > skills/zzextra.md'
+pull >/dev/null
+check "reinstall: new skill gets a skills link" "$tmp/work/skills/zzextra.md" "$(readlink "$tmp/rhome/.claude/skills/mithril-zzextra")"
+check "reinstall: new skill gets an agent link" "$tmp/work/skills/zzextra.md" "$(readlink "$tmp/rhome/.claude/agents/mithril-zzextra.md")"
+
+reinstall_setup 'printf "#!/usr/bin/env bash\nexit 1\n" > scripts/install-local.sh'
+out="$(pull)"; rc=$?
+check "reinstall failure exits non-zero" "1" "$rc"
+check "reinstall failure says so" "reinstall failed" "$out"
+
+reinstall_setup 'echo "<!-- v2 -->" >> claude/commands/mithril.md'
+ln -s "$tmp/other/skills/retired.md" "$tmp/rhome/.claude/agents/mithril-retired.md"
+out="$(pull)"; rc=$?
+check "foreign link: pull still succeeds" "0" "$rc"
+check "foreign link is kept" "$tmp/other/skills/retired.md" "$(readlink "$tmp/rhome/.claude/agents/mithril-retired.md")"
+check "foreign link is warned about, remove by hand" "remove it by hand" "$out"
+strict >/dev/null; check "foreign dangling link: strict healthcheck exits 1" "1" "$?"
+rm -rf "$tmp/rhome"
 exit $((fails > 0))

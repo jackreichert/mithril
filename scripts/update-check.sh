@@ -6,6 +6,8 @@
 # `auto_pull=on` in ${XDG_CONFIG_HOME:-~/.config}/mithril/config.
 # When on, a clean checkout that is purely behind is fast-forwarded with
 # `merge --ff-only`; anything else is only reported. Never rebases or resets.
+# After a successful pull it re-runs scripts/install-local.sh so the rendered command
+# copy and the skill/agent links match the new tree; a failed reinstall exits 1.
 set -u
 
 repo="${MITHRIL_REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
@@ -42,6 +44,14 @@ dirty="$(git -C "$repo" status --porcelain --untracked-files=no | wc -l | tr -d 
 if [ "$behind" -gt 0 ] && [ "$ahead" -eq 0 ] && [ "$dirty" -eq 0 ] && auto_pull_enabled; then
   if git -C "$repo" merge --ff-only --quiet "$upstream" >/dev/null 2>&1; then
     echo "mithril: fast-forwarded $behind commit(s) from $upstream"
+    # The rendered command copy is not a link, and new skills need links: re-run the
+    # installer from the pulled tree. It is idempotent and only prunes links it owns;
+    # its warnings (e.g. "remove it by hand") pass through on stderr.
+    if ! bash "$repo/scripts/install-local.sh" >/dev/null; then
+      echo "mithril: reinstall failed after the pull; the command copy and links may be stale, run scripts/install-local.sh by hand" >&2
+      exit 1
+    fi
+    echo "mithril: reinstalled the command copy and links"
   else
     echo "mithril: $behind behind $upstream; fast-forward failed, update by hand"
   fi
