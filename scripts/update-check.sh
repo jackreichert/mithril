@@ -27,15 +27,19 @@ auto_pull_enabled() {
 
 # The rendered command copy is not a link, and new skills need links, so after a pull
 # re-run the pulled tree's installer for each default home that already holds THIS
-# checkout's install (its command copy names this root). Never a first install, and
+# checkout's install (its command copy's router line names this exact root). Never a first install, and
 # never a home installed from another checkout or by hand. Custom --home installs
 # cannot be discovered; re-run scripts/install-local.sh --home DIR for those.
 reinstall_installed_homes() {
-  local root="$1" phys h refreshed=0 failed=0
+  local root="$1" phys h installed refreshed=0 failed=0
   phys="$(cd "$root" && pwd -P)"
   for h in "${CLAUDE_HOME:-$HOME/.claude}" "${GROK_HOME:-$HOME/.grok}"; do
     [ -f "$h/commands/mithril.md" ] || continue
-    grep -qF -e "$root/" -e "$phys/" "$h/commands/mithril.md" || continue
+    # The router line is `bash "<root>/scripts/update-check.sh"`; compare roots exactly,
+    # physical to physical, so a copy or nested checkout whose path merely contains ours
+    # (or a symlinked path to ours) is told apart.
+    installed="$(sed -n 's|.*bash "\(.*\)/scripts/update-check\.sh".*|\1|p' "$h/commands/mithril.md" | head -1)"
+    [ -n "$installed" ] && [ "$(cd "$installed" 2>/dev/null && pwd -P)" = "$phys" ] || continue
     if bash "$root/scripts/install-local.sh" --home "$h" >/dev/null; then
       refreshed=$((refreshed + 1))
     else

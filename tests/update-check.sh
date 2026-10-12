@@ -120,4 +120,32 @@ check "S5: hand-written command survives" "my own command" "$(cat "$tmp/rhome/.c
 check "S5: no first install of agents" "no" "$([ -e "$tmp/rhome/.claude/agents" ] && echo yes || echo no)"
 check "S5: stays silent about the reinstall" "no" "$(printf '%s' "$out" | grep -q reinstall && echo yes || echo no)"
 rm -rf "$tmp/rhome"
+
+# --- the installed root is compared exactly, not as a substring (S7, S7b, S9b) ---
+reinstall_setup 'echo "<!-- v2 -->" >> claude/commands/mithril.md'
+rm -rf "$tmp/rhome"; mkdir -p "$tmp/rhome"
+bak="$tmp/bak$tmp/work"; mkdir -p "$(dirname "$bak")"; cp -R "$tmp/work" "$bak"
+HOME="$tmp/rhome" bash "$bak/scripts/install-local.sh" >/dev/null 2>&1
+before="$(readlink "$tmp/rhome/.claude/agents/mithril-review.md")"
+pull >/dev/null
+check "S7: home installed from a path containing ours is left alone" "$before" "$(readlink "$tmp/rhome/.claude/agents/mithril-review.md")"
+check "S7: and its command is not re-rendered" "no" "$(grep -q 'v2 -->' "$tmp/rhome/.claude/commands/mithril.md" && echo yes || echo no)"
+rm -rf "$tmp/bak"
+
+reinstall_setup 'echo "<!-- v2 -->" >> claude/commands/mithril.md'
+rm -rf "$tmp/rhome"; mkdir -p "$tmp/rhome"
+mkdir -p "$tmp/work/vendor/m"; git -C "$tmp/work" archive HEAD | tar -x -C "$tmp/work/vendor/m"
+HOME="$tmp/rhome" MITHRIL_ALLOW_WORKTREE=1 bash "$tmp/work/vendor/m/scripts/install-local.sh" >/dev/null 2>&1
+before="$(readlink "$tmp/rhome/.claude/agents/mithril-review.md")"
+git -C "$tmp/work" reset -q --hard
+pull >/dev/null
+check "S7b: home installed from a nested checkout is left alone" "$before" "$(readlink "$tmp/rhome/.claude/agents/mithril-review.md")"
+check "S7b: and its command is not re-rendered" "no" "$(grep -q 'v2 -->' "$tmp/rhome/.claude/commands/mithril.md" && echo yes || echo no)"
+
+reinstall_setup 'echo "<!-- v2 -->" >> claude/commands/mithril.md'
+rm -rf "$tmp/rhome"; mkdir -p "$tmp/rhome"; ln -sfn "$tmp/work" "$tmp/linkwork"
+HOME="$tmp/rhome" bash "$tmp/linkwork/scripts/install-local.sh" >/dev/null 2>&1
+pull >/dev/null
+check "S9b: installed via a symlink path, pulled via the real path, refreshes" "yes" "$(grep -q 'v2 -->' "$tmp/rhome/.claude/commands/mithril.md" && echo yes || echo no)"
+rm -rf "$tmp/rhome" "$tmp/linkwork"
 exit $((fails > 0))
