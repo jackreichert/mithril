@@ -1,0 +1,3 @@
+1	DONE	bash greet.sh; echo $?	exit 0, stdout "hello"
+2	DONE	bash tests/greet.sh	exit 0, 1 passed
+3	DONE	bash greet.sh --bad; echo $?	exit 2
