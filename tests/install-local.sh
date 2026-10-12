@@ -112,15 +112,18 @@ check "install removes dangling owned link" "no" "$([[ -L "$sl/.claude/agents/mi
 check "install keeps a link it does not own" "yes" "$([[ -L "$sl/.claude/agents/mithril-foreign.md" ]] && echo yes || echo no)"
 check "install keeps a plain file" "yes" "$([[ -f "$sl/.claude/agents/mithril-plain.md" && ! -L "$sl/.claude/agents/mithril-plain.md" ]] && echo yes || echo no)"
 check "install keeps current links" "yes" "$([[ -e "$sl/.claude/agents/mithril-review.md" && -e "$sl/.claude/skills/mithril-review" ]] && echo yes || echo no)"
-# lite links: pruned only once the checkout ships skills/lite
+# lite links: pruned only once the checkout ships skills/lite. Own copy, lite stripped, so
+# this holds whether or not $full has lite agents (they land with the lite-agents branch).
+nl="$tmp/nolite"; mkdir -p "$nl"
+(cd "$full" && tar -cf - .) | tar -xf - -C "$nl"
+rm -rf "${nl:?}/skills/lite"
 mkdir -p "$old/lite"; echo l > "$old/lite/old.md"
 ln -s "$old/lite/old.md" "$sl/.claude/agents/mithril-lite-old.md"
-bash "$full/scripts/install-local.sh" --home "$sl/.claude" >/dev/null 2>&1
+bash "$nl/scripts/install-local.sh" --home "$sl/.claude" >/dev/null 2>&1
 check "lite link is left alone when the checkout has no lite agents" "yes" "$([[ -L "$sl/.claude/agents/mithril-lite-old.md" ]] && echo yes || echo no)"
-mkdir -p "$full/skills/lite"; cp "$full/skills/review.md" "$full/skills/lite/review.md"
-bash "$full/scripts/install-local.sh" --home "$sl/.claude" >/dev/null 2>&1
+mkdir -p "$nl/skills/lite"; cp "$nl/skills/review.md" "$nl/skills/lite/review.md"
+bash "$nl/scripts/install-local.sh" --home "$sl/.claude" >/dev/null 2>&1
 check "retired lite link is removed once the checkout has lite agents" "no" "$([[ -L "$sl/.claude/agents/mithril-lite-old.md" ]] && echo yes || echo no)"
-rm -rf "$full/skills/lite"
 
 # --- healthcheck rejects unknown arguments ---
 fhc "$sl/.claude" "$sl/.grok" --stirct >/dev/null 2>&1; check "healthcheck rejects an unknown argument" "2" "$?"
