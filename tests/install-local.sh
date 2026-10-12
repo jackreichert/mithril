@@ -125,4 +125,13 @@ rm -rf "$full/skills/lite"
 # --- healthcheck rejects unknown arguments ---
 fhc "$sl/.claude" "$sl/.grok" --stirct >/dev/null 2>&1; check "healthcheck rejects an unknown argument" "2" "$?"
 check "healthcheck prints usage for it" "yes" "$(fhc "$sl/.claude" "$sl/.grok" --stirct 2>&1 | grep -q 'usage: healthcheck.sh' && echo yes || echo no)"
+# --- a missing skills/ link in a managed home is drift ---
+ml="$tmp/missing"; mkdir -p "$ml"
+bash "$full/scripts/install-local.sh" --home "$ml/.claude" >/dev/null 2>&1
+fhc "$ml/.claude" "$ml/.grok" --strict >/dev/null 2>&1; check "--strict exits 0 on a clean install before a link is removed" "0" "$?"
+rm "$ml/.claude/skills/mithril-smells"
+fhc "$ml/.claude" "$ml/.grok" --strict >/dev/null 2>&1; check "--strict exits 1 when a skills link is missing" "1" "$?"
+check "healthcheck names the missing link" "yes" "$(fhc "$ml/.claude" "$ml/.grok" 2>&1 | grep -q 'mithril-smells link is missing' && echo yes || echo no)"
+fhc "$tmp/noclaude/.claude" "$tmp/noclaude/.grok" --strict >/dev/null 2>&1
+check "a machine with no Claude home gets no missing-link warnings" "0" "$(fhc "$tmp/noclaude/.claude" "$tmp/noclaude/.grok" 2>&1 | grep -c 'link is missing')"
 exit $((fails > 0))

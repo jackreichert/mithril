@@ -312,6 +312,11 @@ check_deployed_sync() {
     check_stale_links "$home/skills" skill "$label"
     for f in "$AGENTS_SRC"/*.md; do
       dst="$home/skills/mithril-$(basename "$f" .md)"
+      if [[ ! -e "$dst" && ! -L "$dst" ]]; then
+        # Only a home the installer manages (something deployed) owes a link per skill.
+        (( deployed_any )) && warn "$label: skills/$(basename "$dst") link is missing (run scripts/install-local.sh)"
+        continue
+      fi
       [[ -L "$dst" && ! -e "$dst" ]] && warn "$label: skills/$(basename "$dst") is a dangling link to $(readlink "$dst") (run scripts/install-local.sh from the main checkout)"
     done
   fi
