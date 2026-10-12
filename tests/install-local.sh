@@ -66,6 +66,19 @@ check "healthcheck reports a dangling link" "found" "$d"
 dangling=0; for l in "$tmp"/hm/agents/*; do [[ -e "$l" ]] || dangling=$((dangling+1)); done
 check "install from the main checkout survives worktree removal" "0" "$dangling"
 
+# A git-free copy of the repo: install and healthcheck then agree on one root, so a fresh
+# install is healthy even when $here is a linked worktree.
+full="$tmp/full"; mkdir -p "$full"
+(cd "$here" && tar --exclude=.git -cf - .) | tar -xf - -C "$full"
+fhc() { CLAUDE_HOME="$1" GROK_HOME="$2" bash "$full/healthcheck.sh" "${@:3}"; }
+
+# --- --strict never penalises a machine without Grok ---
+sh_="$tmp/strict-nogrok"; mkdir -p "$sh_"
+bash "$full/scripts/install-local.sh" --home "$sh_/.claude" >/dev/null 2>&1
+fhc "$sh_/.claude" "$sh_/.grok" --strict >/dev/null 2>&1
+check "--strict exits 0 on a correct install with no Grok home" "0" "$?"
+check "a missing Grok home is not reported" "0" "$(fhc "$sh_/.claude" "$sh_/.grok" 2>&1 | grep -c 'nothing deployed to .*\.grok')"
+
 # --- --strict: with the repo healthy, drift is only a warning unless --strict is given ---
 echo drift > "$tmp/hm/commands/mithril.md"
 CLAUDE_HOME="$tmp/hm" GROK_HOME="$tmp/none" bash "$here/healthcheck.sh" >/dev/null 2>&1; check "drift alone exits 0 by default" "0" "$?"

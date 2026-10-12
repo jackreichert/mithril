@@ -281,7 +281,8 @@ check_deployed_sync() {
   (( deployed_any )) || warn "nothing deployed to $home (repository checks passed)"
 }
 check_deployed_sync "$CLAUDE_HOME" "Claude"
-check_deployed_sync "$GROK_HOME"   "Grok"
+# The installer never creates ~/.grok, so a machine without Grok is a correct install.
+[[ -d "$GROK_HOME" ]] && check_deployed_sync "$GROK_HOME" "Grok"
 
 # ---- 6. doc links --------------------------------------------------------------
 hdr "Doc links"
