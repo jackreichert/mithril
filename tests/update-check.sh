@@ -28,7 +28,8 @@ check() { # name expected-substring actual
 setup 0; check "current is silent" "" "$(run)"
 setup 3; check "behind reported, auto_pull off" "3 behind origin/main; auto_pull is off" "$(run)"
 check "off leaves HEAD alone" "base" "$(git -C "$tmp/work" log -1 --format=%s)"
-out="$(MITHRIL_AUTO_PULL=on run)"; check "on fast-forwards" "fast-forwarded 3" "$out"
+out="$(MITHRIL_AUTO_PULL=on run)"; rc=$?; check "on fast-forwards" "fast-forwarded 3" "$out"
+check "on fast-forwards exits 0 with nothing installed" "0" "$rc"
 check "ff moved HEAD" "up" "$(git -C "$tmp/work" log -1 --format=%s)"
 setup 2; echo x > "$tmp/work/f"; git -C "$tmp/work" add f; git -C "$tmp/work" commit -q -m local
 out="$(MITHRIL_AUTO_PULL=on run)"; check "diverged reported, not pulled" "diverged: 1 ahead, 2 behind" "$out"
@@ -36,7 +37,8 @@ check "diverged leaves HEAD" "local" "$(git -C "$tmp/work" log -1 --format=%s)"
 setup 1; echo z > "$tmp/work/g"; git -C "$tmp/work" add g
 out="$(MITHRIL_AUTO_PULL=on run)"; check "dirty and behind is reported, not pulled" "1 behind origin/main, dirty (1 file(s))" "$out"
 setup 1; mkdir -p "$XDG_CONFIG_HOME/mithril"; echo 'auto_pull=on' > "$XDG_CONFIG_HOME/mithril/config"
-check "config file turns it on" "fast-forwarded 1" "$(run)"
+out="$(run)"; rc=$?; check "config file turns it on" "fast-forwarded 1" "$out"
+check "config file fast-forward exits 0 with nothing installed" "0" "$rc"
 rm -rf "$XDG_CONFIG_HOME"
 setup 0; echo x > "$tmp/work/f"; git -C "$tmp/work" add f; git -C "$tmp/work" commit -q -m local
 check "ahead only, auto_pull on, reported" "1 ahead of origin/main" "$(MITHRIL_AUTO_PULL=on run)"
@@ -77,7 +79,7 @@ check "reinstall: new skill gets an agent link" "$tmp/work/skills/zzextra.md" "$
 reinstall_setup 'printf "#!/usr/bin/env bash\nexit 1\n" > scripts/install-local.sh'
 out="$(pull)"; rc=$?
 check "reinstall failure exits non-zero" "1" "$rc"
-check "reinstall failure says so" "reinstall failed" "$out"
+check "reinstall failure says so" "failed after the pull" "$out"
 
 reinstall_setup 'echo "<!-- v2 -->" >> claude/commands/mithril.md'
 ln -s "$tmp/other/skills/retired.md" "$tmp/rhome/.claude/agents/mithril-retired.md"
@@ -86,5 +88,36 @@ check "foreign link: pull still succeeds" "0" "$rc"
 check "foreign link is kept" "$tmp/other/skills/retired.md" "$(readlink "$tmp/rhome/.claude/agents/mithril-retired.md")"
 check "foreign link is warned about, remove by hand" "remove it by hand" "$out"
 strict >/dev/null; check "foreign dangling link: strict healthcheck exits 1" "1" "$?"
+rm -rf "$tmp/rhome"
+
+# --- reinstall only refreshes homes this checkout installed (S1, S2, S5) ---
+reinstall_setup 'echo "<!-- v2 -->" >> claude/commands/mithril.md'
+rm -rf "$tmp/rhome"; mkdir -p "$tmp/rhome/.grok"
+HOME="$tmp/rhome" bash "$tmp/work/scripts/install-local.sh" --home "$tmp/rhome/.claude" >/dev/null 2>&1
+out="$(pull)"; rc=$?
+check "S1: pull exits 0" "0" "$rc"
+check "S1: claude home refreshed" "yes" "$(grep -q 'v2 -->' "$tmp/rhome/.claude/commands/mithril.md" && echo yes || echo no)"
+check "S1: existing but uninstalled grok home gets no command" "no" "$([ -e "$tmp/rhome/.grok/commands/mithril.md" ] && echo yes || echo no)"
+check "S1: existing but uninstalled grok home gets no agents" "no" "$([ -e "$tmp/rhome/.grok/agents" ] && echo yes || echo no)"
+
+reinstall_setup 'echo "<!-- v2 -->" >> claude/commands/mithril.md'
+rm -rf "$tmp/rhome" "$tmp/b" "$tmp/b.git"; mkdir -p "$tmp/rhome/.grok"
+git clone -q "$tmp/origin" "$tmp/b" 2>/dev/null; git -C "$tmp/b" reset -q --hard HEAD~1
+HOME="$tmp/rhome" bash "$tmp/b/scripts/install-local.sh" --home "$tmp/rhome/.claude" >/dev/null 2>&1
+HOME="$tmp/rhome" bash "$tmp/work/scripts/install-local.sh" --home "$tmp/rhome/.grok" >/dev/null 2>&1
+before="$(readlink "$tmp/rhome/.claude/agents/mithril-review.md")"
+pull >/dev/null
+check "S2: home installed from another checkout keeps its links" "$before" "$(readlink "$tmp/rhome/.claude/agents/mithril-review.md")"
+check "S2: home installed from another checkout is not re-rendered" "no" "$(grep -q 'v2 -->' "$tmp/rhome/.claude/commands/mithril.md" && echo yes || echo no)"
+check "S2: this checkout's own home is refreshed" "yes" "$(grep -q 'v2 -->' "$tmp/rhome/.grok/commands/mithril.md" && echo yes || echo no)"
+rm -rf "$tmp/b"
+
+reinstall_setup 'echo "<!-- v2 -->" >> claude/commands/mithril.md'
+rm -rf "$tmp/rhome"; mkdir -p "$tmp/rhome/.claude/commands"; echo "my own command" > "$tmp/rhome/.claude/commands/mithril.md"
+out="$(pull)"; rc=$?
+check "S5: pull exits 0" "0" "$rc"
+check "S5: hand-written command survives" "my own command" "$(cat "$tmp/rhome/.claude/commands/mithril.md")"
+check "S5: no first install of agents" "no" "$([ -e "$tmp/rhome/.claude/agents" ] && echo yes || echo no)"
+check "S5: stays silent about the reinstall" "no" "$(printf '%s' "$out" | grep -q reinstall && echo yes || echo no)"
 rm -rf "$tmp/rhome"
 exit $((fails > 0))
