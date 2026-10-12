@@ -31,8 +31,53 @@ done
 # never truncates an existing command.
 esc_root="$(printf '%s' "$root" | sed 's/[\\&|]/\\&/g')"
 
+# A link is ours when it points at <checkout>/skills[/lite]/X.md and is named for X
+# (mithril-X[.md] / mithril-lite-X[.md]). Retired or renamed agents leave such links behind.
+owned_link() {
+  local l="$1" t x stem
+  [[ -L "$l" ]] || return 1
+  t="$(readlink "$l")"; x="$(basename "$t" .md)"; stem="$(basename "$l" .md)"
+  case "$t" in
+    */skills/lite/*.md) [[ "$stem" == "mithril-lite-$x" ]] ;;
+    */skills/*.md) [[ "$stem" == "mithril-$x" ]] ;;
+    *) return 1 ;;
+  esac
+}
+# Is this link name current in this checkout? $2 is "agent" or "skill".
+current_name() {
+  local stem="$1" kind="$2" n
+  if [[ "$stem" == mithril-lite-* ]]; then
+    [[ "$kind" == agent && -f "$root/skills/lite/${stem#mithril-lite-}.md" ]]
+  else
+    n="${stem#mithril-}"
+    [[ -f "$root/skills/$n.md" ]] && { [[ "$kind" == skill ]] || [[ "$n" != tutor ]]; }
+  fi
+}
+# Remove owned links whose name is no longer current. Lite links are left alone until this
+# checkout ships skills/lite, since a link into a newer checkout is not stale.
+prune_stale() {
+  local dir="$1" kind="$2" l stem
+  for l in "$dir"/mithril-*; do
+    [[ -L "$l" ]] || continue
+    stem="$(basename "$l" .md)"
+    [[ "$stem" == mithril-lite-* && ( "$kind" == skill || ! -d "$root/skills/lite" ) ]] && continue
+    current_name "$stem" "$kind" && continue
+    if owned_link "$l"; then rm -f "$l"; echo "mithril: removed stale link $l"; fi
+  done
+}
+
+first_home="${homes[0]}"
 for home in "${homes[@]}"; do
   mkdir -p "$home/agents" "$home/commands"
+  prune_stale "$home/agents" agent
+  # ~/.claude/skills/mithril-* (every skill, tutor included) belongs to the first home only.
+  if [[ "$home" == "$first_home" ]]; then
+    mkdir -p "$home/skills"
+    prune_stale "$home/skills" skill
+    for f in "$root"/skills/*.md; do
+      ln -sfn "$f" "$home/skills/mithril-$(basename "$f" .md)"
+    done
+  fi
   for f in "$root"/skills/*.md; do
     base="$(basename "$f")"
     [[ "$base" == "tutor.md" ]] && continue

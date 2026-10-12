@@ -245,8 +245,36 @@ else
 fi
 
 # ---- 5. deployed sync ----------------------------------------------------------
+# Links named mithril-* in $1 that no longer map to a skill here: dangling, or ours and stale.
+# $2 is "agent" or "skill". Mirrors scripts/install-local.sh (owned_link / current_name).
+check_stale_links() {
+  local dir="$1" kind="$2" label="$3" l stem t x n owned current
+  for l in "$dir"/mithril-*; do
+    [[ -L "$l" ]] || continue
+    stem="$(basename "$l" .md)"; t="$(readlink "$l")"; x="$(basename "$t" .md)"
+    owned=0; current=0
+    case "$t" in
+      */skills/lite/*.md) [[ "$stem" == "mithril-lite-$x" ]] && owned=1 ;;
+      */skills/*.md) [[ "$stem" == "mithril-$x" ]] && owned=1 ;;
+    esac
+    if [[ "$stem" == mithril-lite-* ]]; then
+      [[ "$kind" == agent && -f "$SCRIPT_DIR/skills/lite/${stem#mithril-lite-}.md" ]] && current=1
+      # No lite agents in this checkout: the link may belong to a newer one, so only dangling counts.
+      [[ ! -d "$SCRIPT_DIR/skills/lite" ]] && current=1
+    else
+      n="${stem#mithril-}"
+      [[ -f "$SCRIPT_DIR/skills/$n.md" ]] && { [[ "$kind" == skill || "$n" != tutor ]] && current=1; }
+    fi
+    if [[ ! -e "$l" ]]; then
+      (( current )) && continue   # current names get the dangling warning in the sync pass
+      warn "$label: $(basename "$l") is a dangling link to $t for a skill that no longer exists (run scripts/install-local.sh)"
+    elif (( ! current && owned )); then
+      warn "$label: $(basename "$l") is a stale link to $t; no such skill in this checkout (run scripts/install-local.sh)"
+    fi
+  done
+}
 check_deployed_sync() {
-  local home="$1" label="$2"
+  local home="$1" label="$2" skills_too="${3:-0}"
   hdr "Deployed sync ($home — $label)"
   local deployed_any=0
   local f name dst
@@ -278,9 +306,17 @@ check_deployed_sync() {
     fi
     rm -f "$expected_command"
   fi
+  check_stale_links "$home/agents" agent "$label"
+  if (( skills_too )); then
+    check_stale_links "$home/skills" skill "$label"
+    for f in "$AGENTS_SRC"/*.md; do
+      dst="$home/skills/mithril-$(basename "$f" .md)"
+      [[ -L "$dst" && ! -e "$dst" ]] && warn "$label: skills/$(basename "$dst") is a dangling link to $(readlink "$dst") (run scripts/install-local.sh from the main checkout)"
+    done
+  fi
   (( deployed_any )) || warn "nothing deployed to $home (repository checks passed)"
 }
-check_deployed_sync "$CLAUDE_HOME" "Claude"
+check_deployed_sync "$CLAUDE_HOME" "Claude" 1
 # The installer never creates ~/.grok, so a machine without Grok is a correct install.
 [[ -d "$GROK_HOME" ]] && check_deployed_sync "$GROK_HOME" "Grok"
 

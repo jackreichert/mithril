@@ -87,4 +87,39 @@ fhc "$dh/.claude" "$dh/.grok" --strict >/dev/null 2>&1; check "--strict exits 0 
 echo drift > "$dh/.claude/commands/mithril.md"
 fhc "$dh/.claude" "$dh/.grok" >/dev/null 2>&1; check "drift alone exits 0 by default" "0" "$?"
 fhc "$dh/.claude" "$dh/.grok" --strict >/dev/null 2>&1; check "--strict exits 1 on drift" "1" "$?"
+# --- retired or renamed mithril-* links are flagged and pruned ---
+sl="$tmp/stale"; mkdir -p "$sl/.grok"
+bash "$full/scripts/install-local.sh" --home "$sl/.claude" >/dev/null 2>&1
+bash "$full/scripts/install-local.sh" --home "$sl/.grok" >/dev/null 2>&1
+check "install links smells and lint-fix into skills/" "yes" "$([[ "$(readlink "$sl/.claude/skills/mithril-smells")" == "$full/skills/smells.md" && -L "$sl/.claude/skills/mithril-lint-fix" ]] && echo yes || echo no)"
+check "install links tutor into skills/" "yes" "$([[ -L "$sl/.claude/skills/mithril-tutor" ]] && echo yes || echo no)"
+fhc "$sl/.claude" "$sl/.grok" --strict >/dev/null 2>&1; check "--strict exits 0 on a fresh install with skills links" "0" "$?"
+old="$tmp/oldcheckout/skills"; mkdir -p "$old"; echo live > "$old/retired.md"
+ln -s "$old/retired.md" "$sl/.claude/agents/mithril-retired.md"
+ln -s "$tmp/gone/skills/gone.md" "$sl/.claude/agents/mithril-gone.md"
+ln -s "$old/retired.md" "$sl/.claude/skills/mithril-retired"
+ln -s "$tmp/elsewhere.md" "$sl/.claude/agents/mithril-foreign.md"
+echo plain > "$sl/.claude/agents/mithril-plain.md"
+fhc "$sl/.claude" "$sl/.grok" --strict >/dev/null 2>&1; check "--strict exits 1 on stale and dangling mithril-* links" "1" "$?"
+out="$(fhc "$sl/.claude" "$sl/.grok" 2>&1)"
+check "healthcheck names the stale agent link" "yes" "$(grep -q 'mithril-retired.md is a stale link' <<<"$out" && echo yes || echo no)"
+check "healthcheck names the stale skills link" "yes" "$(grep -q 'mithril-retired is a stale link' <<<"$out" && echo yes || echo no)"
+check "healthcheck names the dangling retired link" "yes" "$(grep -q 'mithril-gone.md is a dangling link' <<<"$out" && echo yes || echo no)"
+bash "$full/scripts/install-local.sh" --home "$sl/.claude" >/dev/null 2>&1
+check "install removes stale agent link" "no" "$([[ -L "$sl/.claude/agents/mithril-retired.md" ]] && echo yes || echo no)"
+check "install removes stale skills link" "no" "$([[ -L "$sl/.claude/skills/mithril-retired" ]] && echo yes || echo no)"
+check "install removes dangling owned link" "no" "$([[ -L "$sl/.claude/agents/mithril-gone.md" ]] && echo yes || echo no)"
+check "install keeps a link it does not own" "yes" "$([[ -L "$sl/.claude/agents/mithril-foreign.md" ]] && echo yes || echo no)"
+check "install keeps a plain file" "yes" "$([[ -f "$sl/.claude/agents/mithril-plain.md" && ! -L "$sl/.claude/agents/mithril-plain.md" ]] && echo yes || echo no)"
+check "install keeps current links" "yes" "$([[ -e "$sl/.claude/agents/mithril-review.md" && -e "$sl/.claude/skills/mithril-review" ]] && echo yes || echo no)"
+# lite links: pruned only once the checkout ships skills/lite
+mkdir -p "$old/lite"; echo l > "$old/lite/old.md"
+ln -s "$old/lite/old.md" "$sl/.claude/agents/mithril-lite-old.md"
+bash "$full/scripts/install-local.sh" --home "$sl/.claude" >/dev/null 2>&1
+check "lite link is left alone when the checkout has no lite agents" "yes" "$([[ -L "$sl/.claude/agents/mithril-lite-old.md" ]] && echo yes || echo no)"
+mkdir -p "$full/skills/lite"; cp "$full/skills/review.md" "$full/skills/lite/review.md"
+bash "$full/scripts/install-local.sh" --home "$sl/.claude" >/dev/null 2>&1
+check "retired lite link is removed once the checkout has lite agents" "no" "$([[ -L "$sl/.claude/agents/mithril-lite-old.md" ]] && echo yes || echo no)"
+rm -rf "$full/skills/lite"
+
 exit $((fails > 0))
