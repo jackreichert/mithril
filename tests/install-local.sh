@@ -79,8 +79,12 @@ fhc "$sh_/.claude" "$sh_/.grok" --strict >/dev/null 2>&1
 check "--strict exits 0 on a correct install with no Grok home" "0" "$?"
 check "a missing Grok home is not reported" "0" "$(fhc "$sh_/.claude" "$sh_/.grok" 2>&1 | grep -c 'nothing deployed to .*\.grok')"
 
-# --- --strict: with the repo healthy, drift is only a warning unless --strict is given ---
-echo drift > "$tmp/hm/commands/mithril.md"
-CLAUDE_HOME="$tmp/hm" GROK_HOME="$tmp/none" bash "$here/healthcheck.sh" >/dev/null 2>&1; check "drift alone exits 0 by default" "0" "$?"
-CLAUDE_HOME="$tmp/hm" GROK_HOME="$tmp/none" bash "$here/healthcheck.sh" --strict >/dev/null 2>&1; check "--strict exits 1 on drift" "1" "$?"
+# --- --strict: a healthy install passes; drift is a warning unless --strict is given ---
+dh="$tmp/strict-drift"; mkdir -p "$dh/.grok"
+bash "$full/scripts/install-local.sh" --home "$dh/.claude" >/dev/null 2>&1
+bash "$full/scripts/install-local.sh" --home "$dh/.grok" >/dev/null 2>&1
+fhc "$dh/.claude" "$dh/.grok" --strict >/dev/null 2>&1; check "--strict exits 0 before any drift" "0" "$?"
+echo drift > "$dh/.claude/commands/mithril.md"
+fhc "$dh/.claude" "$dh/.grok" >/dev/null 2>&1; check "drift alone exits 0 by default" "0" "$?"
+fhc "$dh/.claude" "$dh/.grok" --strict >/dev/null 2>&1; check "--strict exits 1 on drift" "1" "$?"
 exit $((fails > 0))
