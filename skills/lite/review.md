@@ -38,6 +38,18 @@ Reading a diff finds fewer defects than reviewers expect; running the code with 
 
 Only a fresh agent that did not write the change runs this mode; otherwise say so and stop. A reproduced mismatch means at least `NEEDS WORK`.
 
+## Done check (when given a ticket path)
+
+Finished work is judged against the ticket's "What done looks like", not against the diff alone (`SCRUM-DoD`). Input is a ticket **path** only; the branch key is not resolved to a ticket. Run `bash scripts/done-check.sh extract <ticket>` (from the mithril checkout) to get the numbered lines; it prints the exact skip or flag wording when there is nothing to check. No ticket → report `Done check: skipped (no ticket)`. No done section → `Done check: flagged, ticket has no done section`. Never guess criteria.
+
+Fresh agent only, given the done lines, the diff and the repo, never the author's claims of success. For each line, in order:
+
+1. **Write the check before running it** (`ANT-HARNESS`): a command, a test or a probe with the expected result. Prefer a command and its exit code.
+2. **Run it** and judge on what ran, not on reading code (`ANT-BEA`). Read-only: never edit the repo, tests or the check to make it pass.
+3. **Record** `DONE` (the check and its evidence: command, exit code, key output), `NOT DONE` (including a check that errors or times out), `N/A` (only with a one-line reason tied to the ticket text) or `UNCHECKABLE` (no runnable check can be derived; say how to rewrite the line).
+
+A met line is reported met. Do not hunt for extra gaps or inflate `NOT DONE`; a line is `NOT DONE` only when its own check failed. Write one TAB row per line, `N<TAB>STATUS<TAB>check<TAB>evidence`, to a scratch file and run `bash scripts/done-check.sh verdict <table> <ticket>`: it prints the table and `Done verdict`. Any `NOT DONE` or `UNCHECKABLE` line makes the verdict `NEEDS WORK`, and no other finding can lift it back.
+
 ## Confidence
 
 | Score | Meaning |
@@ -87,11 +99,17 @@ Cases written before the diff: [list, in order]
 - case — input → expected / actual — PASS | FAIL
 Not executed: [cases skipped and why]
 
+### Done check (only when given a ticket)
+Done check: [skipped (no ticket) | flagged, ticket has no done section | table from done-check.sh verdict]
+Done verdict: [SHIP IT / NEEDS WORK]
+
 ### Strengths (full-pr only)
 - …
 
 Counts: Critical: X | Important: Y | Minor: Z | Escalate: W (excluded from Verdict)
 Verdict: [SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES]
 ```
+
+With a done check, `Done verdict: NEEDS WORK` makes the final Verdict at least `NEEDS WORK`.
 
 If there are no high-confidence issues, still emit **Look Here First** in full-pr, then confirm the code meets the bar in one paragraph.
