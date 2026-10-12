@@ -14,7 +14,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y shellcheck
-          shellcheck healthcheck.sh calibration/prompt-size.sh hooks/pre-commit scripts/update-check.sh scripts/test-cull.sh scripts/install-local.sh tests/install-local.sh tests/update-check.sh tests/test-cull.sh tests/fixtures/test-cull/tools/fake-runner.sh calibration/run.sh tests/calibration-run.sh scripts/done-check.sh tests/done-check.sh
+          shellcheck healthcheck.sh calibration/prompt-size.sh hooks/pre-commit hooks/done-verdict.sh scripts/update-check.sh scripts/test-cull.sh scripts/install-local.sh tests/install-local.sh tests/update-check.sh tests/test-cull.sh tests/fixtures/test-cull/tools/fake-runner.sh calibration/run.sh tests/calibration-run.sh scripts/done-check.sh tests/done-check.sh tests/done-hook.sh
 
       - name: Canonical skill integrity
         run: |
@@ -31,6 +31,9 @@ jobs:
 
       - name: Done-check tests
         run: bash tests/done-check.sh
+
+      - name: Done-verdict hook tests
+        run: bash tests/done-hook.sh
 
       - name: Calibration runner tests
         run: bash tests/calibration-run.sh

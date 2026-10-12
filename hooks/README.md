@@ -1,3 +1,7 @@
+# Hooks
+
+`hooks.json` is a plugin hook, not a git hook. Hosts that load it run `done-verdict.sh`, which executes `scripts/done-check.sh`. Do not symlink `hooks.json` into `.git/hooks`.
+
 # Git Hooks — enforce the gates, don't just advise
 
 The `/mithril` agents and the `/mithril gates` runner are *invoked*. This hook makes a fast subset of the gates *automatic*: it runs on every `git commit` and **blocks the commit** when staged code breaches a threshold. It's the difference between catching problems and preventing them — the write-time enforcement the [Constitution](../CONSTITUTION.md) (Article VII) describes.

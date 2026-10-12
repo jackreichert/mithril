@@ -162,6 +162,8 @@ Every prompt carries: the Project Context block, the Review Contract, the change
 1. `bash "${CLAUDE_PLUGIN_ROOT}/scripts/done-check.sh" extract <ticket>`. Exit 0 → pass the numbered lines to the fresh `mithril-review` agent (never one that wrote the code), which returns one TAB row per line. Exit 2 (no done section, unreadable) → print its line and set `Done verdict: NEEDS WORK`; spawn no done agent. No path given → print `Done check: skipped (no ticket)`.
 2. Write the agent's rows verbatim to a scratch file and run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/done-check.sh" verdict <rows-file> <ticket>`. Print its table; its exit code and `Done verdict` line are the done verdict. Do not edit the rows or override the result.
 
+On a host that loads plugin hooks, `hooks/done-verdict.sh` runs those two commands itself: `extract` when this command expands (it prints the lines and a `Rows file:` path), and `verdict` before the response concludes, on that file or on the TAB rows `mithril-review` returned. A `Done verdict` line from the hook is the verdict. Do not override it. If the hook printed nothing, this host did not run it: follow the two steps above, and do not invent a Done verdict.
+
 ```
 Task(
   subagent_type="mithril-code-quality",
