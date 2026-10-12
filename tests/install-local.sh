@@ -122,4 +122,7 @@ bash "$full/scripts/install-local.sh" --home "$sl/.claude" >/dev/null 2>&1
 check "retired lite link is removed once the checkout has lite agents" "no" "$([[ -L "$sl/.claude/agents/mithril-lite-old.md" ]] && echo yes || echo no)"
 rm -rf "$full/skills/lite"
 
+# --- healthcheck rejects unknown arguments ---
+fhc "$sl/.claude" "$sl/.grok" --stirct >/dev/null 2>&1; check "healthcheck rejects an unknown argument" "2" "$?"
+check "healthcheck prints usage for it" "yes" "$(fhc "$sl/.claude" "$sl/.grok" --stirct 2>&1 | grep -q 'usage: healthcheck.sh' && echo yes || echo no)"
 exit $((fails > 0))

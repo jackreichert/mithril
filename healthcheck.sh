@@ -38,6 +38,7 @@ for _arg in "$@"; do
   case "$_arg" in
     --quiet) QUIET=1 ;;
     --strict) STRICT=1 ;;
+    *) echo "healthcheck: unknown argument: $_arg (usage: healthcheck.sh [--quiet] [--strict])" >&2; exit 2 ;;
   esac
 done
 
