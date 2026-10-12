@@ -48,7 +48,7 @@ Fresh agent only, given the done lines, the diff and the repo, never the author'
 2. **Run it** and judge on what ran, not on reading code (`ANT-BEA`). Read-only: never edit the repo, tests or the check to make it pass.
 3. **Record** `DONE` (the check and its evidence: command, exit code, key output), `NOT DONE` (including a check that errors or times out), `N/A` (only with a one-line reason tied to the ticket text) or `UNCHECKABLE` (no runnable check can be derived; say how to rewrite the line).
 
-A met line is reported met. Do not hunt for extra gaps or inflate `NOT DONE`; a line is `NOT DONE` only when its own check failed. Return exactly one TAB row per line number, `N<TAB>STATUS<TAB>check<TAB>evidence`, ids exactly the numbers you were given. You do not decide the done verdict: the orchestrator runs `done-check.sh verdict` on your rows, and its exit code is the verdict. Any `NOT DONE` or `UNCHECKABLE` line, a duplicate, unknown or missing id, makes it `NEEDS WORK`, and no other finding can lift it back. Run without an orchestrator, print the rows and say the verdict is unenforced.
+A met line is reported met. Do not hunt for extra gaps or inflate `NOT DONE`; a line is `NOT DONE` only when its own check failed. Return exactly one TAB row per line number, `N<TAB>STATUS<TAB>check<TAB>evidence`, ids exactly the numbers you were given. You do not decide the done verdict: the plugin hook runs `done-check.sh verdict` on your rows, and its exit code is the verdict. Any `NOT DONE` or `UNCHECKABLE` line, a duplicate, unknown or missing id, makes it `NEEDS WORK`, and no other finding can lift it back. Run without an orchestrator, print the rows and say the verdict is unenforced.
 
 ## Confidence
 

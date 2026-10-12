@@ -209,7 +209,15 @@ for pair in 'review|Execute mode' 'review|blast radius' 'review|ESCALATE' 'revie
     || { bad "mithril-lite-$base missing '$phrase' (lite lags its full twin)"; lite_ok=0; }
 done
 grep -q 'done-check.sh" verdict' "$SCRIPT_DIR/claude/commands/mithril.md" \
-  || { bad "mithril.md does not run done-check.sh verdict (the done verdict would be the model's say-so)"; lite_ok=0; }
+  || { bad "mithril.md does not name done-check.sh verdict (hosts without plugin hooks would have no fallback)"; lite_ok=0; }
+grep -q 'hooks/done-verdict.sh' "$SCRIPT_DIR/hooks/hooks.json" \
+  || { bad "hooks.json does not run hooks/done-verdict.sh"; lite_ok=0; }
+if bash "$SCRIPT_DIR/tests/done-hook.sh" >/dev/null; then
+  ok "done-verdict hook executes the verdict"
+else
+  bad "done-verdict hook did not execute the verdict (tests/done-hook.sh failed)"
+  lite_ok=0
+fi
 (( lite_ok )) && ok "$n_lite lite agents have full twins, valid names, and the required execute/blast-radius/authoring behavior"
 
 # ---- 3. count claims -----------------------------------------------------------
