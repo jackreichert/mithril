@@ -11,12 +11,19 @@ Name the smell the next maintainer will trip on, and the catalog move that answe
 
 - **Bloaters:** Long Function (needs comments to follow; one block per concern) → Extract Function, Decompose Conditional, Split Loop · Long Parameter List → Preserve Whole Object, Introduce Parameter Object, Remove Flag Argument · Data Clumps (same fields travel together, deleting one breaks the others) → Introduce Parameter Object, Extract Class · Primitive Obsession (raw string/int carrying a domain rule) → Replace Primitive with Object · Large Class (disjoint field clusters) → Extract Class.
 - **Data:** Global Data (written from afar) → Encapsulate Variable · Mutable Data (updated where a derived value or copy would do) → Split Variable, Separate Query from Modifier, Replace Derived Variable with Query · Data Class (public fields, behavior living in callers) → Encapsulate Record, Move Function · Temporary Field (set only on some paths) → Extract Class, Introduce Special Case.
-- **Names and noise:** Mysterious Name → Change Function Declaration, Rename Variable · Duplicated Code (the same decision in two places) → Extract Function, Pull Up Method · Comments (explaining what, not why) → Extract Function, Introduce Assertion · Loops (hand-rolled filter/map) → Replace Loop with Pipeline.
+- **Names and noise:** Mysterious Name → Change Function Declaration, Rename Variable · Duplicated Code (the same decision in two places) → Extract Function, Pull Up Method · Comments (stale or bloated, see below) → Extract Function, Change Function Declaration, Introduce Assertion · Loops (hand-rolled filter/map) → Replace Loop with Pipeline.
 - **Change preventers:** Divergent Change (one module edited for unrelated reasons) → Split Phase, Extract Class · Shotgun Surgery (one change edits many files) → Move Function, Combine Functions into Class · Repeated Switches (same type-switch in several places) → Replace Conditional with Polymorphism.
 - **Couplers:** Feature Envy (a function mostly touches another module's data) → Move Function · Message Chains (`a.b().c().d()` across layers) → Hide Delegate · Middle Man (only delegates) → Remove Middle Man, Inline Function · Insider Trading (modules share internals) → Move Function, Hide Delegate.
 - **Dispensables and inheritance:** Lazy Element (adds a name but no behavior) → Inline Function, Inline Class · Speculative Generality (hook or parameter with no caller) → Collapse Hierarchy, Remove Dead Code · Refused Bequest (subclass ignores what it inherits) → Push Down Method, Replace Subclass with Delegate · Alternative Classes with Different Interfaces → Change Function Declaration, Extract Superclass.
 
 Mysterious Name, Duplicated Code, Long Function and Large Class are also judged by `mithril-code-quality`: cite the smell name, don't re-report the line. Races, security and tests are other agents' ground.
+
+## Comments
+
+Source: Refactoring ch. 3 "Comments" and Clean Code ch. 4 / ch. 17 C1–C5 (`Resources/Books/Canon/05-Refactoring.md`, `01-Clean-Code.md`). Judge only comments the diff adds or sits beside.
+- **Stale:** the diff changed the code and left a comment that no longer matches it (renamed parameter, changed behavior, removed branch, wrong value, closed TODO or ticket). Consequence: the next reader trusts it and is misled. Name the line it contradicts.
+- **Bloated:** restates the code, narrates history ("changed X to Y", "previously"; that belongs in the commit message), a block where a better name or Extract Function would do, or commented-out code (version control has it). Consequence: one more thing to keep in sync that will drift.
+- Keep and never flag: why-comments, contracts, warnings, non-obvious constraints. A comment merely untouched and unrelated to the diff is not a finding.
 
 ## Lint (report-only)
 
