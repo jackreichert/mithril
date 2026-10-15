@@ -96,7 +96,7 @@ A reviewer cannot call code correct without knowing the behavior it must impleme
 - `refactor` → mithril-refactor (Mode 2: plan) · `simplify` → mithril-refactor (Mode 1: light)
 - `tests`/`test`/`spec`/`specification` → mithril-test-quality
 - `security` → mithril-security-review
-- `review` → mithril-review (confidence-scored PR review with Look Here First) · `review execute`/`exec` → mithril-review in execute mode (runs the changed code in a throwaway fixture; fresh agent only)
+- `review` → mithril-review (confidence-scored PR review with Look Here First) · `review execute`/`exec` → mithril-review in execute mode (default for logic diffs; this forces it on test-only, docs and mechanical diffs too; runs the changed code in a throwaway fixture; fresh agent only)
 - `flow`/`flows` → mithril-flow
 - `delivery`/`deploy` → mithril-delivery
 - `distributed`/`dist` → mithril-distributed
@@ -155,7 +155,7 @@ Every prompt carries: the Project Context block, the Review Contract, the change
 
 > The diff is your FOCUS, not your SCOPE. Read each changed file in full and Grep the repo (start from the reuse surface) before judging. Every Critical/Important finding must state a concrete failure: given what input/state → what wrong outcome.
 
-**Execute mode** (`review execute`): this replaces the plain `mithril-review` agent, never adds a second one. Spawn it fresh (never reuse an agent that wrote the code) with `mode: execute`, the Review Contract, the base ref, and the changed-file list. Unlike every other prompt it gets **no** diff text, so it writes its cases before reading the change.
+**Execute mode** (`review execute`, and by default when a fresh `mithril-review` pass covers a diff that changes logic in non-test code, up to about 5 code files; opt-in for test-only, docs and mechanical diffs): this replaces the plain `mithril-review` agent, never adds a second one. Spawn it fresh (never reuse an agent that wrote the code) with `mode: execute`, the Review Contract, the base ref, and the changed-file list. Unlike every other prompt it gets **no** diff text, so it writes its cases before reading the change.
 
 **Done check** (`done <ticket-path>` in `$ARGUMENTS`; it forces `mithril-review`, like `review`). The script is `${CLAUDE_PLUGIN_ROOT}/scripts/done-check.sh` (an absolute path: agents run in the user's repo, not this checkout). Path only: a branch key is not resolved to a ticket. You run it in the main thread, not the agent, so the verdict is not the model's say-so:
 
@@ -261,7 +261,7 @@ Teaching, not review: runs **inline in the main thread** (no agent, no findings,
 /mithril security flow           # auth or input-handling change: exploitability + entry→sink paths
 /mithril persistence delivery    # schema change: queries + migration safety
 /mithril review                  # PR-style confidence-scored review with Look Here First
-/mithril review execute          # same, but runs tests first and calls the changed code with its own inputs
+/mithril review execute          # force execute mode (default for logic diffs): runs tests first, calls the changed code with its own inputs
 /mithril review done <ticket>   # also verify each "What done looks like" line of that ticket file, with evidence
 /mithril simplify                # light behavior-preserving cleanup (opt-in)
 /mithril refactor                # named, test-first refactor plan (opt-in)

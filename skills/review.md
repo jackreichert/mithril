@@ -18,7 +18,7 @@ Establish intended behavior from the request, ticket, confirmed examples, reprod
 | **quick** | Coding checkpoint | code |
 | **full-pr** | Before a PR or PR update, or when asked to review a PR | all lenses |
 | **targeted-follow-up** | After review feedback | code + relevant lenses |
-| **execute** | Opt-in (`/mithril review execute`); logic or data changes; full-pr lenses plus the run below | full-pr, executing |
+| **execute** | Default for a fresh full-pr review whose diff changes logic in non-test code (up to ~5 code files); opt-in (`/mithril review execute`) for test-only, docs and mechanical diffs; full-pr lenses plus the run below | full-pr, executing |
 
 Treat any PR or branch-vs-base review request as **full-pr**. For a sliced PR, also review per commit: one reason to change each, tree working.
 
@@ -26,14 +26,16 @@ Treat any PR or branch-vs-base review request as **full-pr**. For a sliced PR, a
 
 **Priority:** design fit → functionality (intent, edges, concurrency, data safety) → complexity → tests block when significant; naming, comments, style, and docs are flag-only. Style defers to the repo's formatter and linter.
 
-## Execute mode (opt-in)
+## Execute mode (default for logic diffs)
+
+On by default for a fresh full-pr review when the diff changes logic in non-test code, up to about 5 code files. Opt-in for test-only, docs and mechanical diffs, and for larger diffs. Cost tracks the change's shape, not its size: under 8 min on small pure-logic diffs, about 40 min on a subprocess-heavy one under load, and the costly run found the only real defect (measured on three real PRs; `BB-MCR`, `BB-ET3`).
 
 Reading a diff finds fewer defects than reviewers expect; understanding is the bottleneck (`BB-MCR`). Running the code with inputs you chose is how you learn it (`BB-ET3`). In order:
 
 1. **Cases first.** From the Review Contract only (PR body, ticket, examples), write 5-10 cases with expected results before opening the diff: typical, boundary (0, 1, N, N±1, empty, null), failure, one repeat. Include inputs the author's tests skip. With an ASSUMED contract, tag expectations ASSUMED and go on.
 2. **Run the tests before reading the code.** Record pass/fail and the gaps.
 3. **Read the diff**; add cases for what you found.
-4. **Throwaway fixture** (temp dir or scratch DB, never shared or real data or secrets; delete after): call the changed code, preferring the public entry point.
+4. **Throwaway fixture** (temp dir or scratch DB, never shared or real data or secrets; delete after; start stubs before building time-sensitive fixtures, and do not run this mode while other full test suites are loading the machine): call the changed code, preferring the public entry point.
 5. Report only what you ran. A mismatch with the contract is a finding at confidence ≥90. A case not run goes under `Not executed`, never implied clean.
 
 Only a fresh agent that did not write the change runs this mode; otherwise say so and stop. A reproduced mismatch means at least `NEEDS WORK`.
