@@ -9,8 +9,8 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # Links must outlive this checkout: refuse from a linked git worktree, which is disposable.
 # (MITHRIL_ALLOW_WORKTREE=1 overrides, for tests that install into a throwaway home.)
-gd="$(cd "$root" && git rev-parse --git-dir 2>/dev/null || true)"
-gc="$(cd "$root" && git rev-parse --git-common-dir 2>/dev/null || true)"
+gd="$(git -C "$root" rev-parse --git-dir 2>/dev/null || true)"
+gc="$(git -C "$root" rev-parse --git-common-dir 2>/dev/null || true)"
 if [[ -z "${MITHRIL_ALLOW_WORKTREE:-}" && -n "$gd" && -n "$gc" ]] \
   && [[ "$(cd "$root" && cd "$gd" && pwd -P)" != "$(cd "$root" && cd "$gc" && pwd -P)" ]]; then
   echo "mithril: $root is a linked git worktree; links would dangle once it is removed." >&2
