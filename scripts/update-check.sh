@@ -39,7 +39,9 @@ reinstall_installed_homes() {
     # physical to physical, so a copy or nested checkout whose path merely contains ours
     # (or a symlinked path to ours) is told apart.
     installed="$(sed -n 's|.*bash "\(.*\)/scripts/update-check\.sh".*|\1|p' "$h/commands/mithril.md" | head -1)"
-    [ -n "$installed" ] && [ "$(cd "$installed" 2>/dev/null && pwd -P)" = "$phys" ] || continue
+    if [ -z "$installed" ] || [ "$(cd "$installed" 2>/dev/null && pwd -P)" != "$phys" ]; then
+      continue
+    fi
     if bash "$root/scripts/install-local.sh" --home "$h" >/dev/null; then
       refreshed=$((refreshed + 1))
     else

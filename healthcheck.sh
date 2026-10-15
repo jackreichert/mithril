@@ -26,8 +26,8 @@ CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
 GROK_HOME="${GROK_HOME:-$HOME/.grok}"
 # From a linked worktree, links and the rendered command belong to the main checkout.
 INSTALL_ROOT="$SCRIPT_DIR"
-_gd="$(cd "$SCRIPT_DIR" && git rev-parse --git-dir 2>/dev/null || true)"
-_gc="$(cd "$SCRIPT_DIR" && git rev-parse --git-common-dir 2>/dev/null || true)"
+_gd="$(git -C "$SCRIPT_DIR" rev-parse --git-dir 2>/dev/null || true)"
+_gc="$(git -C "$SCRIPT_DIR" rev-parse --git-common-dir 2>/dev/null || true)"
 if [[ -n "$_gd" && -n "$_gc" && "$(cd "$SCRIPT_DIR" && cd "$_gd" && pwd -P)" != "$(cd "$SCRIPT_DIR" && cd "$_gc" && pwd -P)" ]]; then
   INSTALL_ROOT="$(cd "$SCRIPT_DIR" && cd "$_gc" && cd .. && pwd -P)"
 fi
