@@ -96,7 +96,7 @@ A reviewer cannot call code correct without knowing the behavior it must impleme
 - `refactor` → mithril-refactor (Mode 2: plan) · `simplify` → mithril-refactor (Mode 1: light)
 - `tests`/`test`/`spec`/`specification` → mithril-test-quality
 - `security` → mithril-security-review
-- `review` → mithril-review (confidence-scored PR review with Look Here First) · `review execute`/`exec` → mithril-review in execute mode (runs the changed code in a throwaway fixture; fresh agent only)
+- `review` → mithril-review (confidence-scored PR review with Look Here First) · `review execute`/`exec` → mithril-review in execute mode (default for logic diffs; this forces it on test-only, docs and mechanical diffs too; runs the changed code in a throwaway fixture; fresh agent only)
 - `flow`/`flows` → mithril-flow
 - `delivery`/`deploy` → mithril-delivery
 - `distributed`/`dist` → mithril-distributed
@@ -261,7 +261,7 @@ Teaching, not review: runs **inline in the main thread** (no agent, no findings,
 /mithril security flow           # auth or input-handling change: exploitability + entry→sink paths
 /mithril persistence delivery    # schema change: queries + migration safety
 /mithril review                  # PR-style confidence-scored review with Look Here First
-/mithril review execute          # same, but runs tests first and calls the changed code with its own inputs
+/mithril review execute          # force execute mode (default for logic diffs): runs tests first, calls the changed code with its own inputs
 /mithril review done <ticket>   # also verify each "What done looks like" line of that ticket file, with evidence
 /mithril simplify                # light behavior-preserving cleanup (opt-in)
 /mithril refactor                # named, test-first refactor plan (opt-in)
