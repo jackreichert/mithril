@@ -100,6 +100,7 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `scripts/install-local.sh` | Local-checkout install without the plugin: symlinks each `skills/*.md` into `~/.claude/agents/mithril-*.md` links every skill (tutor included) as `~/.claude/skills/mithril-*`, removes the `mithril-*` links it owns whose skill was retired or renamed, and renders `/mithril` (it names `${CLAUDE_PLUGIN_ROOT}`, so it cannot be a symlink) into `~/.claude/commands/`. Idempotent; re-run after editing the command. `healthcheck.sh` warns when the installed copy drifts; `--strict` makes that, dangling links and stale `mithril-*` links exit non-zero (Grok is checked only when `~/.grok` exists). Tests: `bash tests/install-local.sh`. | — |
 | `scripts/test-cull.sh` | Report-only periodic test cull: ranks tests to cull or rewrite from mutation (Stryker report), refactor change-coupling, duplicate assertions, flaky and slow runs. Read-only on the target repo; records coverage and mutation baselines and `--compare`s a later run. Tests: `bash tests/test-cull.sh`. | — |
 | `playbooks/test-cull.md` | Short step list a small model follows to run the script, read the report, and list candidates to the owner. Never deletes. | — |
+| `playbooks/preflight.md` | Ten-question builder checklist, one line per review lens (necessity first), pointing at the skills and short ids instead of restating them. Repo conventions and linters win. | — |
 
 ### Two modes: review-time and write-time
 
