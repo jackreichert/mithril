@@ -12,7 +12,7 @@ Replace only the first line (the repo to cull); keep the other two.
 
 ```bash
 REPO=/absolute/path/to/the/repo/to/cull
-MITHRIL=/Users/aryajack/dev-env/skills/mithril
+MITHRIL=<path-to-mithril>
 OUT="$HOME/test-cull-reports/$(basename "$REPO")-$(date +%Y%m%d)"
 ```
 
@@ -23,13 +23,13 @@ OUT="$HOME/test-cull-reports/$(basename "$REPO")-$(date +%Y%m%d)"
 The event loop's `reminder` type fires once, so register the next one at the start of every run. Doing it first means the schedule cannot lapse when a later step stops early. This sets the next cull 30 days out (macOS `date`):
 
 ```bash
-node /Users/aryajack/dev-env/skills/the-maestro/scripts/event-loop.ts add \
+node <path-to-the-maestro>/scripts/event-loop.ts add \
   --id "test-cull-$(basename "$REPO")" --type reminder \
   --target "$(date -u -v+30d +%Y-%m-%dT%H:%M:%SZ)" \
   --report "Run playbooks/test-cull.md from $MITHRIL on $REPO, report the candidates; step 2 of that playbook re-arms this reminder"
 ```
 
-This `add` form was run against a throwaway event dir and registered. If a reminder with that id is already registered and `add` complains, run `node /Users/aryajack/dev-env/skills/the-maestro/scripts/event-loop.ts remove "test-cull-$(basename "$REPO")"` and add again. The reminder carries no secrets.
+This `add` form was run against a throwaway event dir and registered. If a reminder with that id is already registered and `add` complains, run `node <path-to-the-maestro>/scripts/event-loop.ts remove "test-cull-$(basename "$REPO")"` and add again. The reminder carries no secrets.
 
 Choice made where the ticket was ambiguous: the event loop has no recurring-timer type, so a one-shot reminder re-armed at the end of every run is the schedule. A standing recurring type would be a change to the-maestro, not to this repo.
 
