@@ -155,7 +155,7 @@ Every prompt carries: the Project Context block, the Review Contract, the change
 
 > The diff is your FOCUS, not your SCOPE. Read each changed file in full and Grep the repo (start from the reuse surface) before judging. Every Critical/Important finding must state a concrete failure: given what input/state → what wrong outcome.
 
-**Execute mode** (`review execute`): this replaces the plain `mithril-review` agent, never adds a second one. Spawn it fresh (never reuse an agent that wrote the code) with `mode: execute`, the Review Contract, the base ref, and the changed-file list. Unlike every other prompt it gets **no** diff text, so it writes its cases before reading the change.
+**Execute mode** (`review execute`, and by default when a fresh `mithril-review` pass covers a diff that changes logic in non-test code, up to about 5 code files; opt-in for test-only, docs and mechanical diffs): this replaces the plain `mithril-review` agent, never adds a second one. Spawn it fresh (never reuse an agent that wrote the code) with `mode: execute`, the Review Contract, the base ref, and the changed-file list. Unlike every other prompt it gets **no** diff text, so it writes its cases before reading the change.
 
 **Done check** (`done <ticket-path>` in `$ARGUMENTS`; it forces `mithril-review`, like `review`). The script is `${CLAUDE_PLUGIN_ROOT}/scripts/done-check.sh` (an absolute path: agents run in the user's repo, not this checkout). Path only: a branch key is not resolved to a ticket. You run it in the main thread, not the agent, so the verdict is not the model's say-so:
 
