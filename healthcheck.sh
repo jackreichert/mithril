@@ -79,7 +79,7 @@ else
   bad "claude/commands/mithril.md missing"
 fi
 
-# ---- 2b. plugin manifests (Claude + Grok) --------------------------------------
+# ---- 2b. plugin manifests (Claude) --------------------------------------
 hdr "Plugin manifests"
 check_plugin_manifest() {
   local plugin_json="$1" label="$2"
@@ -100,7 +100,6 @@ check_plugin_manifest() {
   (( manifest_ok )) && ok "$label agent/command entries match canonical files"
 }
 check_plugin_manifest "$SCRIPT_DIR/.claude-plugin/plugin.json" ".claude-plugin/plugin.json"
-check_plugin_manifest "$SCRIPT_DIR/.grok-plugin/plugin.json"   ".grok-plugin/plugin.json"
 
 # ---- 2c. skill → agent checklist parity (2026-06+ lag guard) --------------------
 hdr "Skill → agent checklist parity"
