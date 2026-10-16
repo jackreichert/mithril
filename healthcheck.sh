@@ -2,35 +2,24 @@
 #
 # Mithril — health check
 #
-# Guards the canonical-skill architecture (skills/ → deployed ~/.claude/ and
-# ~/.grok/) plus doc integrity:
+# Guards the canonical-skill architecture (skills/ loaded by the plugin manifests)
+# plus doc integrity:
 #   1. AGENT INTEGRITY   — every runtime skill has valid frontmatter and its
 #                          ${CLAUDE_PLUGIN_ROOT} skill references point at real files
 #   2. ROUTING           — every subagent_type the orchestrator routes to has a
 #                          matching runtime skill (and no skill is orphaned)
 #   3. COUNT CLAIMS      — "N agent" figures in README.md match reality
 #   4. SUMMARY DEPTH     — every chapter summary has at least three sentences
-#   5. DEPLOYED SYNC     — ~/.claude and ~/.grok agents match canonical skills
-#                          (including skills/lite/ twins)
-#   6. DOC LINKS         — relative .md links AND plain-text ../ paths resolve
+#   5. DOC LINKS         — relative .md links AND plain-text ../ paths resolve
 #
 # Exit 0 = healthy, 1 = problems found.
 #
 #   bash healthcheck.sh            # full check
 #   bash healthcheck.sh --quiet    # only failures + verdict
-#   bash healthcheck.sh --strict   # warnings (deployed-copy drift, dangling links) also exit 1
+#   bash healthcheck.sh --strict   # warnings also exit 1
 
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
-GROK_HOME="${GROK_HOME:-$HOME/.grok}"
-# From a linked worktree, links and the rendered command belong to the main checkout.
-INSTALL_ROOT="$SCRIPT_DIR"
-_gd="$(git -C "$SCRIPT_DIR" rev-parse --git-dir 2>/dev/null || true)"
-_gc="$(git -C "$SCRIPT_DIR" rev-parse --git-common-dir 2>/dev/null || true)"
-if [[ -n "$_gd" && -n "$_gc" && "$(cd "$SCRIPT_DIR" && cd "$_gd" && pwd -P)" != "$(cd "$SCRIPT_DIR" && cd "$_gc" && pwd -P)" ]]; then
-  INSTALL_ROOT="$(cd "$SCRIPT_DIR" && cd "$_gc" && cd .. && pwd -P)"
-fi
 AGENTS_SRC="$SCRIPT_DIR/skills"
 CMD_SRC="$SCRIPT_DIR/claude/commands/mithril.md"
 QUIET=0
@@ -90,7 +79,7 @@ else
   bad "claude/commands/mithril.md missing"
 fi
 
-# ---- 2b. plugin manifests (Claude + Grok) --------------------------------------
+# ---- 2b. plugin manifests (Claude) --------------------------------------
 hdr "Plugin manifests"
 check_plugin_manifest() {
   local plugin_json="$1" label="$2"
@@ -111,7 +100,6 @@ check_plugin_manifest() {
   (( manifest_ok )) && ok "$label agent/command entries match canonical files"
 }
 check_plugin_manifest "$SCRIPT_DIR/.claude-plugin/plugin.json" ".claude-plugin/plugin.json"
-check_plugin_manifest "$SCRIPT_DIR/.grok-plugin/plugin.json"   ".grok-plugin/plugin.json"
 
 # ---- 2c. skill → agent checklist parity (2026-06+ lag guard) --------------------
 hdr "Skill → agent checklist parity"
@@ -186,39 +174,20 @@ else
   bad "scripts/update-check.sh missing, not executable, or not called from the router"
 fi
 
-# ---- 2e. lite agents -----------------------------------------------------------
-hdr "Lite agents"
-LITE_SRC="$SCRIPT_DIR/skills/lite"
-lite_ok=1; n_lite=0
-for f in "$LITE_SRC"/*.md; do
-  [[ -f "$f" ]] || continue
-  base="$(basename "$f" .md)"; n_lite=$((n_lite+1))
-  [[ -f "$AGENTS_SRC/$base.md" ]] || { bad "mithril-lite-$base has no full twin skills/$base.md"; lite_ok=0; }
-  grep -qE "^name:[[:space:]]*mithril-lite-$base([[:space:]]|$)" "$f" \
-    || { bad "mithril-lite-$base — frontmatter name does not match filename"; lite_ok=0; }
-done
-for f in "$AGENTS_SRC"/*.md; do
-  base="$(basename "$f" .md)"
-  case "$base" in tutor|smells|lint-fix) continue ;; esac
-  [[ -f "$LITE_SRC/$base.md" ]] || { warn "mithril-$base has no lite twin in skills/lite/"; }
-done
-# Behavior the full twin's contract requires must survive in the lite copy.
-for pair in 'review|Execute mode' 'review|blast radius' 'review|ESCALATE' 'review|Done check' 'test-quality|Authoring gate' 'test-quality|Retention bar'; do
-  base="${pair%%|*}"; phrase="${pair#*|}"
-  grep -q "$phrase" "$LITE_SRC/$base.md" 2>/dev/null \
-    || { bad "mithril-lite-$base missing '$phrase' (lite lags its full twin)"; lite_ok=0; }
-done
+# ---- 2e. done-verdict wiring ---------------------------------------------------
+hdr "Done-verdict"
+done_ok=1
 grep -q 'done-check.sh" verdict' "$SCRIPT_DIR/claude/commands/mithril.md" \
-  || { bad "mithril.md does not name done-check.sh verdict (hosts without plugin hooks would have no fallback)"; lite_ok=0; }
+  || { bad "mithril.md does not name done-check.sh verdict (hosts without plugin hooks would have no fallback)"; done_ok=0; }
 grep -q 'hooks/done-verdict.sh' "$SCRIPT_DIR/hooks/hooks.json" \
-  || { bad "hooks.json does not run hooks/done-verdict.sh"; lite_ok=0; }
+  || { bad "hooks.json does not run hooks/done-verdict.sh"; done_ok=0; }
 if bash "$SCRIPT_DIR/tests/done-hook.sh" >/dev/null; then
   ok "done-verdict hook executes the verdict"
 else
   bad "done-verdict hook did not execute the verdict (tests/done-hook.sh failed)"
-  lite_ok=0
+  done_ok=0
 fi
-(( lite_ok )) && ok "$n_lite lite agents have full twins, valid names, and the required execute/blast-radius/authoring behavior"
+(( done_ok )) && ok "done-verdict is wired into the router and the plugin hooks"
 
 # ---- 3. count claims -----------------------------------------------------------
 hdr "Count claims"
@@ -280,119 +249,7 @@ else
   ok "all $n_chapters chapter summaries contain at least three sentences"
 fi
 
-# ---- 5. deployed sync ----------------------------------------------------------
-# Links named mithril-* in $1 that no longer map to a skill here: dangling, or ours and stale.
-# $2 is "agent" or "skill". Mirrors scripts/install-local.sh (owned_link / current_name).
-check_stale_links() {
-  local dir="$1" kind="$2" label="$3" l stem t x n owned current
-  for l in "$dir"/mithril-*; do
-    [[ -L "$l" ]] || continue
-    stem="$(basename "$l" .md)"; t="$(readlink "$l")"; x="$(basename "$t" .md)"
-    owned=0; current=0; layout=0
-    case "$t" in
-      */skills/lite/*.md) [[ "$stem" == "mithril-lite-$x" ]] && layout=1 ;;
-      */skills/*.md) [[ "$stem" == "mithril-$x" ]] && layout=1 ;;
-    esac
-    # Ours only when it points into this checkout, matching scripts/install-local.sh.
-    if (( layout )); then
-      case "$t" in "$INSTALL_ROOT"/skills/*.md|"$(cd "$INSTALL_ROOT" && pwd -P)"/skills/*.md) owned=1 ;; esac
-    fi
-    if [[ "$stem" == mithril-lite-* ]]; then
-      [[ "$kind" == agent && -f "$SCRIPT_DIR/skills/lite/${stem#mithril-lite-}.md" ]] && current=1
-      # No lite agents in this checkout: the link may belong to a newer one, so only dangling counts.
-      [[ ! -d "$SCRIPT_DIR/skills/lite" ]] && current=1
-    else
-      n="${stem#mithril-}"
-      [[ -f "$SCRIPT_DIR/skills/$n.md" ]] && { [[ "$kind" == skill || "$n" != tutor ]] && current=1; }
-    fi
-    if [[ ! -e "$l" ]]; then
-      (( current )) && continue   # current names get the dangling warning in the sync pass
-      if (( owned )); then
-        warn "$label: $(basename "$l") is a dangling link to $t for a skill that no longer exists (run scripts/install-local.sh)"
-      else
-        warn "$label: $(basename "$l") is a dangling link to $t that the installer does not manage; remove it by hand"
-      fi
-    elif (( ! current && owned )); then
-      warn "$label: $(basename "$l") is a stale link to $t; no such skill in this checkout (run scripts/install-local.sh)"
-    elif (( ! current && layout )); then
-      warn "$label: $(basename "$l") points into another checkout ($t) and no such skill exists here; the installer leaves it, remove it by hand"
-    fi
-  done
-}
-check_deployed_sync() {
-  local home="$1" label="$2" skills_too="${3:-0}"
-  hdr "Deployed sync ($home — $label)"
-  local deployed_any=0
-  local f name dst
-  # Managed = the installer has been here (a rendered command or any mithril-* agent entry).
-  # Only a managed home owes a link per skill; an unmanaged one gets "nothing deployed" below.
-  local managed=0
-  if [[ -e "$home/commands/mithril.md" ]] || compgen -G "$home/agents/mithril-*" >/dev/null; then managed=1; fi
-  for f in "$AGENTS_SRC"/*.md; do
-    name="$(basename "$f")"
-    [[ "$name" == "tutor.md" ]] && continue
-    dst="$home/agents/mithril-$name"
-    if [[ ! -e "$dst" && ! -L "$dst" ]]; then
-      (( managed )) && warn "$label: mithril-$name link is missing (run scripts/install-local.sh)"
-    elif [[ -L "$dst" && ! -e "$dst" ]]; then
-      deployed_any=1
-      warn "$label: mithril-$name is a dangling link to $(readlink "$dst") (run scripts/install-local.sh from the main checkout)"
-    elif [[ -f "$dst" ]]; then
-      deployed_any=1
-      if diff -q "$f" "$dst" >/dev/null 2>&1; then
-        ok "$label: mithril-$name deployed & in sync"
-      else
-        warn "$label: mithril-$name deployed but DRIFTED from its canonical skill (run scripts/install-local.sh)"
-      fi
-    fi
-  done
-  for f in "$LITE_SRC"/*.md; do
-    [[ -f "$f" ]] || continue
-    name="$(basename "$f")"
-    dst="$home/agents/mithril-lite-$name"
-    if [[ -L "$dst" && ! -e "$dst" ]]; then
-      deployed_any=1
-      warn "$label: mithril-lite-$name is a dangling link to $(readlink "$dst") (run scripts/install-lite.sh from the main checkout)"
-    elif [[ -f "$dst" ]]; then
-      deployed_any=1
-      if diff -q "$f" "$dst" >/dev/null 2>&1; then
-        ok "$label: mithril-lite-$name deployed & in sync"
-      else
-        warn "$label: mithril-lite-$name deployed but DRIFTED from skills/lite/ (run scripts/install-lite.sh)"
-      fi
-    fi
-  done
-  if [[ -f "$home/commands/mithril.md" ]]; then
-    deployed_any=1
-    local expected_command
-    expected_command="$(mktemp "${TMPDIR:-/tmp}/mithril-healthcheck.XXXXXX")"
-    sed "s|\${CLAUDE_PLUGIN_ROOT}|$(printf '%s' "$INSTALL_ROOT" | sed 's/[\\&|]/\\&/g')|g" "$CMD_SRC" > "$expected_command"
-    if diff -q "$expected_command" "$home/commands/mithril.md" >/dev/null 2>&1; then
-      ok "$label: mithril.md command deployed & in sync"
-    else
-      warn "$label: mithril.md command deployed but DRIFTED from canonical command (run scripts/install-local.sh)"
-    fi
-    rm -f "$expected_command"
-  fi
-  check_stale_links "$home/agents" agent "$label"
-  if (( skills_too )); then
-    check_stale_links "$home/skills" skill "$label"
-    for f in "$AGENTS_SRC"/*.md; do
-      dst="$home/skills/mithril-$(basename "$f" .md)"
-      if [[ ! -e "$dst" && ! -L "$dst" ]]; then
-        (( managed )) && warn "$label: skills/$(basename "$dst") link is missing (run scripts/install-local.sh)"
-        continue
-      fi
-      [[ -L "$dst" && ! -e "$dst" ]] && warn "$label: skills/$(basename "$dst") is a dangling link to $(readlink "$dst") (run scripts/install-local.sh from the main checkout)"
-    done
-  fi
-  (( deployed_any )) || warn "nothing deployed to $home (repository checks passed)"
-}
-check_deployed_sync "$CLAUDE_HOME" "Claude" 1
-# The installer never creates ~/.grok, so a machine without Grok is a correct install.
-[[ -d "$GROK_HOME" ]] && check_deployed_sync "$GROK_HOME" "Grok"
-
-# ---- 6. doc links --------------------------------------------------------------
+# ---- 5. doc links --------------------------------------------------------------
 hdr "Doc links"
 brk=0; checked=0
 while IFS= read -r f; do

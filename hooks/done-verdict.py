@@ -62,7 +62,7 @@ def is_mithril_command(name: str) -> bool:
 def is_review_agent(agent: str) -> bool:
     """True for the review agent, including the plugin-scoped mithril:mithril-review form."""
     bare = agent.strip().split(":")[-1]
-    return bare in {"mithril-review", "mithril-lite-review"}
+    return bare == "mithril-review"
 
 
 def secret_path(ticket: Path) -> bool:

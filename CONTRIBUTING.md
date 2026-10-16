@@ -5,7 +5,7 @@
 The framework keeps **one canonical definition** for every runtime specialist: `skills/*.md`.
 
 ```text
-skills/code-quality.md ──── Claude/Grok plugin manifests (direct path)
+skills/code-quality.md ──── Claude plugin manifest (direct path)
 
 claude/commands/mithril.md ──── the `/mithril` orchestrator, loaded by the plugin
 ```
@@ -15,7 +15,7 @@ claude/commands/mithril.md ──── the `/mithril` orchestrator, loaded by t
 | Canonical | `skills/*.md` | Source-grounded runtime prompt and sole content source. |
 | Orchestrator | `claude/commands/mithril.md` | Routes specialists and remains a separate command artifact. |
 
-Install via the plugin marketplace (`.claude-plugin/plugin.json`, `.grok-plugin/plugin.json`) — the standard mechanism for each tool. There is no separate deploy step; the plugin loads `skills/*.md` and `claude/commands/mithril.md` directly.
+Install via the plugin marketplace (`.claude-plugin/plugin.json`). There is no separate deploy step; the plugin loads `skills/*.md` and `claude/commands/mithril.md` directly.
 
 When adding or renaming a skill, update both plugin manifests' `agents` lists by hand — there is no longer an automated parity check.
 
@@ -40,10 +40,9 @@ Edit `claude/commands/mithril.md` directly. The plugin loads it live; no redeplo
 ## Adding a new agent
 
 1. Add the canonical runtime `.md` under `skills/`, including agent frontmatter.
-2. Add `./skills/<name>.md` to both plugin manifests.
+2. Add `./skills/<name>.md` to the plugin manifest.
 3. Update `claude/commands/mithril.md` to route the new aspect.
-4. Update `README.md` (skills table) and `Copilot-Integration.md` (file layout).
-5. If a Copilot prompt is wanted, add `copilot/prompts/mithril-accessibility.prompt.md` mirroring an existing one.
+4. Update `README.md` (skills table).
 
 ## CI
 

@@ -4,7 +4,7 @@
 
 This repo is a **code-quality framework** — the canonical CS literature distilled into agent-executable form — delivered through two layers:
 
-- **Review-time (catch).** A set of specialized review agents — for code quality, architecture, refactoring, testing, security, delivery, distributed systems, design patterns, persistence, and process discipline — run against your current `git diff` and aggregate their findings into a severity-ranked verdict (`SHIP IT` / `NEEDS WORK` / `SIGNIFICANT ISSUES`). This layer runs first-class inside [Claude Code](https://docs.claude.com/claude-code) and [Grok Build](https://docs.x.ai) via the `/mithril` slash command (parallel subagent orchestration + tool execution).
+- **Review-time (catch).** A set of specialized review agents — for code quality, architecture, refactoring, testing, security, delivery, distributed systems, design patterns, persistence, and process discipline — run against your current `git diff` and aggregate their findings into a severity-ranked verdict (`SHIP IT` / `NEEDS WORK` / `SIGNIFICANT ISSUES`). This layer runs first-class inside [Claude Code](https://docs.claude.com/claude-code) via the `/mithril` slash command (parallel subagent orchestration + tool execution).
 - **Write-time (prevent).** The always-on [Constitution](CONSTITUTION.md) compiles the same canon into terse imperative rules an agent obeys *while writing*. It's plain markdown, so it's portable: point any tool's project-instructions file at `CONSTITUTION.md` (see [Multi-tool reach](#multi-tool-reach)).
 
 Each agent is a focused lens. The orchestrator picks which lenses are relevant to the diff, runs them in parallel, re-checks every blocking finding against the code, deduplicates overlap, and returns one report.
@@ -19,7 +19,7 @@ The framework is a **distillation of the canonical CS literature** into agent-ex
 2. **Per-source summaries.** Each book/article was summarized into a structured note in [`Resources/`](Resources/) (Books, Articles, Papers, Standards, Originals). Book chapter entries contain at least three sentences so a reader can understand the idea, why it matters, and how to apply or qualify it without prior knowledge.
 3. **Cross-source themes.** The summaries are synthesized into **20 concept guides** in [`Resources/Themes/`](Resources/Themes/) (plus the one-file horizontal cut, [`THEMES.md`](THEMES.md)) — a Tier 1→5 curriculum (foundations → construction → design at scale → verification → systems in production). Each theme walks how the idea builds across its sources, names the real tensions instead of papering over them, and ends with the operational checklist its skill encodes. The learning on-ramp, and the reasoning layer the skills cite.
 4. **Synthesis into skills.** The themes and summaries were synthesized into concise, source-grounded runtime prompts in [`skills/`](skills/). These are both the executable specialists and the sole content source.
-5. **Host compatibility.** The Claude Code and Grok plugin manifests load `skills/*.md` directly as subagents.
+5. **Host compatibility.** The Claude Code plugin manifest loads `skills/*.md` directly as subagents.
 6. **Orchestration.** The `/mithril` slash command routes a diff to the relevant agents, runs them in parallel, normalizes severity, and aggregates the report.
 
 The "Sources by Skill" section below shows exactly which book/article/chapter informed each part of each skill, so any finding the framework produces can be traced back to a primary source.
@@ -30,31 +30,20 @@ For the master inventory of every book and article that informed this work, see 
 
 ## Quick start
 
-Install as a plugin — the standard mechanism for each tool. There's no clone-and-run installer; the plugin loads `skills/*.md` and `claude/commands/mithril.md` directly, so editing a skill takes effect immediately.
-
-**Claude Code:**
+Install as a Claude Code plugin. There is no clone-and-run installer; the plugin loads `skills/*.md` and `claude/commands/mithril.md` directly.
 
 ```
 /plugin marketplace add jackreichert/mithril
 /plugin install mithril@mithril
 ```
 
-**Grok Build:**
-
-```bash
-grok plugin install jackreichert/mithril --trust
-grok plugin enable mithril
-```
-
-Then run `/mithril` from either tool in any git repo.
-
-**GitHub Copilot, Codex, and other tools** don't have an equivalent plugin/subagent mechanism for the review agents, but the write-time [Constitution](CONSTITUTION.md) is plain markdown — point that tool's project-instructions file at `CONSTITUTION.md` (see [Multi-tool reach](#multi-tool-reach)). For Copilot specifically, see [`Copilot-Integration.md`](Copilot-Integration.md).
+Then run `/mithril` in any git repo.
 
 ### Update check
 
 On each `/mithril` run (except `tutor`) the router calls `scripts/update-check.sh`, which fetches the checkout's own upstream and prints one line only when something is off: behind, ahead, diverged, or dirty (tracked files). Current, not a git checkout (a plugin cache copy), or an offline fetch: silent.
 
-Config key `auto_pull`, default **off**. Turn it on with `MITHRIL_AUTO_PULL=on` or the line `auto_pull=on` in `${XDG_CONFIG_HOME:-~/.config}/mithril/config`. When on, a clean checkout that is purely behind is fast-forwarded with `git merge --ff-only`; anything else (dirty, ahead, diverged) is only reported. It never merges, rebases or resets. After a successful pull it re-runs `scripts/install-local.sh` so the rendered `/mithril` command copy and the skill and agent links match the new tree; a failed reinstall prints a message and exits 1. Auto-pull refreshes only the default homes (`${CLAUDE_HOME:-~/.claude}` and `${GROK_HOME:-~/.grok}`) whose `/mithril` command copy already names this checkout; it never installs into a new home, and an install made with a custom `--home` needs `scripts/install-local.sh --home DIR` by hand. Tests: `bash tests/update-check.sh`.
+Config key `auto_pull`, default **off**. Turn it on with `MITHRIL_AUTO_PULL=on` or the line `auto_pull=on` in `${XDG_CONFIG_HOME:-~/.config}/mithril/config`. When on, a clean checkout that is purely behind is fast-forwarded with `git merge --ff-only`; anything else (dirty, ahead, diverged) is only reported. It never merges, rebases or resets. Tests: `bash tests/update-check.sh`.
 
 ### Contributing
 
@@ -97,7 +86,6 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `Resources/Themes/` | 20 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer between the per-source summaries and the skills; each theme names its tensions and the checklist its skill encodes | — |
 | `CONSTITUTION.md` | Write-time prevention layer — the skills distilled into always-on imperative rules, a conflict-precedence order, numeric gate thresholds, and a Definition of Done. Loaded via a `CLAUDE.md` `@`-import. | — |
 | `hooks/pre-commit` | Opt-in git hook that runs the fast gates (lint + complexity) on staged files and blocks the commit on a breach. See `hooks/README.md`. | — |
-| `scripts/install-local.sh` | Local-checkout install without the plugin: symlinks each `skills/*.md` into `~/.claude/agents/mithril-*.md` links every skill (tutor included) as `~/.claude/skills/mithril-*`, removes the `mithril-*` links it owns whose skill was retired or renamed, and renders `/mithril` (it names `${CLAUDE_PLUGIN_ROOT}`, so it cannot be a symlink) into `~/.claude/commands/`. Idempotent; re-run after editing the command. `healthcheck.sh` warns when the installed copy drifts; `--strict` makes that, dangling links and stale `mithril-*` links exit non-zero (Grok is checked only when `~/.grok` exists). Tests: `bash tests/install-local.sh`. | — |
 | `scripts/test-cull.sh` | Report-only periodic test cull: ranks tests to cull or rewrite from mutation (Stryker report), refactor change-coupling, duplicate assertions, flaky and slow runs. Read-only on the target repo; records coverage and mutation baselines and `--compare`s a later run. Tests: `bash tests/test-cull.sh`. | — |
 | `playbooks/test-cull.md` | Short step list a small model follows to run the script, read the report, and list candidates to the owner. Never deletes. | — |
 | `playbooks/preflight.md` | Ten-question builder checklist, one line per review lens (necessity first), pointing at the skills and short ids instead of restating them. Repo conventions and linters win. | — |
@@ -128,38 +116,12 @@ This mirrors the lesson of [unclebob/swarm-forge](https://github.com/unclebob/sw
 
 | Path | Purpose |
 |------|---------|
-| `claude/commands/mithril.md` | The `/mithril [aspects]` command — routes to agents, aggregates findings. Loaded directly by the Claude Code and Grok plugins. |
+| `claude/commands/mithril.md` | The `/mithril [aspects]` command — routes to agents, aggregates findings. Loaded directly by the Claude Code plugin. |
 | `skills/*.md` | Canonical agent content, loaded directly by the plugin manifests. |
-| `skills/lite/*.md` | `mithril-lite-*` twins for personal-repo use (no patient-data policy lines). Not in the plugin manifests: install with `bash scripts/install-lite.sh`, which symlinks each into `~/.claude/agents/mithril-lite-<name>.md` (replacing plain copies). Tests: `bash tests/install-lite.sh`. `healthcheck.sh` checks they keep each full twin's execute, blast-radius, done-check and authoring-gate behavior and warns when an installed copy drifts. |
 
-### Multi-tool reach
+### Using the Constitution in other tools
 
-The **review framework** (`/mithril` — parallel agents, diff-routing, severity aggregation, tool-backed SAST/SCA) is first-class on **Claude Code and Grok Build** via their plugin systems. Copilot and Codex do not offer equivalent subagent orchestration, so they get the write-time Constitution only.
-
-The **write-time [Constitution](CONSTITUTION.md)** is plain markdown — point each tool at it the standard way for that tool:
-
-| Tool | Where to put it | `/mithril` review agents? |
-|------|-----------------|---------------------------|
-| **Claude Code** | `@import` it from `~/.claude/CLAUDE.md` or the repo's `CLAUDE.md` | ✅ full (via the plugin) |
-| **Grok Build** | point `~/.grok/AGENTS.md` (or the repo's) at it | ✅ full (via the plugin) |
-| **Codex** | point `~/.codex/AGENTS.md` at it, or inline it if Codex can't reference an external file | ❌ |
-| **Copilot** (VS Code / IntelliJ / github.com) | Copilot can't `@import` — inline the Constitution's content into your instructions file. See [`Copilot-Integration.md`](Copilot-Integration.md). | ❌ |
-| **Any other agentic tool** — Cursor, Continue, Windsurf, Cline, Aider, Zed, Gemini CLI, … | point the tool's project-instructions file at `CONSTITUTION.md` | ❌ |
-
-The lingua franca is the [**`AGENTS.md`**](https://agents.md) open standard: drop a repo-root `AGENTS.md` (or point it at `CONSTITUTION.md`) and Codex, Cursor, Zed, Gemini CLI, Jules, and a growing list of agents pick it up.
-
-| Tool | Where to put it |
-|------|-----------------|
-| **Cursor** | `.cursor/rules/*.mdc`, or a repo-root `AGENTS.md` |
-| **Continue** | a rule in `.continue/rules/` (or `rules:` in `config.yaml`) |
-| **Windsurf** | `.windsurf/rules/`, or `AGENTS.md` |
-| **Cline** | `.clinerules/` |
-| **Aider** | a conventions file referenced from `.aider.conf.yml`, or `AGENTS.md` |
-| **Zed / Gemini CLI** | `.rules` / `GEMINI.md`, both of which also honor `AGENTS.md` |
-
-Check the tool's current docs for the exact filename — these conventions move fast. Either way the principle holds: **one canonical `CONSTITUTION.md`, every tool pointed at it.**
-
-> **Company HIPAA lives *inline* in each tool's instructions** (Claude's `CLAUDE.md`; the self-contained file for Codex/Copilot) — never delegated to the imported Constitution — so the mandate survives even where `@import` doesn't resolve.
+The review framework (`/mithril`) runs on Claude Code. The write-time [Constitution](CONSTITUTION.md) is plain markdown: `@import` it from `~/.claude/CLAUDE.md` or a repo `CLAUDE.md`, or point any other tool's project-instructions file (or a repo-root [`AGENTS.md`](https://agents.md)) at it, inlining the content where the tool cannot reference an external file. Company policy such as HIPAA rules belongs inline in each tool's instructions, not in the imported Constitution.
 
 ---
 
@@ -684,7 +646,6 @@ cd ~/some-test-repo
 echo "// test comment" >> src/some-file.ts
 
 # Run the framework:
-# (in Claude Code or Grok session)
 /mithril
 ```
 
@@ -706,17 +667,16 @@ echo "// test comment" >> src/some-file.ts
 
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
-| `/mithril` not recognized | Plugin not installed or not enabled | `/plugin` (Claude Code) or `grok plugin enable mithril` (Grok) |
+| `/mithril` not recognized | Plugin not installed or not enabled | `/plugin` (Claude Code) |
 | Orchestrator asks for files instead of using diff | Not a git repo OR no changes | `git status` — confirm you're in a repo with uncommitted work |
 | Agent returns nothing useful | Diff is empty or trivial | Verify `git diff` shows substantive changes |
 | Agent times out | Diff too large | Run targeted aspect on subset: `/mithril code` on specific file |
 | Severity counts don't match findings | Some agent didn't tag severity inline | Check that agent file has the `[CRITICAL]/[IMPORTANT]/[MINOR]` tagging instruction |
 | An agent reports `PASS`, `High`, or another off-vocabulary word | That agent's output format drifted from the shared vocabulary | Every agent uses `[CRITICAL]/[IMPORTANT]/[MINOR]` and `SHIP IT / NEEDS WORK / SIGNIFICANT ISSUES`; `bash healthcheck.sh` asserts it |
-| Output is severity-grouped but I want category-grouped | Default is severity-grouped (orchestrator); per-agent reports are category-grouped | Run agents directly via `Task` (Claude) or `spawn_subagent` (Grok) for per-agent category view |
+| Output is severity-grouped but I want category-grouped | Default is severity-grouped (orchestrator); per-agent reports are category-grouped | Run agents directly via `Task` for per-agent category view |
 | Agents disagree about a finding | Expected — different lenses | Orchestrator preserves the most severe rating during deduplication |
-| Grok can't find `mithril-*` agents | Plugin not installed or disabled | `grok plugin install jackreichert/mithril --trust` then `grok plugin enable mithril` |
 
-If output is consistently broken, smoke-test a single agent directly via `Task` (Claude Code) or `spawn_subagent` (Grok) to isolate whether the bug is in the orchestrator or the agent.
+If output is consistently broken, smoke-test a single agent directly via `Task` to isolate whether the bug is in the orchestrator or the agent.
 
 ---
 

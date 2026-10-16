@@ -6,9 +6,6 @@
 # `auto_pull=on` in ${XDG_CONFIG_HOME:-~/.config}/mithril/config.
 # When on, a clean checkout that is purely behind is fast-forwarded with
 # `merge --ff-only`; anything else is only reported. Never rebases or resets.
-# After a successful pull it re-runs scripts/install-local.sh for each default home that
-# this checkout already installed, so the rendered command copy and the skill/agent
-# links match the new tree; a failed reinstall exits 1. It never installs anywhere new.
 set -u
 
 repo="${MITHRIL_REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
@@ -23,35 +20,6 @@ auto_pull_enabled() {
     [ -r "$cfg" ] && v="$(sed -n 's/^auto_pull=//p' "$cfg" | tail -1)"
   fi
   case "$v" in on | true | 1 | yes) return 0 ;; *) return 1 ;; esac
-}
-
-# The rendered command copy is not a link, and new skills need links, so after a pull
-# re-run the pulled tree's installer for each default home that already holds THIS
-# checkout's install (its command copy's router line names this exact root). Never a first install, and
-# never a home installed from another checkout or by hand. Custom --home installs
-# cannot be discovered; re-run scripts/install-local.sh --home DIR for those.
-reinstall_installed_homes() {
-  local root="$1" phys h installed refreshed=0 failed=0
-  phys="$(cd "$root" && pwd -P)"
-  for h in "${CLAUDE_HOME:-$HOME/.claude}" "${GROK_HOME:-$HOME/.grok}"; do
-    [ -f "$h/commands/mithril.md" ] || continue
-    # The router line is `bash "<root>/scripts/update-check.sh"`; compare roots exactly,
-    # physical to physical, so a copy or nested checkout whose path merely contains ours
-    # (or a symlinked path to ours) is told apart.
-    installed="$(sed -n 's|.*bash "\(.*\)/scripts/update-check\.sh".*|\1|p' "$h/commands/mithril.md" | head -1)"
-    if [ -z "$installed" ] || [ "$(cd "$installed" 2>/dev/null && pwd -P)" != "$phys" ]; then
-      continue
-    fi
-    if bash "$root/scripts/install-local.sh" --home "$h" >/dev/null; then
-      refreshed=$((refreshed + 1))
-    else
-      echo "mithril: reinstall into $h failed after the pull; its command copy and links may be stale (see the installer output above)" >&2
-      failed=1
-    fi
-  done
-  [ "$failed" -eq 0 ] || return 1
-  [ "$refreshed" -eq 0 ] || echo "mithril: reinstalled the command copy and links ($refreshed home(s))"
-  return 0
 }
 
 upstream="$(git -C "$repo" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null)" || exit 0
@@ -74,7 +42,6 @@ dirty="$(git -C "$repo" status --porcelain --untracked-files=no | wc -l | tr -d 
 if [ "$behind" -gt 0 ] && [ "$ahead" -eq 0 ] && [ "$dirty" -eq 0 ] && auto_pull_enabled; then
   if git -C "$repo" merge --ff-only --quiet "$upstream" >/dev/null 2>&1; then
     echo "mithril: fast-forwarded $behind commit(s) from $upstream"
-    reinstall_installed_homes "$repo" || exit 1
   else
     echo "mithril: $behind behind $upstream; fast-forward failed, update by hand"
   fi
