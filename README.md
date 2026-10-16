@@ -54,7 +54,7 @@ Then run `/mithril` from either tool in any git repo.
 
 On each `/mithril` run (except `tutor`) the router calls `scripts/update-check.sh`, which fetches the checkout's own upstream and prints one line only when something is off: behind, ahead, diverged, or dirty (tracked files). Current, not a git checkout (a plugin cache copy), or an offline fetch: silent.
 
-Config key `auto_pull`, default **off**. Turn it on with `MITHRIL_AUTO_PULL=on` or the line `auto_pull=on` in `${XDG_CONFIG_HOME:-~/.config}/mithril/config`. When on, a clean checkout that is purely behind is fast-forwarded with `git merge --ff-only`; anything else (dirty, ahead, diverged) is only reported. It never merges, rebases or resets. After a successful pull it re-runs `scripts/install-local.sh` so the rendered `/mithril` command copy and the skill and agent links match the new tree; a failed reinstall prints a message and exits 1. Auto-pull refreshes only the default homes (`${CLAUDE_HOME:-~/.claude}` and `${GROK_HOME:-~/.grok}`) whose `/mithril` command copy already names this checkout; it never installs into a new home, and an install made with a custom `--home` needs `scripts/install-local.sh --home DIR` by hand. Tests: `bash tests/update-check.sh`.
+Config key `auto_pull`, default **off**. Turn it on with `MITHRIL_AUTO_PULL=on` or the line `auto_pull=on` in `${XDG_CONFIG_HOME:-~/.config}/mithril/config`. When on, a clean checkout that is purely behind is fast-forwarded with `git merge --ff-only`; anything else (dirty, ahead, diverged) is only reported. It never merges, rebases or resets. Tests: `bash tests/update-check.sh`.
 
 ### Contributing
 
@@ -97,7 +97,6 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 | `Resources/Themes/` | 20 cross-source concept guides (Tier 1→5 curriculum) — the synthesis layer between the per-source summaries and the skills; each theme names its tensions and the checklist its skill encodes | — |
 | `CONSTITUTION.md` | Write-time prevention layer — the skills distilled into always-on imperative rules, a conflict-precedence order, numeric gate thresholds, and a Definition of Done. Loaded via a `CLAUDE.md` `@`-import. | — |
 | `hooks/pre-commit` | Opt-in git hook that runs the fast gates (lint + complexity) on staged files and blocks the commit on a breach. See `hooks/README.md`. | — |
-| `scripts/install-local.sh` | Local-checkout install without the plugin: symlinks each `skills/*.md` into `~/.claude/agents/mithril-*.md` links every skill (tutor included) as `~/.claude/skills/mithril-*`, removes the `mithril-*` links it owns whose skill was retired or renamed, and renders `/mithril` (it names `${CLAUDE_PLUGIN_ROOT}`, so it cannot be a symlink) into `~/.claude/commands/`. Idempotent; re-run after editing the command. `healthcheck.sh` warns when the installed copy drifts; `--strict` makes that, dangling links and stale `mithril-*` links exit non-zero (Grok is checked only when `~/.grok` exists). Tests: `bash tests/install-local.sh`. | — |
 | `scripts/test-cull.sh` | Report-only periodic test cull: ranks tests to cull or rewrite from mutation (Stryker report), refactor change-coupling, duplicate assertions, flaky and slow runs. Read-only on the target repo; records coverage and mutation baselines and `--compare`s a later run. Tests: `bash tests/test-cull.sh`. | — |
 | `playbooks/test-cull.md` | Short step list a small model follows to run the script, read the report, and list candidates to the owner. Never deletes. | — |
 | `playbooks/preflight.md` | Ten-question builder checklist, one line per review lens (necessity first), pointing at the skills and short ids instead of restating them. Repo conventions and linters win. | — |
@@ -130,7 +129,6 @@ This mirrors the lesson of [unclebob/swarm-forge](https://github.com/unclebob/sw
 |------|---------|
 | `claude/commands/mithril.md` | The `/mithril [aspects]` command — routes to agents, aggregates findings. Loaded directly by the Claude Code and Grok plugins. |
 | `skills/*.md` | Canonical agent content, loaded directly by the plugin manifests. |
-| `skills/lite/*.md` | `mithril-lite-*` twins for personal-repo use (no patient-data policy lines). Not in the plugin manifests: install with `bash scripts/install-lite.sh`, which symlinks each into `~/.claude/agents/mithril-lite-<name>.md` (replacing plain copies). Tests: `bash tests/install-lite.sh`. `healthcheck.sh` checks they keep each full twin's execute, blast-radius, done-check and authoring-gate behavior and warns when an installed copy drifts. |
 
 ### Multi-tool reach
 

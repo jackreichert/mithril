@@ -14,7 +14,7 @@
     ],
     "SubagentStop": [
       {
-        "matcher": "^(mithril:)?mithril-review$|^(mithril:)?mithril-lite-review$",
+        "matcher": "^(mithril:)?mithril-review$",
         "hooks": [
           {
             "type": "command",
