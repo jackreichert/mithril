@@ -42,8 +42,7 @@ Edit `claude/commands/mithril.md` directly. The plugin loads it live; no redeplo
 1. Add the canonical runtime `.md` under `skills/`, including agent frontmatter.
 2. Add `./skills/<name>.md` to both plugin manifests.
 3. Update `claude/commands/mithril.md` to route the new aspect.
-4. Update `README.md` (skills table) and `Copilot-Integration.md` (file layout).
-5. If a Copilot prompt is wanted, add `copilot/prompts/mithril-accessibility.prompt.md` mirroring an existing one.
+4. Update `README.md` (skills table).
 
 ## CI
 

@@ -48,7 +48,7 @@ grok plugin enable mithril
 
 Then run `/mithril` from either tool in any git repo.
 
-**GitHub Copilot, Codex, and other tools** don't have an equivalent plugin/subagent mechanism for the review agents, but the write-time [Constitution](CONSTITUTION.md) is plain markdown — point that tool's project-instructions file at `CONSTITUTION.md` (see [Multi-tool reach](#multi-tool-reach)). For Copilot specifically, see [`Copilot-Integration.md`](Copilot-Integration.md).
+**GitHub Copilot, Codex, and other tools** don't have an equivalent plugin/subagent mechanism for the review agents, but the write-time [Constitution](CONSTITUTION.md) is plain markdown — point that tool's project-instructions file at `CONSTITUTION.md` (see [Multi-tool reach](#multi-tool-reach)).
 
 ### Update check
 
@@ -143,7 +143,7 @@ The **write-time [Constitution](CONSTITUTION.md)** is plain markdown — point e
 | **Claude Code** | `@import` it from `~/.claude/CLAUDE.md` or the repo's `CLAUDE.md` | ✅ full (via the plugin) |
 | **Grok Build** | point `~/.grok/AGENTS.md` (or the repo's) at it | ✅ full (via the plugin) |
 | **Codex** | point `~/.codex/AGENTS.md` at it, or inline it if Codex can't reference an external file | ❌ |
-| **Copilot** (VS Code / IntelliJ / github.com) | Copilot can't `@import` — inline the Constitution's content into your instructions file. See [`Copilot-Integration.md`](Copilot-Integration.md). | ❌ |
+| **Copilot** (VS Code / IntelliJ / github.com) | Copilot can't `@import` — inline the Constitution's content into your instructions file. | ❌ |
 | **Any other agentic tool** — Cursor, Continue, Windsurf, Cline, Aider, Zed, Gemini CLI, … | point the tool's project-instructions file at `CONSTITUTION.md` | ❌ |
 
 The lingua franca is the [**`AGENTS.md`**](https://agents.md) open standard: drop a repo-root `AGENTS.md` (or point it at `CONSTITUTION.md`) and Codex, Cursor, Zed, Gemini CLI, Jules, and a growing list of agents pick it up.
