@@ -65,6 +65,7 @@ Skill text cites sources by these ids so long citations stay out of the prompts.
 | `MF-ND` | Fowler, Eradicating Non-Determinism in Tests | `Articles/Martin-Fowler/16-Eradicating-Non-Determinism-in-Tests.md` |
 | `SQLPE-5` | SQL Performance Explained, Ch 5 Clustering Data (covering indexes) | `Books/Performance-Reliability/30-SQL-Performance-Explained.md` |
 | `SQLPE-7` | SQL Performance Explained, Ch 7 Partial Results (paging) | `Books/Performance-Reliability/30-SQL-Performance-Explained.md` |
+| `OE-cost` | Observability Engineering, cost of telemetry (full-fidelity capture is not free; sample or aggregate deliberately) | `Books/Performance-Reliability/42-Observability-Engineering.md` |
 | `SKEET-UTC` | Jon Skeet, Storing UTC is not a silver bullet | `Articles/Jon-Skeet/01-Storing-UTC-Is-Not-a-Silver-Bullet.md` |
 | `BB-MCR` | Bacchelli and Bird, Expectations, Outcomes, and Challenges of Modern Code Review (ICSE 2013) | `Papers/05-Expectations-Outcomes-and-Challenges-of-Modern-Code-Review.md` |
 | `BB-ET3` | Bach and Bolton, Exploratory Testing 3.0 | `Articles/Bach-Bolton/01-Exploratory-Testing-3.0.md` |
