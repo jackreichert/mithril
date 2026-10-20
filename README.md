@@ -57,7 +57,7 @@ The framework keeps one canonical agent definition in `skills/`. See [`CONTRIBUT
 
 | File | Focus | Subagent type |
 |------|-------|---------------|
-| `skills/code-quality.md` | Size-as-prompt calibration, reuse and placement, supported packages (stdlib or an already-declared dependency before hand-rolling; vet added dependencies), sibling survey (open the shared-core or other-integration implementation and flag unstated divergence), names, errors, contracts, performance (load X → outcome Y), pattern misuse | `mithril-code-quality` |
+| `skills/code-quality.md` | Size-as-prompt calibration, reuse and placement (incl. a direct read that bypasses the resolver owning a config, flag or permission value), supported packages (stdlib or an already-declared dependency before hand-rolling; vet added dependencies), sibling survey (open the shared-core or other-integration implementation and flag unstated divergence), names, errors, contracts, performance (load X → outcome Y), pattern misuse | `mithril-code-quality` |
 | `skills/smells.md` | Runs on every source diff and project scan. Refactoring ch. 3 smell vocabulary, each with its catalog move; flagged only with a concrete maintenance consequence, never as proof of a defect | `mithril-smells` |
 | `skills/lint-fix.md` | Default in diff mode (`/mithril nofix` opts out; project and deep stay report-only). The only specialist with `Edit`: project linter autofix then hand-fix on changed files, never suppressing, committed separately | `mithril-lint-fix` |
 | `skills/architecture.md` | Sonnet. New modules and layer-crossing imports only. Dependency direction, cycles, public-contract evolution, timeouts at integration points | `mithril-architecture` |
