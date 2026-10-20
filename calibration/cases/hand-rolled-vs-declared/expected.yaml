@@ -14,7 +14,7 @@ defects:
 
   - id: near-duplicate-dependency
     agent: mithril-code-quality
-    file: requirements.txt
+    file: src/schedule.py   # marker at the import; the new dependency is also in requirements.txt
     severity_min: Important
     match: "(arrow|dateutil|duplicate|already declared|overlap)"
     note: arrow added for a single parse call; python-dateutil is already in the manifest

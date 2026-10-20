@@ -14,4 +14,4 @@ defects:
 
 false_positive_budget: 1
 clean_bait:
-  - src/sync/emr_beta.py::page_size=25 (stated reason: API cap)
+  - src/sync/emr_beta.py::BETA (page_size=25 override, stated reason: API cap)
