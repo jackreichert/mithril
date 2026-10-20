@@ -1,0 +1,17 @@
+# Golden case: sibling-divergence
+# One seeded silent divergence from the shared SyncSpec defaults and the sibling
+# integration. The page_size override carries a stated reason and is the
+# false-positive bait.
+
+case: sibling-divergence
+defects:
+  - id: silent-archive-divergence
+    agent: mithril-code-quality   # rule 9, sibling survey
+    file: src/sync/emr_beta.py
+    severity_min: Important
+    match: "(archive_missing|archiv|sibling|emr_alpha|core\\.py|diverg)"
+    note: beta turns archive_missing off with no stated reason although its feed is a full roster like alpha's; departed clinicians stay active
+
+false_positive_budget: 1
+clean_bait:
+  - src/sync/emr_beta.py::page_size=25 (stated reason: API cap)
