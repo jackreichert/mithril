@@ -48,6 +48,11 @@ Skill text cites sources by these ids so long citations stay out of the prompts.
 | `BSRS-5/8` | Building Secure and Reliable Systems, Ch 5 Least Privilege and Ch 8 Design for Resilience | `Books/Security/39-Building-Secure-and-Reliable-Systems.md` |
 | `PP-2` | The Pragmatic Programmer, Ch 2 A Pragmatic Approach (DRY) | `Books/Canon/03-The-Pragmatic-Programmer.md` |
 | `PP-4` | The Pragmatic Programmer, Ch 4 Pragmatic Paranoia (Crash Early) | `Books/Canon/03-The-Pragmatic-Programmer.md` |
+| `EJ-59` | Effective Java, Item 59 Know and use the libraries | `Books/Language-Specific/22-Effective-Java.md` |
+| `SWEG-21` | Software Engineering at Google, Ch 21 Dependency Management (diamond dependencies, semver limits) | `Books/Engineering-Culture-Process/18-Software-Engineering-at-Google.md` |
+| `SCS-DH` | Software Supply Chain Security, Dependency hygiene (provenance, new maintainers, pin and review lockfile diffs) | `Standards/08-Supply-Chain-Security.md` |
+| `APOSD-17` | A Philosophy of Software Design, Ch 17 Consistency | `Books/Canon/06-A-Philosophy-of-Software-Design.md` |
+| `REF-3` | Refactoring, Ch 3 Bad Smells (Alternative Classes with Different Interfaces, Duplicated Code, Shotgun Surgery) | `Books/Canon/05-Refactoring.md` |
 | `EIP-ch` | Enterprise Integration Patterns, channels, routing and endpoints (Invalid Message and Dead Letter Channel, Resequencer, Competing Consumers) | `Books/Domain-Systems-Design/38-Enterprise-Integration-Patterns.md` |
 | `DDIA-9` | Designing Data-Intensive Applications, Ch 9 Consistency and Consensus | `Books/Domain-Systems-Design/12-Designing-Data-Intensive-Applications.md` |
 | `DDIA-11` | Designing Data-Intensive Applications, Ch 11 Stream Processing | `Books/Domain-Systems-Design/12-Designing-Data-Intensive-Applications.md` |

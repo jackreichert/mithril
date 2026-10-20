@@ -121,6 +121,8 @@ require_in_agent mithril-delivery 'expand-contract' 'expand-contract deploy/roll
 require_in_agent mithril-code-quality 'Size is a prompt, not a finding' 'anti-dogma size calibration'
 require_in_agent mithril-code-quality 'independent reasons to change' 'class decomposition decision test'
 require_in_agent mithril-code-quality 'load X → outcome Y' 'performance failure-scenario format'
+require_in_agent mithril-code-quality 'Sibling survey' 'sibling-implementation comparison'
+require_in_agent mithril-code-quality 'Supported packages' 'stdlib/declared-dependency check and new-dependency vetting'
 require_in_agent mithril-architecture 'illegal states|one transaction = one aggregate' 'domain integrity / aggregates'
 require_in_agent mithril-architecture 'Hyrum|expand-contract' 'API contract evolution'
 require_in_agent mithril-architecture 'Class decomposition test|disjoint method/field clusters' 'class decomposition counterweight'

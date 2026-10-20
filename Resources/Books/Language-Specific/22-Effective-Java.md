@@ -56,7 +56,7 @@ focus: Idiomatic Java; principles transfer to all OO languages
 - Validate parameters. Make defensive copies. Design method signatures carefully. Avoid long parameter lists. Return types interfaces. Varargs judiciously. Empty collections over null. Optional return type sparingly. Document with Javadoc.
 
 ### Ch 9 — General Programming (items 57–68)
-- Minimize variable scope. for-each over for. Standard libraries. Avoid float/double for monetary. Primitives over boxed when possible. Strings sparingly. String concatenation perf. Interfaces over reflective access. Avoid native methods. Optimize *judiciously* (profile first). Naming conventions.
+- Minimize variable scope. for-each over for. Standard libraries (**Item 59**, "Know and use the libraries": use the standard library rather than re-implementing what it already offers). Avoid float/double for monetary. Primitives over boxed when possible. Strings sparingly. String concatenation perf. Interfaces over reflective access. Avoid native methods. Optimize *judiciously* (profile first). Naming conventions.
 
 ### Ch 10 — Exceptions (items 69–77)
 - Use exceptions only for exceptional. Checked for recoverable, runtime for programming errors. Avoid unnecessary checked. Standard exceptions. Throw exceptions appropriate to abstraction. Document all thrown. Include failure-capture info. Failure-atomic methods. Don't ignore exceptions.

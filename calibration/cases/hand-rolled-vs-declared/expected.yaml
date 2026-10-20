@@ -1,0 +1,25 @@
+# Golden case: hand-rolled-vs-declared
+# Two seeded supported-package defects: a hand-rolled retry loop although tenacity
+# is declared and used, and a new dependency that duplicates python-dateutil.
+# The trivial shift_label formatter is the false-positive bait.
+
+case: hand-rolled-vs-declared
+defects:
+  - id: hand-rolled-retry
+    agent: mithril-code-quality   # rule 10, supported packages
+    file: src/schedule.py
+    severity_min: Important
+    match: "(tenacity|retry|backoff)"
+    note: fetch_shifts re-implements the retry/backoff that tenacity (declared, used in fetch.py) provides
+
+  - id: near-duplicate-dependency
+    agent: mithril-code-quality
+    file: src/schedule.py   # marker at the import; the new dependency is also in requirements.txt
+    severity_min: Important
+    match: "(arrow|dateutil|duplicate|already declared|overlap)"
+    note: arrow added for a single parse call; python-dateutil is already in the manifest
+
+false_positive_budget: 1
+clean_bait:
+  - src/schedule.py::shift_label
+  - src/fetch.py::fetch_roster
